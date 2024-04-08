@@ -1,14 +1,9 @@
 import { FormikErrors, FormikTouched } from 'formik';
 import React, { useEffect, useState } from 'react';
-import { useServiceLocationStore } from '../../../../../../hooks/professional/ServiceLocationStore';
 import { Option } from '../../../../../../types/inputs';
-import { ReasonForConsultation } from '../../../../../../types/Patient';
-import api from '../../../../../../services/useAxios';
-import { useQuery } from '@tanstack/react-query';
 import CsLineIcons from '../../../../../../cs-line-icons/CsLineIcons';
 import { Form } from 'react-bootstrap';
 import { FormikValues } from '.';
-import StaticLoading from '../../../../../../components/loading/StaticLoading';
 import Select, { SingleValue } from 'react-select';
 import { PatternFormat } from 'react-number-format';
 import { useModalAddPatientStore } from '../../../hooks/ModalAddPatientStore';
@@ -16,14 +11,10 @@ import { useModalAddPatientStore } from '../../../hooks/ModalAddPatientStore';
 interface RequiredDataProps {
   formik: {
     handleChange: {
-      // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
       (e: React.ChangeEvent<any>): void;
-      // eslint-disable-next-line no-unused-vars
       <T_1 = string | React.ChangeEvent<unknown>>(field: T_1): T_1 extends React.ChangeEvent<unknown> ? void : (e: string | React.ChangeEvent<unknown>) => void;
     };
-    // eslint-disable-next-line no-unused-vars
     setFieldValue: (field: string, value: unknown, shouldValidate?: boolean) => Promise<FormikErrors<FormikValues>> | Promise<void>;
-    // eslint-disable-next-line no-unused-vars
     setValues: (values: React.SetStateAction<FormikValues>, shouldValidate?: boolean) => Promise<FormikErrors<FormikValues>> | Promise<void>;
     values: FormikValues;
     errors: FormikErrors<FormikValues>;
@@ -31,162 +22,120 @@ interface RequiredDataProps {
   };
 }
 
-export const genders = [
+export const patient_sex = [
   { value: '0', label: 'Feminino' },
   { value: '1', label: 'Masculino' },
-]
+];
 
 export default function RequiredData(props: RequiredDataProps) {
   const { handleChange, values, touched, errors, setFieldValue } = props.formik;
 
-  const { getServiceLocations } = useServiceLocationStore();
-
   const [selectSex, setSelectSex] = useState<Option>();
-  const [selectedLocal, setSelectedLocal] = useState<Option>();
-  const [selectedReasonForConsultation, setSelectedReasonForConsultation] = useState<Option>();
 
   const selectedPatient = useModalAddPatientStore((state) => state.selectedPatient);
 
-  const selectOnChangeLocal = (selectedOption: SingleValue<Option>) => {
-    if (selectedOption) {
-      setFieldValue('consultationLocation', selectedOption.value);
-      setSelectedLocal(selectedOption);
-    }
-  };
-  const selectOnChangeReasonForConsultation = (selectedOption: SingleValue<Option>) => {
-    if (selectedOption) {
-      setFieldValue('reasonForConsultation', selectedOption.value);
-      setSelectedReasonForConsultation(selectedOption);
-    }
-  };
-
   const selectOnChangeSex = (selectedOption: SingleValue<Option>) => {
     if (selectedOption) {
-      setFieldValue('gender', selectedOption.value);
+      setFieldValue('patient_sex', selectedOption.value);
       setSelectSex(selectedOption);
     }
   };
 
-  const getServiceLocations_ = async () => {
-    try {
-      const response = await getServiceLocations();
-
-      if (response === false) throw new Error('Error on get service locations');
-
-      return response;
-    } catch (error) {
-      console.error('Error on get service locations', error);
-      throw error;
-    }
-  };
-
-  const getReasonForConsultation_ = async () => {
-    try {
-      const { data } = await api.get<ReasonForConsultation[]>('/tipos-de-tratamento');
-
-      return data ?? false;
-    } catch (error) {
-      console.error('Error on get service locations', error);
-      throw error;
-    }
-  };
-
-  const resultLocals = useQuery({ queryKey: ['locals'], queryFn: getServiceLocations_ });
-  const resultReasons = useQuery({ queryKey: ['reasons-for-consultation'], queryFn: getReasonForConsultation_ });
-
-
   useEffect(() => {
-    if(resultLocals.data && resultLocals.data.length && selectedPatient?.consultationLocation) {
-      const local = resultLocals.data.find((local) => local.id === selectedPatient?.consultationLocation);
-      local && setSelectedLocal({ label: local.nome, value: local.id.toString() });
+    if (patient_sex && patient_sex.length && selectedPatient?.patient_sex != null) {
+      const sex = patient_sex.find((sex) => sex.value == String(selectedPatient?.patient_sex));
+      sex && setSelectSex(sex);
     }
-
-    if(resultReasons.data && resultReasons.data.length && selectedPatient?.reasonForConsultation) {
-      const reason = resultReasons.data.find((reason) => reason.descricao === selectedPatient?.reasonForConsultation);
-      reason && setSelectedReasonForConsultation({ label: reason.descricao, value: reason.descricao });
-    }
-
-    if(genders && genders.length && selectedPatient?.gender != null) {
-      const gender = genders.find((gender) => gender.value == String(selectedPatient?.gender));
-      gender && setSelectSex(gender);
-    }
-
-  }, [resultLocals.data, resultReasons.data, selectedPatient?.consultationLocation, selectedPatient?.gender, selectedPatient?.reasonForConsultation]);
+  }, [selectedPatient?.patient_sex]);
 
   return (
     <>
       <div className="mb-3 filled">
         <CsLineIcons icon="user" />
-        <Form.Control type="text" name="name" value={values.name} onChange={handleChange} placeholder="Nome completo" />
-        {errors.name && touched.name && <div className="error">{errors.name}</div>}
+        <Form.Control type="text" name="patient_full_name" value={values.patient_full_name} onChange={handleChange} placeholder="Nome completo" />
+        {errors.patient_full_name && touched.patient_full_name && <div className="error">{errors.patient_full_name}</div>}
       </div>
 
       <div className="mb-3 filled">
-        <CsLineIcons icon="email" />
-        <Form.Control type="text" name="email" value={values.email} onChange={handleChange} placeholder="Email" />
-        {errors.email && touched.email && <div className="error">{errors.email}</div>}
+        <CsLineIcons icon="user" />
+        <Form.Control type="text" name="patient_rg" value={values.patient_rg} onChange={handleChange} placeholder="RG" />
+        {errors.patient_rg && touched.patient_rg && <div className="error">{errors.patient_rg}</div>}
       </div>
 
-      {resultLocals.isLoading ? (
-        <StaticLoading />
-      ) : (
-        <div className="mb-3 filled">
-          <CsLineIcons icon="pin" />
-          <Select
-            classNamePrefix="react-select"
-            name="consultationLocation"
-            options={resultLocals.data?.map((local) => ({ value: local.id.toString(), label: local.nome } as Option))}
-            value={selectedLocal}
-            onChange={selectOnChangeLocal}
-            placeholder="Local de atendimento"
-          />
-          {errors.consultationLocation && touched.consultationLocation && <div className="error">{errors.consultationLocation}</div>}
-        </div>
-      )}
+      <div className="mb-3 filled">
+        <CsLineIcons icon="user" />
+        <Form.Control type="text" name="patient_rg_issuer" value={values.patient_rg_issuer} onChange={handleChange} placeholder="Emissor" />
+        {errors.patient_rg_issuer && touched.patient_rg_issuer && <div className="error">{errors.patient_rg_issuer}</div>}
+      </div>
 
-      {resultReasons.isLoading ? (
-        <StaticLoading />
-      ) : (
-        <div className="mb-3 filled">
-          <CsLineIcons icon="health" />
-          <Select
-            classNamePrefix="react-select"
-            name="reasonForConsultation"
-            options={resultReasons.data?.map((local) => ({ value: local.descricao, label: local.descricao } as Option))}
-            value={selectedReasonForConsultation}
-            onChange={selectOnChangeReasonForConsultation}
-            placeholder="Motivo da consulta"
-          />
-          {errors.reasonForConsultation && touched.reasonForConsultation && <div className="error">{errors.reasonForConsultation}</div>}
-        </div>
-      )}
+      <div className="mb-3 filled">
+        <CsLineIcons icon="user" />
+        <Form.Control type="text" name="patient_marital_status" value={values.patient_marital_status} onChange={handleChange} placeholder="Estado civil" />
+        {errors.patient_marital_status && touched.patient_marital_status && <div className="error">{errors.patient_marital_status}</div>}
+      </div>
+
+      <div className="mb-3 filled">
+        <CsLineIcons icon="user" />
+        <Form.Control
+          type="text"
+          name="patient_health_insurance"
+          value={values.patient_health_insurance}
+          onChange={handleChange}
+          placeholder="Plano de saude"
+        />
+        {errors.patient_health_insurance && touched.patient_health_insurance && <div className="error">{errors.patient_health_insurance}</div>}
+      </div>
+
+      <div className="mb-3 filled">
+        <CsLineIcons icon="user" />
+        <Form.Control
+          type="text"
+          name="patient_health_insurance_number"
+          value={values.patient_health_insurance_number}
+          onChange={handleChange}
+          placeholder="Nº plano de saude"
+        />
+        {errors.patient_health_insurance_number && touched.patient_health_insurance_number && (
+          <div className="error">{errors.patient_health_insurance_number}</div>
+        )}
+      </div>
+
+      <div className="mb-3 filled">
+        <CsLineIcons icon="user" />
+        <Form.Control
+          type="text"
+          name="patient_medical_record_number"
+          value={values.patient_medical_record_number}
+          onChange={handleChange}
+          placeholder="Nº prontuário"
+        />
+        {errors.patient_medical_record_number && touched.patient_medical_record_number && <div className="error">{errors.patient_medical_record_number}</div>}
+      </div>
+
+      <div className="mb-3 filled w-100">
+        <CsLineIcons icon="user" />
+        <Form.Control type="text" name="patient_reference" placeholder="Referência" value={values.patient_reference} onChange={handleChange} />
+        {errors.patient_reference && touched.patient_reference && <div className="error">{errors.patient_reference}</div>}
+      </div>
 
       <div className="mb-3 filled">
         <CsLineIcons icon="gender" />
-        <Select
-          classNamePrefix="react-select"
-          name="gender"
-          options={genders}
-          value={selectSex}
-          onChange={selectOnChangeSex}
-          placeholder="Sexo"
-        />
-        {errors.gender && touched.gender && <div className="error">{errors.gender}</div>}
+        <Select classNamePrefix="react-select" name="sex" options={patient_sex} value={selectSex} onChange={selectOnChangeSex} placeholder="Sexo" />
+        {errors.patient_sex && touched.patient_sex && <div className="error">{errors.patient_sex}</div>}
       </div>
 
       <div className="mb-3 filled">
         <CsLineIcons icon="calendar" />
         <PatternFormat
           className="form-control"
-          name="dateOfBirth"
+          name="patient_birth_date"
           format="##/##/####"
           mask="_"
           placeholder="DD/MM/YYYY"
-          allowemptyformatting="true"
-          value={values.dateOfBirth}
+          value={values.patient_birth_date}
           onChange={handleChange}
         />
-        {errors.dateOfBirth && touched.dateOfBirth && <div className="error">{errors.dateOfBirth}</div>}
+        {errors.patient_birth_date && touched.patient_birth_date && <div className="error">{errors.patient_birth_date}</div>}
       </div>
     </>
   );

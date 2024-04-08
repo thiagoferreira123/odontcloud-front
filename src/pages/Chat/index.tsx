@@ -10,7 +10,7 @@ import ChatView from './chat/ChatView.tsx';
 import ContactListItem from './contact/ContactListItem.tsx';
 import { chatSetSelectedChat, chatSetSelectedTab, selectChat } from './hooks/chatSlice.tsx';
 import { ChatState, InterfaceState, ThemeValues } from '../../types/Interface.tsx';
-import usePatients from '../../hooks/usePatients.ts';
+import usePatientStore from '../Dashboard/patients/hooks/PatientStore.ts';
 import { useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useAuth } from '../Auth/Login/hook/index.ts';
@@ -44,7 +44,7 @@ const ChatApp = () => {
   const chatService = useChat();
   const firestoreService = useFirebase();
 
-  const { getPatients } = usePatients();
+  const { getPatients } = usePatientStore();
   const { getNotifications } = useChatNotification();
   const changeSelectedTab = (tab: string) => {
     dispatch(chatSetSelectedTab(tab));

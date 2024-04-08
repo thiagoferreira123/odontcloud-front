@@ -19,7 +19,7 @@ import DatepickerTime from '../../../../views/interface/forms/controls/datepicke
 import { Option } from '../../../../types/inputs';
 import useScheduleStore from '../../hooks/ScheduleStore';
 import { EventType, Schedule } from '../../hooks/ScheduleStore/types';
-import usePatients from '../../../../hooks/usePatients';
+import usePatientStore from '../../../Dashboard/patientsPatientStore';
 import { AppException } from '../../../../helpers/ErrorHelpers';
 import { notify } from '../../../../components/toast/NotificationIcon';
 import useScheduleHistoryStore from '../../hooks/ScheduleHistoryStore';
@@ -126,7 +126,7 @@ const ModalAddEdit = () => {
   const { handleSelectScheduleToRemove } = useDeleteScheduleConfirmationModalStore();
   const { openModalDayOffModal, hideModal: hideModalModalDayOffModal } = useModalDayOffModalStore();
   const { addScheduleHistory } = useScheduleHistoryStore();
-  const { getPatients } = usePatients();
+  const { getPatients } = usePatientStore();
   const { hideModal } = useModalAddEditStore();
 
   const getPatients_ = async () => {

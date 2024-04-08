@@ -3,7 +3,7 @@ import { Form } from 'react-bootstrap';
 import { ActionMeta, SingleValue } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import { Option } from '../../../../types/inputs';
-import usePatients from '../../../../hooks/usePatients';
+import usePatientStore from '../../../Dashboard/patientsPatientStore';
 import { useQuery } from '@tanstack/react-query';
 
 type Props = {
@@ -12,7 +12,7 @@ type Props = {
 };
 
 const PacientSelect = ({ onChange, value }: Props) => {
-  const { getPatients } = usePatients();
+  const { getPatients } = usePatientStore();
 
   const getPatients_ = async () => {
     try {

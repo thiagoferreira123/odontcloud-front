@@ -13,19 +13,17 @@ import Dropzone, { IFileWithMeta, StatusValue, defaultClassNames } from 'react-d
 import DropzonePreview from '../../components/dropzone/DropzonePreview';
 
 interface FormikValues {
-  email: string;
-  nome_completo: string;
-  especialidades: string;
-  crn: string;
-  cpf: string;
-  telefone: string;
-  zipCode: string;
-  id_estado: string;
-  id_cidade: string;
-  bairro: string;
-  endereco: string;
-
-  image: string;
+  clinic_email: string;
+  clinic_full_name: string;
+  clinic_phone: string;
+  clinic_cnpj_or_cpf?: string;
+  clinic_zipcode?: string;
+  clinic_state?: string;
+  clinic_city?: string;
+  clinic_neighborhood?: string;
+  clinic_street?: string;
+  clinic_number?: string;
+  clinic_logo_link?: string;
 }
 
 const PersonalData = () => {
@@ -34,41 +32,34 @@ const PersonalData = () => {
   const user = useAuth((state) => state.user);
 
   const validationSchema = Yup.object().shape({
-    email: Yup.string().email('Insira um e-mail válido').required('O e-mail é obrigatório'),
-    nome_completo: Yup.string()
+    clinic_email: Yup.string().email('Insira um e-mail válido').required('O e-mail é obrigatório'),
+    clinic_full_name: Yup.string()
       .matches(/^[\p{L} ]+$/u, 'Insira um nome completo válido')
       .required('O nome completo é obrigatório'),
-    especialidades: Yup.string().required('A especialidade é obrigatória'),
-    crn: Yup.string()
-      .matches(/^[0-9]+$/, 'O CRN deve conter apenas números')
-      .required('O CRN é obrigatório'),
-    cpf: Yup.string()
+    clinic_cnpj_or_cpf: Yup.string()
       .matches(/^(\d{3}\.?\d{3}\.?\d{3}-?\d{2}|\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2})$/, 'Insira um CPF ou CNPJ válido')
       .required('O CPF ou CNPJ é obrigatório')
       .transform((value) => value && value.replace(/\D/g, '')),
-    telefone: Yup.string()
+    clinic_phone: Yup.string()
       .matches(/^\(?\d{2}\)?[\s-]?\d{4,5}[-\s]?\d{4}$/, 'Insira um número de telefone válido')
       .required('O telefone é obrigatório'),
-    zipCode: Yup.string().matches(/^\d{5}-\d{3}$/, 'Insira um CEP válido'),
-    id_estado: Yup.string().matches(/^[A-Za-z]{2}$/, 'Insira uma sigla de estado válida'),
-    id_cidade: Yup.string(),
-    bairro: Yup.string(),
-    endereco: Yup.string(),
+    clinic_zipcode: Yup.string().matches(/^\d{5}-\d{3}$/, 'Insira um CEP válido'),
+    clinic_state: Yup.string().matches(/^[A-Za-z]{2}$/, 'Insira uma sigla de estado válida'),
+    clinic_city: Yup.string(),
+    clinic_neighborhood: Yup.string(),
+    clinic_logo_link: Yup.string(),
+    clinic_number: Yup.number(),
   });
 
   const initialValues: FormikValues = {
-    email: '',
-    nome_completo: '',
-    especialidades: '',
-    crn: '',
-    cpf: '',
-    telefone: '',
-    zipCode: '',
-    id_estado: '',
-    id_cidade: '',
-    bairro: '',
-    endereco: '',
-    image: '',
+    clinic_email: '',
+    clinic_full_name: '',
+    clinic_cnpj_or_cpf: '',
+    clinic_phone: '',
+    clinic_zipcode: '',
+    clinic_state: '',
+    clinic_city: '',
+    clinic_neighborhood: '',
   };
 
   const { setUser } = useAuth();
@@ -77,7 +68,7 @@ const PersonalData = () => {
     try {
       setIsSaving(true);
 
-      const { data } = await api.put<User>('/profissional', values);
+      const { data } = await api.put<User>('/clinic/', values);
 
       setUser(data);
 
@@ -109,23 +100,23 @@ const PersonalData = () => {
 
   const handleCpfCnpjChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const maskedValue = applyCpfCnpjMask(event.target.value);
-    formik.setFieldValue('cpf', maskedValue);
+    formik.setFieldValue('clinic_cnpj_or_cpf', maskedValue);
   };
 
   const handleZipCodeChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const rawZipCode = event.target.value;
     const maskedZipCode = applyZipCodeMask(rawZipCode);
-    formik.setFieldValue('zipCode', maskedZipCode);
+    formik.setFieldValue('clinic_zipcode', maskedZipCode);
 
     if (maskedZipCode.length === 9) {
       try {
         const numericZipCode = maskedZipCode.replace('-', '');
         const response = await axios.get(`https://viacep.com.br/ws/${numericZipCode}/json/`);
-        const { uf, localidade, bairro, logradouro } = response.data;
+        const { uf, localidade, clinic_neighborhood, logradouro } = response.data;
 
-        formik.setFieldValue('id_estado', uf);
-        formik.setFieldValue('id_cidade', localidade);
-        formik.setFieldValue('bairro', bairro);
+        formik.setFieldValue('clinic_state', uf);
+        formik.setFieldValue('clinic_city', localidade);
+        formik.setFieldValue('clinic_neighborhood', clinic_neighborhood);
         formik.setFieldValue('endereco', logradouro);
       } catch (error) {
         console.error('Erro ao buscar CEP', error);
@@ -133,20 +124,20 @@ const PersonalData = () => {
     }
   };
 
-  const getUploadParams = () => ({ url: apiUrl + '/profissional/upload-image' });
+  const getUploadParams = () => ({ url: apiUrl + '/clinic/upload-logo' });
 
   const onChangeStatus = (file: IFileWithMeta, status: StatusValue) => {
     if (status === 'done') {
       if (!file?.xhr?.response) return console.error('Erro ao enviar imagem');
       if (!user) return console.error('Usuário não encontrado');
 
-      setFieldValue('image', file.xhr.response);
+      setFieldValue('clinic_logo_link', file.xhr.response);
     } else if (status === 'removed') {
       if (!file?.xhr?.response) return console.error('Erro ao enviar imagem');
       if (!user) return console.error('Usuário não encontrado');
 
-      api.delete('/profissional/upload-image', { data: { url: file.xhr.response } });
-      setUser({ ...user, image: '' });
+      api.delete('/clinic/upload-logo', { data: { url: file.xhr.response } });
+      setUser({ ...user, clinic_logo_link: '' });
     }
   };
 
@@ -154,18 +145,16 @@ const PersonalData = () => {
     if (!user) return;
 
     setValues({
-      email: user.email,
-      nome_completo: user.nome_completo,
-      especialidades: user.especialidades ?? '',
-      crn: user.crn ?? '',
-      cpf: user.cpf ?? '',
-      telefone: user.telefone ?? '',
-      zipCode: user.zipCode ?? '',
-      id_estado: user.id_estado ?? '',
-      id_cidade: user.id_cidade?.toString() ?? '',
-      bairro: user.bairro ?? '',
-      endereco: user.endereco ?? '',
-      image: user.image ?? '',
+      clinic_email: user.clinic_email,
+      clinic_full_name: user.clinic_full_name,
+      clinic_cnpj_or_cpf: user.clinic_cnpj_or_cpf ?? '',
+      clinic_phone: user.clinic_phone ?? '',
+      clinic_zipcode: user.clinic_zipcode ?? '',
+      clinic_state: user.clinic_state ?? '',
+      clinic_city: user.clinic_city?.toString() ?? '',
+      clinic_neighborhood: user.clinic_neighborhood ?? '',
+      clinic_logo_link: user.clinic_logo_link ?? '',
+      clinic_number: user.clinic_number?.toString() ?? '',
     });
   }, [setValues, user]);
 
@@ -189,37 +178,23 @@ const PersonalData = () => {
           </div>
 
           <div className="mb-3 top-label">
-            <Form.Control type="text" name="nome_completo" value={values.nome_completo} onChange={handleChange} />
+            <Form.Control type="text" name="clinic_full_name" value={values.clinic_full_name} onChange={handleChange} />
             <Form.Label>NOME COMPLETO</Form.Label>
-            {errors.nome_completo && touched.email && <div className="error">{errors.nome_completo}</div>}
+            {errors.clinic_full_name && touched.clinic_full_name && <div className="error">{errors.clinic_full_name}</div>}
           </div>
 
           <div className="mb-3 top-label">
-            <Form.Control type="text" name="email" value={values.email} onChange={handleChange} readOnly />
+            <Form.Control type="text" name="clinic_email" value={values.clinic_email} onChange={handleChange} readOnly />
             <Form.Label className='bg-transparent'>EMAIL</Form.Label>
-            {errors.email && touched.email && <div className="error">{errors.email}</div>}
-          </div>
-
-          <div className="mb-3 top-label">
-            <Form.Control type="text" name="especialidades" value={values.especialidades} onChange={handleChange} />
-            <Form.Label>ESPECIALIDADE</Form.Label>
-            {errors.especialidades && touched.especialidades && <div className="error">{errors.especialidades}</div>}
+            {errors.clinic_email && touched.clinic_email && <div className="error">{errors.clinic_email}</div>}
           </div>
 
           <div className="d-flex">
             <Col xl={6}>
-              <div className="mb-3 top-label d-flex me-2">
-                <Form.Control type="text" name="crn" value={values.crn} onChange={handleChange} />
-                <Form.Label>REGISTRO PROFISSIONAL</Form.Label>
-                {errors.crn && touched.crn && <div className="error">{errors.crn}</div>}
-              </div>
-            </Col>
-
-            <Col xl={6}>
               <div className="mb-3 top-label d-flex">
-                <Form.Control type="text" name="cpf" value={values.cpf} onChange={handleCpfCnpjChange} />
+                <Form.Control type="text" name="clinic_cnpj_or_cpf" value={values.clinic_cnpj_or_cpf} onChange={handleCpfCnpjChange} />
                 <Form.Label>CNPJ OU CPF</Form.Label>
-                {errors.cpf && touched.cpf && <div className="error">{errors.cpf}</div>}
+                {errors.clinic_cnpj_or_cpf && touched.clinic_cnpj_or_cpf && <div className="error">{errors.clinic_cnpj_or_cpf}</div>}
               </div>
             </Col>
           </div>
@@ -227,34 +202,34 @@ const PersonalData = () => {
           <div className="d-flex">
             <Col xl={6}>
               <div className="mb-3 top-label d-flex me-2">
-                <Form.Control type="text" name="telefone" value={values.telefone} onChange={handleChange} />
+                <Form.Control type="text" name="clinic_phone" value={values.clinic_phone} onChange={handleChange} />
                 <Form.Label>CONTATO</Form.Label>
-                {errors.telefone && touched.telefone && <div className="error">{errors.telefone}</div>}
+                {errors.clinic_phone && touched.clinic_phone && <div className="error">{errors.clinic_phone}</div>}
               </div>
             </Col>
 
             <Col xl={6}>
               <div className="mb-3 top-label d-flex">
-                <Form.Control type="text" name="zipCode" value={formik.values.zipCode} onChange={handleZipCodeChange} />
+                <Form.Control type="text" name="clinic_zipcode" value={formik.values.clinic_zipcode} onChange={handleZipCodeChange} />
                 <Form.Label>CEP</Form.Label>
-                {errors.zipCode && touched.zipCode && <div className="error">{errors.zipCode}</div>}
+                {errors.clinic_zipcode && touched.clinic_zipcode && <div className="error">{errors.clinic_zipcode}</div>}
               </div>
             </Col>
           </div>
           <div className="d-flex">
             <Col xl={6}>
               <div className="mb-3 top-label d-flex me-2">
-                <Form.Control type="text" name="id_estado" value={values.id_estado} onChange={handleChange} />
+                <Form.Control type="text" name="clinic_state" value={values.clinic_state} onChange={handleChange} />
                 <Form.Label>ESTADO</Form.Label>
-                {errors.id_estado && touched.id_estado && <div className="error">{errors.id_estado}</div>}
+                {errors.clinic_state && touched.clinic_state && <div className="error">{errors.clinic_state}</div>}
               </div>
             </Col>
 
             <Col xl={6}>
               <div className="mb-3 top-label d-flex">
-                <Form.Control type="text" name="id_cidade" value={values.id_cidade} onChange={handleChange} />
+                <Form.Control type="text" name="clinic_city" value={values.clinic_city} onChange={handleChange} />
                 <Form.Label>CIDADE</Form.Label>
-                {errors.id_cidade && touched.id_cidade && <div className="error">{errors.id_cidade}</div>}
+                {errors.clinic_city && touched.clinic_city && <div className="error">{errors.clinic_city}</div>}
               </div>
             </Col>
           </div>
@@ -262,17 +237,16 @@ const PersonalData = () => {
           <div className="d-flex">
             <Col xl={6}>
               <div className="mb-3 top-label d-flex me-2">
-                <Form.Control type="text" name="bairro" value={values.bairro} onChange={handleChange} />
+                <Form.Control type="text" name="clinic_neighborhood" value={values.clinic_neighborhood} onChange={handleChange} />
                 <Form.Label>BAIRRO</Form.Label>
-                {errors.bairro && touched.bairro && <div className="error">{errors.bairro}</div>}
+                {errors.clinic_neighborhood && touched.clinic_neighborhood && <div className="error">{errors.clinic_neighborhood}</div>}
               </div>
             </Col>
-
             <Col xl={6}>
-              <div className="mb-3 top-label d-flex">
-                <Form.Control type="text" name="endereco" value={values.endereco} onChange={handleChange} />
-                <Form.Label>ENDEREÇO</Form.Label>
-                {errors.endereco && touched.endereco && <div className="error">{errors.endereco}</div>}
+              <div className="mb-3 top-label d-flex me-2">
+                <Form.Control type="text" name="clinic_number" value={values.clinic_number} onChange={handleChange} />
+                <Form.Label>Nº</Form.Label>
+                {errors.clinic_number && touched.clinic_number && <div className="error">{errors.clinic_number}</div>}
               </div>
             </Col>
           </div>

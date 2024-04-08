@@ -16,7 +16,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AppException } from '../../../../helpers/ErrorHelpers';
 import { notify } from '../../../../components/toast/NotificationIcon';
 import { WaitingList } from '../../hooks/WaitingListStore/types';
-import usePatients from '../../../../hooks/usePatients';
+import usePatientStore from '../../../Dashboard/patientsPatientStore';
 import { HealthInsurance } from '../../hooks/HealthInsuranceStore/types';
 import { useModalWaitingListStore } from '../../hooks/modals/ModalWaitingListStore';
 import { useModalAddEditStore } from '../../hooks/modals/ModalAddEditStore';
@@ -78,7 +78,7 @@ const ModalWaitingList = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   const { getWaitingList, removeWaitingList, addWaitingList } = useWaitingListStore();
-  const { getPatients } = usePatients();
+  const { getPatients } = usePatientStore();
   const { hideModal } = useModalWaitingListStore();
   const { openModalAddEdit } = useModalAddEditStore();
 

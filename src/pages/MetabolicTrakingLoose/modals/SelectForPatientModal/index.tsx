@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { FixedSizeList } from 'react-window';
 import PatientRow from './PatientRow';
 import { useSelectTrackingForPatientModalStore } from '../../hooks/SelectTrackingForPatientModalStore';
-import usePatients from '../../../../hooks/usePatients';
+import usePatientStore from '../../../Dashboard/patientsPatientStore';
 import { Patient } from '../../../../types/Patient';
 import StaticLoading from '../../../../components/loading/StaticLoading';
 
@@ -14,7 +14,7 @@ const SelectTrackingForPatientModal = () => {
   const query = useSelectTrackingForPatientModalStore((state) => state.query);
 
   const { hideModal } = useSelectTrackingForPatientModalStore();
-  const { getPatients } = usePatients();
+  const { getPatients } = usePatientStore();
 
   const getPatients_ = async () => {
     try {

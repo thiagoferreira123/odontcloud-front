@@ -33,47 +33,23 @@ export type CreateAuthStore = {
   setUser: (user: User) => void;
 }
 
-export type User = Professional | Secretary;
-
-export interface Professional {
-  id: number;
-  email: string;
-  nome_completo: string;
-  image: string;
-  crn: string;
-  cpf: string;
-  endereco: string;
-  bairro: string;
-  ddi_pais: string;
-  ddi: string;
-  telefone: string;
-  abreviatura_tratamento: string;
-  admin: number;
-  free: null | number; // Presumindo que pode ser um número ou nulo
-  link_reset: string;
-  id_cidade: number;
-  id_estado: string;
-  imagem_assinatura: string;
-  token: null | string; // Presumindo que pode ser um string ou nulo
-  ativo: number;
-  url_base_assinatura: string;
-  data_cadastro: string; // Ou Date, se for manipular como objeto Date
-  token_app: string;
-  especialidades: string;
-  zipCode: string;
-  locationsService?: LocalAtendimento[];
-  subscriptionStatus?: SubscriptionStatus;
-  role?: Role;
-}
-
-export interface Secretary {
-  id: number;
-  nome: string;
-  email: string;
-  senha: string;
-  id_profissional: number;
-  id_local: number;
-  role?: Role;
+export interface User {
+  clinic_id: string;
+  clinic_email: string;
+  clinic_full_name: string;
+  clinic_password: string;
+  clinic_phone: string;
+  clinic_reset_password_token?: string;
+  clinic_reset_password_token_expires?: Date;
+  clinic_cnpj_or_cpf?: string;
+  clinic_zipcode?: string;
+  clinic_state?: string;
+  clinic_city?: string;
+  clinic_neighborhood?: string;
+  clinic_street?: string;
+  clinic_number?: number;
+  clinic_logo_link: string;
+  clinic_signature_link: string;
 }
 
 export enum Role {

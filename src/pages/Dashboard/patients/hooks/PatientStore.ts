@@ -1,41 +1,39 @@
 import { QueryClient } from "@tanstack/react-query";
-import { Patient, isPatient } from "../types/Patient";
-import api from "../services/useAxios";
+import { Patient } from "../../../../types/Patient";
+import api from "../../../../services/useAxios";
 import { create } from "zustand";
 import { AxiosError } from "axios";
-import { notify } from "../components/toast/NotificationIcon";
+import { notify } from "../../../../components/toast/NotificationIcon";
 
-type createPatients = {
+type PatientStore = {
   addPatient: (patient: Partial<Patient>, queryClient?: QueryClient) => Promise<boolean>;
-  updatePatient: (patient: Partial<Patient> & { id: number }, queryClient: QueryClient, ignoreNotify?: boolean) => Promise<boolean>;
-  removePatient: (patient: Patient & { id: number }, queryClient: QueryClient) => Promise<boolean>;
-  getPatients: () => Promise<(Patient & { id: number })[]>;
+  updatePatient: (patient: Partial<Patient> & { patient_id: string }, queryClient: QueryClient, ignoreNotify?: boolean) => Promise<boolean>;
+  removePatient: (patient: Patient & { patient_id: string }, queryClient: QueryClient) => Promise<boolean>;
+  getPatients: () => Promise<(Patient & { patient_id: string })[]>;
 };
 
-const usePatients = create<createPatients>(() => {
+const usePatientStore = create<PatientStore>(() => {
   return {
     patients: [],
 
     getPatients: async () => {
-      const { data } = await api.get<(Patient & { id: number })[]>('/clinic-patient/by-clinic')
+      const { data } = await api.get<(Patient & { patient_id: number })[]>('/clinic-patient/by-clinic')
 
       return data;
     },
 
     addPatient: async (payload, queryClient) => {
       try {
-        let newPatient: Patient & { id: number };
+        let newPatient: Patient & { patient_id: number };
 
         if(!payload.patient_id) {
-          const { data } = await api.post<Patient & { id: number }>('/clinic-patient', payload);
+          const { data } = await api.post<Patient & { patient_id: number }>('/clinic-patient', payload);
           newPatient = {...data, patient_full_name: data.patient_full_name || ''}; // Ensure name is not undefined
         } else {
-          newPatient = payload as Patient & { id: number };
+          newPatient = payload as Patient & { patient_id: number };
         }
 
-        if (!isPatient(newPatient)) throw new Error('Invalid patient');
-
-        const value: (Patient & { id: number, key: string }) = { ...newPatient, key: newPatient.id.toString() };
+        const value: (Patient & { patient_id: number, key: string }) = { ...newPatient, key: newPatient.patient_id };
 
         queryClient && queryClient.setQueryData(['my-patients'], (patients: Patient[]) => {
           return patients?.length ? [value, ...patients] : [value];
@@ -45,7 +43,6 @@ const usePatients = create<createPatients>(() => {
 
         return true;
       } catch (error) {
-        // console.log(error.response?.data.message);
         if (error instanceof AxiosError && error.response?.status === 400 && error.response?.data.message) {
           notify(error.response?.data.message, 'Erro', 'close', 'danger');
         } else {
@@ -57,9 +54,9 @@ const usePatients = create<createPatients>(() => {
       }
     },
 
-    removePatient: async (patient: Patient & { id: number }, queryClient) => {
+    removePatient: async (patient, queryClient) => {
       try {
-        const value: (Patient & { key: string }) = { ...patient, key: patient.id.toString() };
+        const value: (Patient & { key: string }) = { ...patient, key: patient.patient_id };
 
         queryClient.setQueryData(['my-patients'], (patients: Patient[]) => {
           const updatedExams = patients.filter((e) => e.patient_id !== patient.patient_id);
@@ -67,7 +64,7 @@ const usePatients = create<createPatients>(() => {
           return updatedExams?.length ? [...updatedExams] : [];
         });
 
-        await api.delete('/paciente/' + value.patient_id)
+        await api.delete('/clinic-patient/' + value.patient_id)
 
         return true;
       } catch (error) {
@@ -93,7 +90,7 @@ const usePatients = create<createPatients>(() => {
 
           return [...updatedExams];
         });
-        await api.patch('/paciente/' + payload.id, { ...payload })
+        await api.put('/clinic-patient/' + payload.patient_id, { ...payload })
 
         !ignoreNotify && notify('Paciente atualizado com sucesso', 'Sucesso', 'check', 'success');
 
@@ -113,4 +110,4 @@ const usePatients = create<createPatients>(() => {
   };
 });
 
-export default usePatients;
+export default usePatientStore;

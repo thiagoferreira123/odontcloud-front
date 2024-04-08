@@ -22,7 +22,7 @@ interface PatientsAnalysisStore {
   setYear: (year: string) => void;
 }
 
-export const usePatientsAnalysisStore = create<PatientsAnalysisStore>((set) => ({
+export const usePatientStoreAnalysisStore = create<PatientsAnalysisStore>((set) => ({
   year: new Date().getFullYear().toString(),
 
   getPatientsAnalysis: async (year) => {

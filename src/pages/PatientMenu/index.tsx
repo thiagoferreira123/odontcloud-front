@@ -24,9 +24,9 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { isTitle: true, text: 'Questionários' },
-  
-  // { to: 'plano-de-tratamento', text: 'Plano de tratamento', Icon: Icon.BookmarkHeart },
-  // { to: 'orcamento', text: 'Orçamento', Icon: Icon.CashCoin },
+
+  { to: 'plano-de-tratamento', text: 'Plano de tratamento', Icon: Icon.BookmarkHeart },
+  { to: 'orcamento', text: 'Orçamento', Icon: Icon.CashCoin },
   { to: 'formulario-pre-consulta', text: 'Formulário pré-consulta', Icon: Icon.Clipboard2Heart },
   { to: 'anamnese', text: 'Anamnese', Icon: Icon.ClipboardPlus },
   { to: 'recordatorio', text: 'Recordatório alimentar', Icon: Icon.ClockHistory },
@@ -71,7 +71,7 @@ const ProfileStandard = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    setPatientId(Number(id));
+    id && setPatientId(id);
   }, [id, setPatientId]);
 
   const title = 'Menu do paciente';
@@ -83,7 +83,7 @@ const ProfileStandard = () => {
     try {
       if (!id) throw new Error('Id não informado');
 
-      const response = await getPatient(+id, navigate);
+      const response = await getPatient(id, navigate);
       return response;
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status != 404) throw error;
@@ -117,12 +117,12 @@ const ProfileStandard = () => {
                 <div className="d-flex align-items-center flex-column mb-4">
                   <div className="d-flex align-items-center flex-column">
                     <div className="sw-13 position-relative mb-3">
-                      <img src={patient?.photoLink} className="img-fluid rounded-xl avatar" alt="thumb" />
+                      <img src={patient?.patient_photo} className="img-fluid rounded-xl avatar" alt="thumb" />
                     </div>
-                    <div className="h5 mb-0">{patient?.name ?? ''}</div>
-                    <div className="text-muted">
+                    <div className="h5 mb-0">{patient?.patient_full_name ?? ''}</div>
+                    {/* <div className="text-muted">
                       {patient?.reasonForConsultation ?? ''}, {patient?.age ?? ''} anos
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 

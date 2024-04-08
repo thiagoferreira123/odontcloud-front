@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import Select, { SingleValue } from 'react-select';
 import { getLastFourYears } from '../../../helpers/DateHelper';
 import { Option } from '../../../types/inputs';
-import { usePatientsAnalysisStore } from './hooks';
+import { usePatientStoreAnalysisStore } from './hooks';
 
 const SelectYear = () => {
-  const year = usePatientsAnalysisStore((state) => state.year);
+  const year = usePatientStoreAnalysisStore((state) => state.year);
   const [value, setValue] = useState<SingleValue<Option>>({ label: year.toString(), value: year.toString() });
 
-  const { setYear } = usePatientsAnalysisStore();
+  const { setYear } = usePatientStoreAnalysisStore();
 
   return (
     <Select

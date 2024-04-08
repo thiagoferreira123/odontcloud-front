@@ -3,20 +3,17 @@ import { Button, Card } from 'react-bootstrap';
 import * as Icon from 'react-bootstrap-icons';
 import ModalAddPatient from './modals/ModalAddPatient/index.tsx';
 import { useQuery } from '@tanstack/react-query';
-import usePatients from '../../../hooks/usePatients.ts';
+import usePatientStore from './hooks/PatientStore.ts';
 import { Patient } from '../../../types/Patient.ts';
 import { useModalAddPatientStore } from './hooks/ModalAddPatientStore.ts';
-import DeleteConfirm from './DeleteConfirm.tsx';
+import DeleteConfirm from './modals/DeleteConfirm.tsx';
 import { usePatientListFilterStore } from './hooks/PatientListFilterStore.ts';
 import { FixedSizeList } from 'react-window';
 import PatientRow from './PatientRow.tsx';
-import ModalReport from './modals/ModalReport.tsx';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { useAuth } from '../../Auth/Login/hook/index.ts';
 import ModalPremium from '../ModalPremium.tsx';
 import Empty from '../../../components/Empty.tsx';
-import PanelPatientModal from './modals/PanelPatientModal.tsx';
 
 // Componente Skeleton para simular um item da lista de pacientes
 const PatientItemSkeleton = () => {
@@ -32,62 +29,26 @@ const PatientItemSkeleton = () => {
   );
 };
 
-// Função para filtrar pacientes
-const filterPatient = (patients: (Patient & { id: number })[], query: string, category: string) => {
+const filterPatient = (patients: (Patient & { patient_id: string })[], query: string) => {
   return patients.filter((patient) => {
     let matchesQuery = true;
-    let matchesCategory = true;
 
-    // Filtra por nome do paciente se uma query foi fornecida
     if (query.length) {
       matchesQuery = patient.patient_full_name.toLowerCase().includes(query.toLowerCase());
     }
 
-    // Filtra por categoria
-    switch (category) {
-      // case 'Ativos':
-      //   matchesCategory = patient.patientActiveOrInactive === 1;
-      //   break;
-      // case 'Inativos':
-      //   matchesCategory = patient.patientActiveOrInactive === 0;
-      //   break;
-      // case 'Com pedências':
-      //   matchesCategory = patient.consultationCompletedOrPending === 'Pendente';
-      //   break;
-      // case 'Sem pedências':
-      //   matchesCategory = patient.consultationCompletedOrPending !== 'Pendente';
-      //   break;
-      // case 'Todos':
-      default:
-        // Não aplica filtro de categoria
-        matchesCategory = true;
-        break;
-    }
-
-    // Retorna true se o paciente corresponder tanto à query quanto à categoria
-    return matchesQuery && matchesCategory;
+    return matchesQuery;
   });
 };
 
 const ListPatient = () => {
   const { handleOpenModal } = useModalAddPatientStore();
   const query = usePatientListFilterStore((state) => state.query);
-  const category = usePatientListFilterStore((state) => state.category);
-  const [showModalReport, setShowModalReport] = useState(false);
   const [showModalPremium, setShowModalPremium] = useState(false);
 
-  // const user = useAuth((state) => state.user);
-
-  const { getPatients } = usePatients();
+  const { getPatients } = usePatientStore();
 
   const handleClickOpenModalAddPatient = async () => {
-    // if (!user?.subscriptionStatus?.status || user.subscriptionStatus.status !== 'approved') {
-    //   // return setShowModalPremium(true);
-    //   const { data } = await api.get('/paciente/search/');
-
-    //   if (data.statusCode === 900) return setShowModalPremium(true);
-    // }
-
     handleOpenModal();
   };
 
@@ -96,7 +57,7 @@ const ListPatient = () => {
     queryFn: getPatients,
   });
 
-  const filteredData = (result.data?.length && query.length) || category !== 'Todos' ? filterPatient(result.data ?? [], query, category) : result.data ?? [];
+  const filteredData = (result.data?.length && query.length) ? filterPatient(result.data ?? [], query) : result.data ?? [];
 
   return (
     <>
@@ -140,13 +101,8 @@ const ListPatient = () => {
               </>
             )}
           </div>
-          {/* <Button variant="primary" size="lg" className="btn-icon btn-icon-end mb-1 mt-3" onClick={() => setShowModalReport(true)}>
-              <span>Reportar</span> <CsLineIcons icon="cloud-upload" />
-            </Button> */}
         </Card.Body>
-        <ModalReport showModal={showModalReport} />
         <ModalPremium showModal={showModalPremium} setShowModal={setShowModalPremium} />
-        <PanelPatientModal />
       </Card>
 
       <ModalAddPatient />

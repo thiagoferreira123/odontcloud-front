@@ -35,7 +35,7 @@ const ModalAddPatient = () => {
       <Modal.Footer>
         {/* Em caso de sucesso, é carregado um toastfy dizendo "Paciente cadastrado com sucesso", o mesmo para erro*/}
         <AsyncButton isSaving={isSaving} loadingText="Cadastrando paciente..." type="button" className="mb-1 btn btn-primary" onClickHandler={handleUpdateForm}>
-          {selectedPatient && selectedPatient.id ? 'Atualizar' : 'Cadastrar'}
+          {selectedPatient && selectedPatient.patient_id ? 'Atualizar' : 'Cadastrar'}
         </AsyncButton>
       </Modal.Footer>
     </Modal>

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import CsLineIcons from '/src/cs-line-icons/CsLineIcons';
+import CsLineIcons from '../../cs-line-icons/CsLineIcons';
 import Dropzone, { IFileWithMeta, StatusValue, defaultClassNames } from 'react-dropzone-uploader';
 import 'react-dropzone-uploader/dist/styles.css';
-import DropzonePreview from '/src/components/dropzone/DropzonePreview';
+import DropzonePreview from '../../components/dropzone/DropzonePreview';
 import api, { apiUrl } from '../../services/useAxios';
 import { useAuth } from '../Auth/Login/hook';
 import AsyncButton from '../../components/AsyncButton';
@@ -14,7 +14,7 @@ const SignatureIimage = () => {
 
   const { setUser } = useAuth();
 
-  const getUploadParams = () => ({ url: apiUrl + '/profissional/upload-assinatura' });
+  const getUploadParams = () => ({ url: apiUrl + '/clinic/upload-signature' });
 
   const onChangeStatus = (file: IFileWithMeta, status: StatusValue) => {
     if (status === 'done') {
@@ -23,19 +23,14 @@ const SignatureIimage = () => {
 
       setUser({
         ...user,
-        url_base_assinatura: file.xhr.response
-          .split('/')
-          .slice(0, file.xhr.response.split('/').length - 1)
-          .join('/')
-          .replace('https://', ''),
-        imagem_assinatura: file.xhr.response.split('/').pop(),
+        clinic_signature_link: file.xhr.response,
       });
     } else if (status === 'removed') {
       if (!file?.xhr?.response) return console.error('Erro ao enviar imagem');
       if (!user) return console.error('Usuário não encontrado');
 
-      api.delete('/profissional/upload-assinatura', { data: { url: file.xhr.response } });
-      setUser({ ...user, url_base_assinatura: '', imagem_assinatura: '' });
+      api.delete('/clinic/upload-signature', { data: { url: file.xhr.response } });
+      setUser({ ...user, clinic_signature_link: '' });
     }
   };
 
@@ -43,7 +38,7 @@ const SignatureIimage = () => {
     try {
       setIsSaving(true);
 
-      await api.put('/profissional', { imagem_assinatura: user?.imagem_assinatura, url_base_assinatura: user?.url_base_assinatura });
+      await api.put('/clinic', { clinic_signature_link: user?.clinic_signature_link });
 
       setIsSaving(false);
     } catch (error) {

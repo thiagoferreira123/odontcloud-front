@@ -10,7 +10,7 @@ const NavLogo = () => {
 
   return (
     <div className="logo position-relative">
-      <Link to={user?.role === Role.PROFESSIONAL ? DEFAULT_PATHS.APP : `${appRoot}/calendar`}>
+      <Link to={DEFAULT_PATHS.APP}>
           <img src="/img/logo/logo-light.webp" alt="logo" />
       </Link>
     </div>

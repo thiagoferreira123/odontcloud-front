@@ -5,29 +5,40 @@ import * as Yup from 'yup';
 import RequiredData from './RequiredData.tsx';
 import OptionalValues from './OptionalValues.tsx';
 import Avatar from './Avatar.tsx';
-import usePatients from '../../../../../../hooks/usePatients.ts';
+import usePatientStore from '../../../hooks/PatientStore.ts';
 import { Patient } from '../../../../../../types/Patient.ts';
 import { useQueryClient } from '@tanstack/react-query';
 import { useModalAddPatientStore } from '../../../hooks/ModalAddPatientStore.ts';
-import { convertIsoToBrDate, parseBrDateToIso } from '../../../../../../helpers/DateHelper.ts';
+import { parseBrDateToIso, parseDateToIso } from '../../../../../../helpers/DateHelper.ts';
 
 export interface FormikValues {
-  email: string;
-  name: string;
-  consultationLocation: string;
-  reasonForConsultation: string;
-  gender: string;
-  dateOfBirth: string;
-  cep: string;
-  phone: string;
-
-  cpf: string;
-  state: string;
-  neighborhood: string;
-  street: string;
-  houseNumber: string;
-  observation: string;
-  photoLink: string;
+  patient_last_interaction: string;
+  patient_full_name: string;
+  patient_photo?: string;
+  patient_birth_date: string;
+  patient_cpf: string;
+  patient_rg?: string;
+  patient_rg_issuer?: string;
+  patient_sex: number;
+  patient_marital_status: string;
+  patient_health_insurance?: string;
+  patient_health_insurance_number?: string;
+  patient_medical_record_number?: string;
+  patient_reference?: string;
+  patient_phone?: string;
+  patient_email?: string;
+  patient_extra_contact_full_name?: string;
+  patient_extra_contact_cpf?: string;
+  patient_extra_contact_phone?: string;
+  patient_extra_contact_relationship: string;
+  patient_zip_code?: string;
+  patient_number?: string;
+  patient_street?: string;
+  patient_complement?: string;
+  patient_neighborhood?: string;
+  patient_city?: string;
+  patient_state?: string;
+  patient_observation?: string;
 }
 
 interface FormAddPatienteProps {
@@ -41,32 +52,42 @@ const FormAddPatiente = (props: FormAddPatienteProps, ref: React.Ref<unknown> | 
   }));
 
   const queryClient = useQueryClient();
-  const selectedPatient = useModalAddPatientStore((state) => state.selectedPatient);
+  const selectedPatient = useModalAddPatientStore((patient_state) => patient_state.selectedPatient);
 
   const validationSchema = Yup.object().shape({
-    email: Yup.string().required('Digite um e-mail valido. Se o paciente não possui, insira algo como: nome@dietsystem.com'),
-    name: Yup.string().required('Digite um nome valido.'),
-    dateOfBirth: Yup.string().typeError('A data deve estar no formato ##/##/####').nullable().required('Digite uma data de nascimento valida.'),
-    gender: Yup.string().required('Selecione um sexo valido'),
-    reasonForConsultation: Yup.string().required('Selecione um motivo de consulta valido'),
+    patient_email: Yup.string(),
+    patient_full_name: Yup.string().required('Digite um nome valido.'),
+    patient_birth_date: Yup.string().typeError('A data deve estar no formato ##/##/####').nullable().required('Digite uma data de nascimento valida.'),
+    patient_sex: Yup.string().required('Selecione um sexo valido'),
   });
 
   const initialValues: FormikValues = {
-    email: '',
-    name: '',
-    consultationLocation: '',
-    reasonForConsultation: '',
-    gender: '',
-    dateOfBirth: '',
-    cep: '',
-    cpf: '',
-    state: '',
-    phone: '',
-    neighborhood: '',
-    street: '',
-    houseNumber: '',
-    observation: '',
-    photoLink: '',
+    patient_last_interaction: '',
+    patient_full_name: '',
+    patient_photo: '',
+    patient_birth_date: '',
+    patient_cpf: '',
+    patient_rg: '',
+    patient_rg_issuer: '',
+    patient_sex: 0,
+    patient_marital_status: '',
+    patient_health_insurance: '',
+    patient_health_insurance_number: '',
+    patient_medical_record_number: '',
+    patient_reference: '',
+    patient_phone: '',
+    patient_email: '',
+    patient_extra_contact_full_name: '',
+    patient_extra_contact_cpf: '',
+    patient_extra_contact_phone: '',
+    patient_extra_contact_relationship: '',
+    patient_zip_code: '',
+    patient_number: '',
+    patient_street: '',
+    patient_complement: '',
+    patient_neighborhood: '',
+    patient_city: '',
+    patient_state: '',
   };
   const onSubmit = async (values: FormikValues) => {
     try {
@@ -74,35 +95,22 @@ const FormAddPatiente = (props: FormAddPatienteProps, ref: React.Ref<unknown> | 
 
       const payload: Partial<Patient> = {
         ...values,
-        gender: Number(values.gender),
-        consultationLocation: Number(values.consultationLocation),
-        dateOfBirth: parseBrDateToIso(values.dateOfBirth),
-        dateOfFirstConsultation: new Date(),
-        dateOfLastConsultation: new Date(),
-        patientActiveOrInactive: 1,
-        ddiCountry: '',
-        ddiCountryNumber: '',
-        city: '',
-        appPlansOnOrOff: 1,
-        appAnthropometryOnOrOff: 1,
-        appGoalsOnOrOff: 1,
-        appRecipesOnOrOff: 1,
-        appSuplementationOnOrOff: 1,
-        appDialyOnOrOff: 1,
-        inactivateAppDate: new Date(new Date().getFullYear() + 1, new Date().getMonth(), new Date().getDate()).toISOString(),
-        deviceToken: null,
+        patient_sex: Number(values.patient_sex),
+        patient_birth_date: parseBrDateToIso(values.patient_birth_date),
+        patient_register_date: parseDateToIso(new Date()),
+        patient_last_interaction: parseDateToIso(new Date()),
       };
 
-      if (selectedPatient && selectedPatient.id) {
-        payload.id = selectedPatient.id;
+      if (selectedPatient && selectedPatient.patient_id) {
+        payload.patient_id = selectedPatient.patient_id;
 
-        const response = await updatePatient(payload as Partial<Patient> & { id: number }, queryClient);
+        const response = await updatePatient(payload as Partial<Patient> & { patient_id: number }, queryClient);
 
-        if(!response) throw new Error('Erro ao atualizar paciente');
+        if (!response) throw new Error('Erro ao atualizar paciente');
       } else {
         const response = await addPatient(payload, queryClient);
 
-        if(!response) throw new Error('Erro ao cadastrar paciente');
+        if (!response) throw new Error('Erro ao cadastrar paciente');
       }
       props.setIsSaving(false);
       props.handleCloseModal();
@@ -114,29 +122,39 @@ const FormAddPatiente = (props: FormAddPatienteProps, ref: React.Ref<unknown> | 
 
   const formik = useFormik({ initialValues, validationSchema, onSubmit });
   const { handleSubmit, resetForm, setValues } = formik;
-  const { addPatient, updatePatient } = usePatients();
+  const { addPatient, updatePatient } = usePatientStore();
 
   useEffect(() => {
     if (!selectedPatient) return resetForm();
 
     const payload: FormikValues = {
-      email: selectedPatient.email,
-      name: selectedPatient.name,
-
-      consultationLocation: String(selectedPatient.consultationLocation),
-      reasonForConsultation: selectedPatient.reasonForConsultation,
-      gender: String(selectedPatient.gender),
-      phone: selectedPatient.phone ?? '',
-
-      dateOfBirth: convertIsoToBrDate(selectedPatient.dateOfBirth),
-      cep: String(selectedPatient.cep),
-      cpf: String(selectedPatient.cpf),
-      state: String(selectedPatient.state),
-      neighborhood: String(selectedPatient.neighborhood),
-      street: String(selectedPatient.street),
-      houseNumber: String(selectedPatient.houseNumber),
-      observation: String(selectedPatient.observation),
-      photoLink: selectedPatient.photoLink
+      patient_last_interaction: selectedPatient.patient_last_interaction ?? '',
+      patient_full_name: selectedPatient.patient_full_name ?? '',
+      patient_photo: selectedPatient.patient_photo ?? '',
+      patient_birth_date: selectedPatient.patient_birth_date ?? '',
+      patient_cpf: selectedPatient.patient_cpf ?? '',
+      patient_rg: selectedPatient.patient_rg ?? '',
+      patient_rg_issuer: selectedPatient.patient_rg_issuer ?? '',
+      patient_sex: selectedPatient.patient_sex ?? 0,
+      patient_marital_status: selectedPatient.patient_marital_status ?? '',
+      patient_health_insurance: selectedPatient.patient_health_insurance ?? '',
+      patient_health_insurance_number: selectedPatient.patient_health_insurance_number ?? '',
+      patient_medical_record_number: selectedPatient.patient_medical_record_number ?? '',
+      patient_reference: selectedPatient.patient_reference ?? '',
+      patient_phone: selectedPatient.patient_phone ?? '',
+      patient_email: selectedPatient.patient_email ?? '',
+      patient_extra_contact_full_name: selectedPatient.patient_extra_contact_full_name ?? '',
+      patient_extra_contact_cpf: selectedPatient.patient_extra_contact_cpf ?? '',
+      patient_extra_contact_phone: selectedPatient.patient_extra_contact_phone ?? '',
+      patient_extra_contact_relationship: selectedPatient.patient_extra_contact_relationship ?? '',
+      patient_zip_code: selectedPatient.patient_zip_code ?? '',
+      patient_number: selectedPatient.patient_number ?? '',
+      patient_street: selectedPatient.patient_street ?? '',
+      patient_complement: selectedPatient.patient_complement ?? '',
+      patient_neighborhood: selectedPatient.patient_neighborhood ?? '',
+      patient_city: selectedPatient.patient_city ?? '',
+      patient_state: selectedPatient.patient_state ?? '',
+      patient_observation: selectedPatient.patient_observation ?? '',
     };
 
     setValues(payload);

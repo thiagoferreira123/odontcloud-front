@@ -7,15 +7,15 @@ import { AxiosError } from 'axios';
 import { NavigateFunction } from 'react-router-dom';
 
 interface createPatientMenuStore {
-  patientId: number;
+  patient_id: string;
   patient: Patient | null;
   query: string;
 
   setQuery: (query: string) => void;
-  getPatient: (patientId: number, navigate: NavigateFunction) => Promise<Patient & { id: number } | false>;
-  setPatientId: (patientId: number) => void;
+  getPatient: (patient_id: string, navigate: NavigateFunction) => Promise<Patient & { patient_id: string } | false>;
+  setPatientId: (patient_id: string) => void;
   updatePatient: (patient: Partial<Patient>) => void;
-  persistUpdatePatient: (PatientData: Partial<Patient> & { id: number }, hideNotification?: boolean) => Promise<boolean>;
+  persistUpdatePatient: (PatientData: Partial<Patient> & { patient_id: string }, hideNotification?: boolean) => Promise<boolean>;
 }
 
 export function getAvatarByGender(gender: number) {
@@ -26,7 +26,7 @@ export function getAvatarByGender(gender: number) {
 }
 
 const usePatientMenuStore = create<createPatientMenuStore>((set) => ({
-  patientId: 0,
+  patient_id: '',
   patient: null,
   query: '',
 
@@ -35,13 +35,13 @@ const usePatientMenuStore = create<createPatientMenuStore>((set) => ({
       return { ...state, query };
     }),
 
-  getPatient: async (id, navigate) => {
+  getPatient: async (patient_id, navigate) => {
     try {
-      const { data } = await api.get<Patient & { id: number }>(`/paciente/${id}`);
+      const { data } = await api.get<Patient & { patient_id: string }>(`/clinic-patient/${patient_id}`);
 
-      data.age = calculateYearsDiffByDateISO(data.dateOfBirth);
+      // data.age = calculateYearsDiffByDateISO(data.dateOfBirth);
 
-      data.photoLink = data.photoLink ? data.photoLink : getAvatarByGender(data.gender);
+      // data.photoLink = data.photoLink ? data.photoLink : getAvatarByGender(data.gender);
 
       set((state) => {
         return { ...state, patient: data };
@@ -59,9 +59,9 @@ const usePatientMenuStore = create<createPatientMenuStore>((set) => ({
     }
   },
 
-  setPatientId: (patientId) =>
+  setPatientId: (patient_id) =>
     set((state) => {
-      return { patientId };
+      return { patient_id };
     }),
 
   updatePatient: (patient) =>
@@ -73,7 +73,7 @@ const usePatientMenuStore = create<createPatientMenuStore>((set) => ({
 
   persistUpdatePatient: async (PatientData, hideNotification) => {
     try {
-      await api.patch<Patient>(`/paciente/${PatientData.id}`, PatientData);
+      await api.patch<Patient>(`/clinic-patient/${PatientData.patient_id}`, PatientData);
 
       !hideNotification && notify('Paciente atualizado com sucesso', 'Sucesso', 'check', 'success');
 

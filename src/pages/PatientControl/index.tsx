@@ -11,7 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import Empty from '../../components/Empty';
 import StaticLoading from '../../components/loading/StaticLoading';
 import ModalAddPatient from '../Dashboard/patients/modals/ModalAddPatient';
-import DeleteConfirm from '../Dashboard/patients/DeleteConfirm';
+import DeleteConfirm from '../Dashboard/patients/modals/DeleteConfirm';
 import { useModalAddPatientStore } from '../Dashboard/patients/hooks/ModalAddPatientStore';
 import { useDeleteConfirmStore } from '../Dashboard/patients/hooks/DeleteConfirm';
 import { useAuth } from '../Auth/Login/hook';

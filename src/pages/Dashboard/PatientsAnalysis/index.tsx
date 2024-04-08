@@ -2,16 +2,16 @@ import React from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
 import * as Icon from 'react-bootstrap-icons';
 import ChartCustomLegendBar from './ChartPatientsAnalysis';
-import { usePatientsAnalysisStore } from './hooks';
+import { usePatientStoreAnalysisStore } from './hooks';
 import { useQuery } from '@tanstack/react-query';
 import StaticLoading from '../../../components/loading/StaticLoading';
 import SelectYear from './SelectYear';
 
 export default function PatientsAnalysis() {
 
-  const year = usePatientsAnalysisStore((state) => state.year);
+  const year = usePatientStoreAnalysisStore((state) => state.year);
 
-  const { getPatientsAnalysis } = usePatientsAnalysisStore();
+  const { getPatientsAnalysis } = usePatientStoreAnalysisStore();
 
   const getPatientsAnalysis_ = async () => {
     try {

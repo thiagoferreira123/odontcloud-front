@@ -36,17 +36,15 @@ const NavUserMenuContent = (props: NavUserMenuContentProps) => {
   return (
     <div>
       <Row className="mb-3 ms-0 me-0">
-        {user?.role === Role.PROFESSIONAL ? (
-          <Col xs="12" className="pe-1 ps-1 mb-2">
-            <ul className="list-unstyled">
-              <li>
-                <Link to={'/app/meus-dados'}>
-                  <CsLineIcons icon="gear" className="me-2" size={17} /> <span className="align-middle">Meus dados</span>
-                </Link>
-              </li>
-            </ul>
-          </Col>
-        ) : null}
+        <Col xs="12" className="pe-1 ps-1 mb-2">
+          <ul className="list-unstyled">
+            <li>
+              <Link to={'/app/meus-dados'}>
+                <CsLineIcons icon="gear" className="me-2" size={17} /> <span className="align-middle">Meus dados</span>
+              </Link>
+            </li>
+          </ul>
+        </Col>
         {/* <Col xs="12" className="pe-1 ps-1 mb-2">
         <ul className="list-unstyled">
           <li>
@@ -101,8 +99,8 @@ const NavUserMenuDropdownToggle = React.memo(
         onClick(e);
       }}
     >
-      <img className="profile" alt={user.nome_completo} src={user?.image ? user?.image : '/img/profile/profile-11.webp'} />
-      <div className="name">{user.nome_completo}</div>
+      <img className="profile" alt={user.clinic_full_name} src={user?.clinic_logo_link ? user?.clinic_logo_link : '/img/profile/profile-11.webp'} />
+      <div className="name">{user.clinic_full_name}</div>
     </a>
   ))
 );

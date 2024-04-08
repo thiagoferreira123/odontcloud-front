@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, Row } from 'react-bootstrap';
 import { useCollectFormFilesModalStore } from '../../Hooks/modals/CollectFormFilesModalStore';
 import SearchInput from './SearchInput';
-import usePatients from '../../../../hooks/usePatients';
+import usePatientStore from '../../../Dashboard/patientsPatientStore';
 import { useQuery } from '@tanstack/react-query';
 import { Patient } from '../../../../types/Patient';
 import StaticLoading from '../../../../components/loading/StaticLoading';
@@ -14,7 +14,7 @@ const CollectFormFilesModal = () => {
   const query = useCollectFormFilesModalStore((state) => state.query);
 
   const { hideModal } = useCollectFormFilesModalStore();
-  const { getPatients } = usePatients();
+  const { getPatients } = usePatientStore();
 
   const getPatients_ = async () => {
     try {
