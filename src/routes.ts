@@ -70,6 +70,7 @@ const pages = {
   ManipulatedFormulas: lazy(() => import('./pages/ManipulatedFormulas')),
   MetabolicTracking: lazy(() => import('./pages/MetabolicTracking')),
   SignSymptom: lazy(() => import('./pages/SignSymptom')),
+  CarePlan: lazy(() => import('./pages/CarePlan')),
 };
 
 const patientMenu = {
@@ -144,12 +145,6 @@ const routesAndMenuItems: RoutesAndMenuItems = {
       roles: [],
     },
     {
-      path: `${appRoot}/calendar`,
-      component: ferramentas.calendar,
-      hideInMenu: true,
-      roles: [],
-    },
-    {
       path: `${appRoot}/menu-paciente/:id`,
       label: 'menu-paciente',
       component: patientMenu.index,
@@ -185,6 +180,12 @@ const routesAndMenuItems: RoutesAndMenuItems = {
         { path: '/plano-de-tratamento', component: patientMenu.CarePlan },
         { path: '/orcamento', component: patientMenu.Budget },
       ],
+    },
+    {
+      path: `${appRoot}/plano-de-tratamento/:id`,
+      component: pages.CarePlan,
+      hideInMenu: true,
+      roles: [],
     },
     {
       path: `${appRoot}/plano-alimentar-classico/:id`,

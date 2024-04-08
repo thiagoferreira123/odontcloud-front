@@ -26,12 +26,12 @@ export interface Procedure {
   procedures: Tooth[];
 }
 
-export type CarePlanActions = {
-  addCarePlan: (careplanDetailData: Partial<CarePlan>, queryClient: QueryClient) => Promise<CarePlan | false>;
-  updateCarePlan: (careplanDetailData: CarePlan, queryClient: QueryClient) => Promise<boolean>;
-  removeCarePlan: (careplan: CarePlan, queryClient: QueryClient) => Promise<boolean>;
+export type ToothActions = {
+  addTooth: (toothDetailData: Partial<Tooth>, queryClient: QueryClient) => Promise<Tooth | false>;
+  updateTooth: (toothDetailData: Tooth, queryClient: QueryClient) => Promise<boolean>;
+  removeTooth: (tooth_id: Tooth, queryClient: QueryClient) => Promise<boolean>;
 };
 
-export type CarePlanStore = {
-  getCarePlan: (care_plan_patient_id: number) => Promise<CarePlan[] | false>;
-} & CarePlanActions;
+export type ToothStore = {
+  getTooth: (tooth_id: number) => Promise<Tooth[] | false>;
+} & ToothActions;

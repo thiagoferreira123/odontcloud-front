@@ -1,13 +1,13 @@
 import api from "../../../../../services/useAxios";
-import { CarePlan, CarePlanActions } from "./types"; 
+import { CarePlan, CarePlanActions } from "./types";
 import { notify } from "../../../../../components/toast/NotificationIcon";
 
 const useCarePlanActions = (): CarePlanActions => ({
-  addCarePlan: async (careplanDetailData, queryClient) => {
+  addCarePlan: async (payload, queryClient) => {
     try {
-      const { data } = await api.post<CarePlan>('/care-plan/', careplanDetailData); 
+      const { data } = await api.post<CarePlan>('/care-plan/', payload);
 
-      queryClient.setQueryData<CarePlan[]>(['careplans', careplanDetailData.care_plan_id], (oldData) => [...(oldData || []), data]);
+      queryClient.setQueryData<CarePlan[]>(['careplans', payload.care_plan_patient_id], (oldData) => [...(oldData || []), data]);
 
       notify('Plano de atendimento criado com sucesso', 'Sucesso', 'check', 'success');
 
@@ -19,11 +19,11 @@ const useCarePlanActions = (): CarePlanActions => ({
     }
   },
 
-  updateCarePlan: async (careplanDetailData, queryClient) => {
+  updateCarePlan: async (payload, queryClient) => {
     try {
-      const { data } = await api.patch<CarePlan>(`/care-plan/${careplanDetailData.care_plan_id}`, careplanDetailData);
+      const { data } = await api.patch<CarePlan>(`/care-plan/${payload.care_plan_id}`, payload);
 
-      queryClient.setQueryData<CarePlan[]>(['careplans', careplanDetailData.care_plan_id], (oldData) =>
+      queryClient.setQueryData<CarePlan[]>(['careplans', payload.care_plan_patient_id], (oldData) =>
         oldData ? oldData.map(detail => detail.care_plan_id === data.care_plan_id ? data : detail) : []
       );
 
@@ -39,9 +39,9 @@ const useCarePlanActions = (): CarePlanActions => ({
 
   removeCarePlan: async (careplan, queryClient) => {
     try {
-      await api.delete(`/care-plan/${careplan.care_plan_id}`); 
+      await api.delete(`/care-plan/${careplan.care_plan_id}`);
 
-      queryClient.setQueryData<CarePlan[]>(['careplans', careplan.care_plan_id], (oldData) =>
+      queryClient.setQueryData<CarePlan[]>(['careplans', careplan.care_plan_patient_id], (oldData) =>
         oldData ? oldData.filter(detail => detail.care_plan_id !== careplan.care_plan_id) : []
       );
 

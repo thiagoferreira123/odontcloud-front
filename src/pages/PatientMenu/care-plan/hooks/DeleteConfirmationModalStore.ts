@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { CarePlanDetails } from "./CarePlanDetailsStore/types";
+import { CarePlanDetails } from "./CarePlanStore/types";
 
 interface DeleteConfirmationModalStore {
   showModal: boolean;

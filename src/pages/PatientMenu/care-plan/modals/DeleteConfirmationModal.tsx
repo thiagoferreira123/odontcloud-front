@@ -5,7 +5,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useQueryClient } from '@tanstack/react-query';
 import { useDeleteConfirmationModalStore } from '../hooks/DeleteConfirmationModalStore';
-import useCarePlanDetailsStore from '../hooks/CarePlanDetailsStore';
+import useCarePlanDetailsStore from '../hooks/CarePlanStore';
 
 const DeleteConfirmationModal = () => {
   const showModal = useDeleteConfirmationModalStore((state) => state.showModal);
@@ -32,7 +32,7 @@ const DeleteConfirmationModal = () => {
 
       const response = await removeCarePlan(selectedCarePlan, queryClient);
 
-      if (response === false) throw new Error('Erro ao remover atestado');
+      if (response === false) throw new Error('Erro ao remover plano de tratamento');
 
       resetForm();
       setIsLoading(false);
@@ -53,7 +53,7 @@ const DeleteConfirmationModal = () => {
         <Modal.Title>Confirmação de exclusão</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        Você realmente deseja excluir o atestado? Se sim, digite 'excluir'. Atenção: esta ação é irreversível.
+        Você realmente deseja excluir o plano de tratamento? Se sim, digite 'excluir'. Atenção: esta ação é irreversível.
         <Form onSubmit={handleSubmit} className="tooltip-end-top">
           <div className="filled mt-4">
             <CsLineIcons icon="bin" />
