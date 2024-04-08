@@ -32,7 +32,7 @@ const ModalFormSelectTemplate = ({ showModal, setShowModal }: Props) => {
               id="tbg-radio-4"
               variant="outline-secondary"
             >
-              Modelos do DietSystem
+              Modelos do OdontCloud
             </ToggleButton>
           </ToggleButtonGroup>
         </div>

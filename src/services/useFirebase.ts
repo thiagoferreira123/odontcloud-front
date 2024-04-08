@@ -48,13 +48,13 @@ export interface Message {
   date?: FieldValue | FieldValueTimestamp;
 }
 
-const FIRESTORE_ROOT_COLLECTION = "dietsystem-chat";
+const FIRESTORE_ROOT_COLLECTION = "OdontCloud-chat";
 const FIRESTORE_MESSAGE_COLLECTION = "messages";
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBr7Hs2VzW69_QqJSV4-8EbN5QhmV8sxsY',
-  authDomain: 'dietsystem-24735.firebaseapp.com',
-  projectId: 'dietsystem-24735',
+  authDomain: 'OdontCloud-24735.firebaseapp.com',
+  projectId: 'OdontCloud-24735',
   // storageBucket: 'dt-chat-68bac.appspot.com',
   // messagingSenderId: '263281938524',
   // appId: '1:263281938524:web:29d77a60d601967daf9699',

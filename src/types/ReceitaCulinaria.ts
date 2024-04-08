@@ -63,7 +63,7 @@ export type RecipeCategory = {
   id_profissional: number;
 }
 
-export type RecipeDietSystemModoDePreparo = {
+export type RecipeOdontCloudModoDePreparo = {
   id: number;
   passo_descricao: string;
   passo_numero: number;

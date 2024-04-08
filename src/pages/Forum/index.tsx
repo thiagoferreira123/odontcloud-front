@@ -54,7 +54,7 @@ export default function Forum() {
             <div className="border-bottom mb-2 pb-2 text-center">
               <div>
                 <p>
-                  O Fórum de Discussões é uma funcionalidade projetada para permitir que nutricionistas compartilhem e debatam estudos de casos, pesquisas e
+                  O Fórum de Discussões é uma funcionalidade projetada para permitir que  Cirurgiões-Dentistas compartilhem e debatam estudos de casos, pesquisas e
                   experiências profissionais em um ambiente colaborativo. Este espaço é dedicado a enriquecer o conhecimento coletivo, promovendo a troca de
                   informações e estratégias inovadoras no campo da nutrição. Os usuários podem criar novos tópicos de discussão, responder a perguntas
                   existentes e participar de debates para explorar diversas perspectivas sobre assuntos relevantes ao exercício da nutrição.

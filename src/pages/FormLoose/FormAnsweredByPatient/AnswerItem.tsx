@@ -100,7 +100,7 @@ const AnswerItem = ({ answer }: Props) => {
           <OverlayTrigger
             placement="top"
             overlay={
-              <Tooltip id="tooltip-collect">Colete os arquivos formulário para a pasta do paciente, de um paciente já cadastrado no DietSystem.</Tooltip>
+              <Tooltip id="tooltip-collect">Colete os arquivos formulário para a pasta do paciente, de um paciente já cadastrado no OdontCloud.</Tooltip>
             }
           >
             <Button

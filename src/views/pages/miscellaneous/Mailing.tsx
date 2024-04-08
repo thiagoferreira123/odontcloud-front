@@ -54,10 +54,10 @@ const MiscellaneousMailing = () => {
                       O status da sua assinatura é: <span class="badge bg-danger">Cancelada</span>
                       </p>
                       <p>
-                      Sua assinatura expirou e estamos sentindo sua falta. Renove agora para desbloquear novamente todos os benefícios e continuar aproveitando o DietSystem sem limites.
+                      Sua assinatura expirou e estamos sentindo sua falta. Renove agora para desbloquear novamente todos os benefícios e continuar aproveitando o OdontCloud sem limites.
                       </p>
                       <p>
-                      Para manter seu acesso às funcionalidades do DietSystem, por favor, atualize sua assinatura clicando no botão abaixo.
+                      Para manter seu acesso às funcionalidades do OdontCloud, por favor, atualize sua assinatura clicando no botão abaixo.
                       </p>
                       <p style="text-align: center;">
                       <a href="https://purchase.hotmart.com/" target="_blank" class="mb-1 btn btn-primary" role="button">Regularizar</a>
@@ -68,14 +68,14 @@ const MiscellaneousMailing = () => {
                       <ol>
                           <li><p>Digite o e-mail utilizado na compra. </p></li>
                           <li><p>Digite sua senha (se esqueceu, selecione "esqueci minha senha").</p></li>
-                          <li><p>Acesse suas compras e selecione o DietSystem.</p></li>
+                          <li><p>Acesse suas compras e selecione o OdontCloud.</p></li>
                           <li><p>Verifique suas faturas pendentes e realize o pagamento.</p></li>
                       </ol>
 
                       <p>
                       <p>Tutorial completo: <a href="https://help.hotmart.com/pt-br/article/como-gerir-os-meus-pagamentos-pela-area-do-comprador-da-plataforma-beta-/19424127593741" target="_blank">Como emitir um novo boleto para uma assinatura atrasada</a>.</p>
                       </p>
-                      <p>Se tiver dúvidas, consulte nossa <a href="https://dietsystem.com.br/politica-de-pagamentos" target="_blank">política de pagamentos</a>.</p>
+                      <p>Se tiver dúvidas, consulte nossa <a href="https://OdontCloud.com.br/politica-de-pagamentos" target="_blank">política de pagamentos</a>.</p>
                     </div>
                   </td>
                 </tr>

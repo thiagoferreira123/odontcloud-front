@@ -81,7 +81,7 @@ export default function FrontPane({ photos }: FrontPaneProps) {
         ...values,
         date: parseBrDateToIso(values.date),
         patient_id: +id,
-        host: 'dietsystem-images.s3.us-east-2.amazonaws.com',
+        host: 'OdontCloud-images.s3.us-east-2.amazonaws.com',
         folder: 'fotos-avaliacao-fisca',
         section: 'TRES' as SectionType,
       };

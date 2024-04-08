@@ -69,7 +69,7 @@ export default function MyAttachments() {
       <Card>
         <Card.Body>
           <Alert className="p-3">
-            Cadastre no DietSystem materiais que são rotineiramente empregados durante suas consultas, tornando-os acessíveis a todos os seus pacientes. Esses
+            Cadastre no OdontCloud materiais que são rotineiramente empregados durante suas consultas, tornando-os acessíveis a todos os seus pacientes. Esses
             materiais podem abranger diversos formatos, como PDFs, imagens, documentos de texto e até mesmo hiperlinks. Acesse o menu do paciente para
             disponibilizá-los.
           </Alert>

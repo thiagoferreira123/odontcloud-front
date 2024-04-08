@@ -24,7 +24,7 @@ export interface ChatNotification {
 }
 
 export const useChatNotification = create<ChatNotificationState>(() => {
-  const url = "https://push.dietsystem.com.br/chat_push";
+  const url = "https://push.OdontCloud.com.br/chat_push";
 
   const prepareMessage = (message: Message) => {
     if (!message.content) return false;

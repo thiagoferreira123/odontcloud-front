@@ -85,7 +85,7 @@ const Register = () => {
           <img src="/img/logo/logo.webp" className="img-fluid rounded-md" alt="Fluid image" />
         </Col>
         <div className="mb-2 mt-3">
-          <h4 className="cta-1 mb-3 text-alternate">Boas-vindas ao DietSystem!</h4>
+          <h4 className="cta-1 mb-3 text-alternate">Boas-vindas ao OdontCloud!</h4>
         </div>
         <div className="mb-5">
           <p className="h6 text-alternate">Cadastre-se gratuitamente inserindo seus dados, a confirmação será feita via WhatsApp.</p>
@@ -172,16 +172,16 @@ const Register = () => {
                 />
                 <label className="form-check-label">
                   Eu li e aceito os{' '}
-                  <NavLink to="https://dietsystem.com.br/termos-de-uso" target="_blank" className="text-alternate">
+                  <NavLink to="https://OdontCloud.com.br/termos-de-uso" target="_blank" className="text-alternate">
                     Termos de uso,
                   </NavLink>{' '}
-                  <NavLink to="https://dietsystem.com.br/politica-de-privacidade" target="_blank" className="text-alternate">
+                  <NavLink to="https://OdontCloud.com.br/politica-de-privacidade" target="_blank" className="text-alternate">
                     Políticas de privacidade,
                   </NavLink>{' '}
-                  <NavLink to="https://dietsystem.com.br/politica-de-pagamentos" target="_blank" className="text-alternate">
+                  <NavLink to="https://OdontCloud.com.br/politica-de-pagamentos" target="_blank" className="text-alternate">
                     Políticas de pagamentos e
                   </NavLink>{' '}
-                  <NavLink to="https://dietsystem.com.br/politica-de-cookies" target="_blank" className="text-alternate">
+                  <NavLink to="https://OdontCloud.com.br/politica-de-cookies" target="_blank" className="text-alternate">
                     Políticas de cookies
                   </NavLink>
                 </label>

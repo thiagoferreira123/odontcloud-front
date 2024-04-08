@@ -87,7 +87,7 @@ export default function ComparativePhotos() {
             </Tab.Content>
             <p className="text-center text-medium">
               {' '}
-              Alertamos que o upload de imagens de pacientes é de inteira responsabilidade do usuário. O DietSystem não se responsabiliza por quaisquer
+              Alertamos que o upload de imagens de pacientes é de inteira responsabilidade do usuário. O OdontCloud não se responsabiliza por quaisquer
               consequências negativas que possam surgir em decorrência desse procedimento.
             </p>
           </Card.Body>

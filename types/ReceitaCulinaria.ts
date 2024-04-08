@@ -30,13 +30,13 @@ export type CategoriaReceitaCulinaria = {
   id_receita_culinaria: number;
 }
 
-export type ReceitaCulinariaDietSystemCategoriaDescricao = {
+export type ReceitaCulinariaOdontCloudCategoriaDescricao = {
   id: number;
   nome: string;
   id_profissional: number;
 }
 
-export type ReceitaCulinariaDietSystemModoDePreparo = {
+export type ReceitaCulinariaOdontCloudModoDePreparo = {
   id: number;
   passo_descricao: string;
   passo_numero: number;

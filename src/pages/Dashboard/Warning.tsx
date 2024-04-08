@@ -30,7 +30,7 @@ const Warning = ({ onHide }) => {
         <Modal.Title>Aviso super importante 😆</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>Desenvolvido em 2021 por uma equipe de nutricionistas brasileiros e programadores, alcançou 10 mil usuários e evoluiu para a versão 2.0, incorporando tecnologias avançadas para maior rapidez e segurança na prática clínica. A versão 2.0 ainda está em desenvolvimento, porém é possível monitorar nosso avanço <a href="#" onClick={handleLinkClick} className="link-primary">aqui</a>.</p>
+        <p>Desenvolvido em 2021 por uma equipe de  Cirurgiões-Dentistas brasileiros e programadores, alcançou 10 mil usuários e evoluiu para a Versão 1.0, incorporando tecnologias avançadas para maior rapidez e segurança na prática clínica. A Versão 1.0 ainda está em desenvolvimento, porém é possível monitorar nosso avanço <a href="#" onClick={handleLinkClick} className="link-primary">aqui</a>.</p>
         <p>Note que ainda estamos finalizando algumas funcionalidades, as quais serão anunciadas à medida que estiverem disponíveis.</p>
         <h5>🚀 <strong>Funcionalidades disponíveis:</strong></h5>
          <p>

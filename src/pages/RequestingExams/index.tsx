@@ -183,7 +183,7 @@ const RequestingExams = () => {
             placement="bottom"
             overlay={
               <Tooltip id="tooltip-chart">
-                Clique neste botão para adicionar um novo exame ao DietSystem, caso ele ainda não esteja cadastrado. Para encontrar um exame já existente,
+                Clique neste botão para adicionar um novo exame ao OdontCloud, caso ele ainda não esteja cadastrado. Para encontrar um exame já existente,
                 utilize a barra de busca acima, na lateral.
               </Tooltip>
             }
@@ -237,7 +237,7 @@ const RequestingExams = () => {
                     <Popover.Header className="text-center">Aviso de responsabilidade</Popover.Header>
                     <Popover.Body className="text-center">
                       Os diagnósticos e as prescrições de tratamentos são de responsabilidade exclusiva dos profissionais, utilize nossa classificação como
-                      referência complementar aos seus cuidados e sintomas do paciente. DietSystem é um software e pode ter diversos valores, portanto, os
+                      referência complementar aos seus cuidados e sintomas do paciente. OdontCloud é um software e pode ter diversos valores, portanto, os
                       profissionais devem sempre verificar o relatório original para garantir.
                     </Popover.Body>
                   </Popover>

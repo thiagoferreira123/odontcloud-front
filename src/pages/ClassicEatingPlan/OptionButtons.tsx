@@ -190,7 +190,7 @@ const OptionButtons = () => {
         </Dropdown>
       </OverlayTrigger>
 
-      <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-filter">Cadastre no DietSystem um alimento personalizado</Tooltip>}>
+      <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-filter">Cadastre no OdontCloud um alimento personalizado</Tooltip>}>
         <Button variant="primary" size="sm" className="btn-icon btn-icon-only mb-1 ms-1" type="button" onClick={handleCreateFood}>
           <CsLineIcons icon="cupcake" />
         </Button>

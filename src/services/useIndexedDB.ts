@@ -4,7 +4,7 @@ export function useIndexedDB() {
   const setData = <T>(key: string, values: Array<T & {key: string}>): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       initializeDb().then(() => {
-        const request = indexedDB.open("DietSystem", dbVersion);
+        const request = indexedDB.open("OdontCloud", dbVersion);
 
         request.onsuccess = () => {
           const db = request.result;
@@ -62,7 +62,7 @@ export function useIndexedDB() {
 
   const addItem = <T>(key: string, value: T & { key: string }): Promise<boolean> => {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open("DietSystem", dbVersion);
+      const request = indexedDB.open("OdontCloud", dbVersion);
 
       if (!Object.prototype.hasOwnProperty.call(value, 'key')) return reject('Item não encontrado');
 
@@ -100,7 +100,7 @@ export function useIndexedDB() {
 
   const updateItem = <T>(key: string, value: T & { key: string }): Promise<boolean> => {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open("DietSystem", dbVersion);
+      const request = indexedDB.open("OdontCloud", dbVersion);
 
       if (!Object.prototype.hasOwnProperty.call(value, 'key')) return reject('Item não encontrado');
 
@@ -140,7 +140,7 @@ export function useIndexedDB() {
     return new Promise((resolve, reject) => {
       initializeDb().then((newVersion: number) => {
         // Recupera dados do IndexedDB
-        const request = indexedDB.open("DietSystem", newVersion);
+        const request = indexedDB.open("OdontCloud", newVersion);
 
         request.onsuccess = () => {
 
@@ -187,7 +187,7 @@ export function useIndexedDB() {
 
   const removeData = <T>(key: string, value: T & { key: string }): Promise<boolean> => {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open("DietSystem", dbVersion);
+      const request = indexedDB.open("OdontCloud", dbVersion);
 
       if (!Object.prototype.hasOwnProperty.call(value, 'key')) return reject('Item não encontrado');
 
@@ -230,23 +230,23 @@ export function useIndexedDB() {
       // Primeiro, verifica se o método databases() está disponível
       if ('databases' in indexedDB) {
         indexedDB.databases().then((dbs) => {
-          // Verifica se o banco de dados 'DietSystem' existe
-          const dbExists = dbs.some(db => db.name === 'DietSystem');
+          // Verifica se o banco de dados 'OdontCloud' existe
+          const dbExists = dbs.some(db => db.name === 'OdontCloud');
           if (!dbExists) {
-            console.warn("Banco de dados 'DietSystem' não existe e, portanto, não pode ser excluído.");
+            console.warn("Banco de dados 'OdontCloud' não existe e, portanto, não pode ser excluído.");
             resolve(false); // Resolve false indicando que não havia nada para excluir
             return;
           }
 
           // Se o banco de dados existir, tenta excluí-lo
-          const request = indexedDB.deleteDatabase("DietSystem");
+          const request = indexedDB.deleteDatabase("OdontCloud");
 
           request.onsuccess = () => {
             resolve(true);
           };
 
           request.onerror = () => {
-            console.error("Erro ao excluir o banco de dados 'DietSystem'.", request.error);
+            console.error("Erro ao excluir o banco de dados 'OdontCloud'.", request.error);
             resolve(false);
           };
 
@@ -271,7 +271,7 @@ export function useIndexedDB() {
   const initializeDb = () => {
     return new Promise<number>((resolve, reject) => {
       // Cria ou atualiza o banco de dados e o Object Store ao criar o componente
-      const request = indexedDB.open("DietSystem", dbVersion);
+      const request = indexedDB.open("OdontCloud", dbVersion);
 
       request.onupgradeneeded = () => {
         const db = request.result;

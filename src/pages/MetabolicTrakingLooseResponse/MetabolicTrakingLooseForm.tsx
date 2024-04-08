@@ -57,7 +57,7 @@ export default function MetabolicTrakingLooseForm() {
       await createMetabolicTracking(payload);
 
       setIsSaving(false);
-      window.location.replace('https://www.dietsystem.com.br')
+      window.location.replace('https://www.OdontCloud.com.br')
     } catch (error) {
       console.error(error);
       setIsSaving(false);

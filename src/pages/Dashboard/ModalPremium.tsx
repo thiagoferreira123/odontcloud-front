@@ -41,7 +41,7 @@ const ModalPremium = ({ showModal, setShowModal }) => {
   
 
   const whatsappNumber = '5567981490781'; 
-  const message = encodeURIComponent("Olá Thiago! gostaria de assinar o DietSystem, mas antes tenho uma dúvida. Você poderia me ajudar?");
+  const message = encodeURIComponent("Olá Thiago! gostaria de assinar o OdontCloud, mas antes tenho uma dúvida. Você poderia me ajudar?");
 
   const handleWhatsAppButtonClick = () => {
     window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
@@ -57,7 +57,7 @@ const ModalPremium = ({ showModal, setShowModal }) => {
             <div style={{ flex: 1, padding: '20px' }}>
               <div>
                 <h4>
-                  Decole com o DietSystem!
+                  Decole com o OdontCloud!
                 </h4>
                 <h4>
                   Faça upgrade para desbloquear mais potência 🚀
@@ -113,7 +113,7 @@ const ModalPremium = ({ showModal, setShowModal }) => {
                   <div>
                     <p className='mt-3 text-alternate'>
                       Desbloqueie todas as funcionalidades <br></br><br></br>
-                      Tenha em mãos, tudo que o DietSystem pode te oferecer, sem restrições.
+                      Tenha em mãos, tudo que o OdontCloud pode te oferecer, sem restrições.
                     </p>
                   </div>
                   <div className='text-center'>
@@ -214,7 +214,7 @@ const ModalPremium = ({ showModal, setShowModal }) => {
                 </div>
               </Alert>
               <div className='text-medium text-center'>
-                <span>* Utilize o mesmo e-mail de cadastro no DietSystem para realizar o pagamento 🚀</span>
+                <span>* Utilize o mesmo e-mail de cadastro no OdontCloud para realizar o pagamento 🚀</span>
               </div>
               <div className='mt-3 mb-3'>
                 Dúvidas frequentes:
@@ -228,7 +228,7 @@ const ModalPremium = ({ showModal, setShowModal }) => {
                   c) Garantia de 7 dias de satisfação ou seu dinheiro de volta.
                 </p>
                 <p className='text-medium mb-2'>
-                  d) Quando o pagamento é feito por cartão de crédito ou PIX, o DietSystem é desbloqueado imediatamente. Em caso de boleto, pode levar até 3 dias úteis.
+                  d) Quando o pagamento é feito por cartão de crédito ou PIX, o OdontCloud é desbloqueado imediatamente. Em caso de boleto, pode levar até 3 dias úteis.
                 </p>
               </div>
               <div className='text-center'>

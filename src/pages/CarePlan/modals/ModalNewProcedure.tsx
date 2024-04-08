@@ -193,7 +193,7 @@ const ModalNewProcedure = ({ showModal, onHide }: ModalNewProcedure) => {
           </Row>
           <Row>
             <Form.Label className="d-block">
-              <strong>Faces do dente:</strong>
+              <strong>Faces do dente 51:</strong>
             </Form.Label>
             <Col xs="12" className="mb-3 d-flex">
               <Form.Check

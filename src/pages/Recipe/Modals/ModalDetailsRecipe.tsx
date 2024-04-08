@@ -69,12 +69,12 @@ const ModalDetailsRecipe = () => {
             <div className="mt-2">
               <Row className="g-0 sh-6">
                 <Col xs="auto">
-                  <img src={ selectedRecipe?.user?.admin === 1 ? '/img/product/dietsystem.webp' : selectedRecipe?.user?.image ? selectedRecipe?.user.image : "/img/profile/profile-11.webp"} className="card-img rounded-xl sh-4 sw-4 mt-2" alt="thumb" />
+                  <img src={ selectedRecipe?.user?.admin === 1 ? '/img/product/OdontCloud.webp' : selectedRecipe?.user?.image ? selectedRecipe?.user.image : "/img/profile/profile-11.webp"} className="card-img rounded-xl sh-4 sw-4 mt-2" alt="thumb" />
                 </Col>
                 <Col>
                   <div className="d-flex flex-row pt-0 pb-0 ps-3 pe-0 h-100 align-items-center justify-content-between">
                     <div className="d-flex flex-column">
-                      <div>{selectedRecipe?.user?.admin === 1 ? 'Cadastrado pelo DietSystem' : selectedRecipe?.user?.nome_completo ?? '...'}</div>
+                      <div>{selectedRecipe?.user?.admin === 1 ? 'Cadastrado pelo OdontCloud' : selectedRecipe?.user?.nome_completo ?? '...'}</div>
                       <div className="text-muted">{selectedRecipe?.user?.especialidades ?? ''}</div>
                     </div>
                   </div>

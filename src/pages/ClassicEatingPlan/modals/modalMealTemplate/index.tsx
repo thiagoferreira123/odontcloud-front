@@ -23,7 +23,7 @@ interface ModalMealTemplateProps {
 }
 
 const ModalMealTemplate: React.FC<ModalMealTemplateProps> = (props: ModalMealTemplateProps) => {
-  const [type, setType] = React.useState('personalPlans' as 'personalPlans' | 'dietSystemPlans' | 'recipePlans');
+  const [type, setType] = React.useState('personalPlans' as 'personalPlans' | 'OdontCloudPlans' | 'recipePlans');
   const [selectedPage, setSelectedPage] = React.useState(1);
   const [query, setQuery] = React.useState('' as string);
   const toastId = useRef<React.ReactText>();
@@ -63,7 +63,7 @@ const ModalMealTemplate: React.FC<ModalMealTemplateProps> = (props: ModalMealTem
       case 'personalPlans':
         url = '/plano-alimentar-classico-refeicao-modelo';
         break;
-      case 'dietSystemPlans':
+      case 'OdontCloudPlans':
         url = '/plano-alimentar-classico-refeicao-modelo/shared';
         break;
       case 'recipePlans':
@@ -86,7 +86,7 @@ const ModalMealTemplate: React.FC<ModalMealTemplateProps> = (props: ModalMealTem
     }
   };
 
-  const handleSetType = (type: 'personalPlans' | 'dietSystemPlans' | 'recipePlans') => {
+  const handleSetType = (type: 'personalPlans' | 'OdontCloudPlans' | 'recipePlans') => {
     setSelectedPage(1);
     setType(type);
   };
@@ -303,8 +303,8 @@ const ModalMealTemplate: React.FC<ModalMealTemplateProps> = (props: ModalMealTem
           <Button variant={type === 'personalPlans' ? 'primary' : 'outline-primary'} className="mb-1 ms-2" onClick={() => handleSetType('personalPlans')}>
             Meus modelos
           </Button>{' '}
-          <Button variant={type === 'dietSystemPlans' ? 'primary' : 'outline-primary'} className="mb-1 ms-2" onClick={() => handleSetType('dietSystemPlans')}>
-            Modelos do DietSystem
+          <Button variant={type === 'OdontCloudPlans' ? 'primary' : 'outline-primary'} className="mb-1 ms-2" onClick={() => handleSetType('OdontCloudPlans')}>
+            Modelos do OdontCloud
           </Button>{' '}
           <Button variant={type === 'recipePlans' ? 'primary' : 'outline-primary'} className="mb-1 ms-2" onClick={() => handleSetType('recipePlans')}>
             Receitas culinárias

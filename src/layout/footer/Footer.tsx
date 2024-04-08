@@ -15,7 +15,7 @@ const Footer = () => {
         <Container>
           <Row>
             <Col xs="12" sm="6">
-              <p className="mb-0 text-muted text-medium">DietSystem Software Para Nutricionistas | Versão 2.0 </p>
+              <p className="mb-0 text-muted text-medium">OdontCloud Software Para  Cirurgiões-Dentistas | Versão 1.0 </p>
             </Col>
           </Row>
         </Container>

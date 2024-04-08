@@ -9,7 +9,7 @@ export default function RoadMap() {
           <Card.Body>
             <div className="border-bottommb-2 pb-2 text-center">
               <div>
-                <h5>O DietSystem, desenvolvido em 2020 por uma equipe de nutricionistas brasileiros e programadores, alcançou 5 mil usuários, e evoluiu para a versão 2.0, incorporando tecnologias avançadas para maior rapidez e segurança na prática clínica. A versão 2.0 ainda está em desenvolvimento, porém é possível monitorar nosso avanço aqui.</h5>
+                <h5>O OdontCloud, desenvolvido em 2020 por uma equipe de  Cirurgiões-Dentistas brasileiros e programadores, alcançou 5 mil usuários, e evoluiu para a Versão 1.0, incorporando tecnologias avançadas para maior rapidez e segurança na prática clínica. A Versão 1.0 ainda está em desenvolvimento, porém é possível monitorar nosso avanço aqui.</h5>
               </div>
             </div>
           </Card.Body>

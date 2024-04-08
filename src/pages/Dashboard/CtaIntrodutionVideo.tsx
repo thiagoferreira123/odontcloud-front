@@ -10,7 +10,7 @@ export const CtaIntrodutionVideo = () => {
       <img src="/img/banner/nutri.webp" className="card-img h-100 scale" alt="card image" />
       <div className="card-img-overlay d-flex flex-column justify-content-between bg-transparent">
         <div>
-          <div className="cta-3 mb-3 text-white w-75 w-md-50">Junte-se ao DietSystem! <br></br>E decole na sua carreira!</div>
+          <div className="cta-3 mb-3 text-white w-75 w-md-50">Junte-se ao OdontCloud! <br></br>E decole na sua carreira!</div>
           <Button variant="primary" className="btn-icon btn-icon-start stretched-link" onClick={() => setShowModalPremium(true)}>
             <Icon.Trophy size={20} className='me-2'/> <span>Ativar modo Premium</span>{' '}
           </Button>

@@ -36,7 +36,7 @@ export default function Budget() {
                             <th>
                                 Acompanhamento de tratamento/procedimento cirúrgico em odontologia
                             </th>
-                            <td>28 C, D, M, O, P, V</td>
+                            <td>15 C, D, O, M, P, V</td>
                             <td><Form.Control type="text" name="observation" className="w-40" /></td>
                             <td>
                                 <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Remover procedimento</Tooltip>}>
@@ -50,7 +50,7 @@ export default function Budget() {
                             <th>
                                 Acompanhamento de tratamento/procedimento cirúrgico em odontologia
                             </th>
-                            <td>28 C, D, M, O, P, V</td>
+                            <td>15 C, D, O, M, P, V</td>
                             <td><Form.Control type="text" name="observation" className="w-40" /></td>
                             <td>
                                 <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Remover procedimento</Tooltip>}>

@@ -111,7 +111,7 @@ const MiscellaneousMailing = () => {
                   <td style="text-align: center; vertical-align: center">
                     <p style="font-size: 10px; text-decoration: none; line-height: 1; color: #afafaf; margin-top: 0px">
                       Email enviado automaticamente por
-                      <a href="https://dietsystem.com.br/" style="color: #2499e3; text-decoration: none">DietSystem - Software para nutricionistas</a>
+                      <a href="https://OdontCloud.com.br/" style="color: #2499e3; text-decoration: none">OdontCloud - Software para  Cirurgiões-Dentistas</a>
                       .
                     </p>
                   </td>

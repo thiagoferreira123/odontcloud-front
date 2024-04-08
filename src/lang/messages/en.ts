@@ -188,7 +188,7 @@ const enMessages = {
   'menu.controle-financeiro': 'Controle financeiro ',
   // 'menu.admin': 'Admin',
   // 'menu.meus-dados': 'Meus dados',
-  // 'menu.road-map': 'Acompanhar progresso do DietSystem',
+  // 'menu.road-map': 'Acompanhar progresso do OdontCloud',
   'menu.site': 'Construtor de site',
   // 'menu.site-agenda': 'Agendamento pelo site',
 };

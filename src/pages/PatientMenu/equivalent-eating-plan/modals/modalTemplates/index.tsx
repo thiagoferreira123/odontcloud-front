@@ -19,7 +19,7 @@ const notify = (message: string, title: string, icon: string, status?: string, i
   toast(<NotificationIcon message={message} title={title} icon={icon} status={status} isLoading={isLoading} />, { autoClose: isLoading ? false : 5000 });
 
 const ModalTemplates = (props: ModalTemplatesProps) => {
-  const [type, /*setType*/] = React.useState('personalPlans' as 'personalPlans' | 'dietSystemPlans');
+  const [type, /*setType*/] = React.useState('personalPlans' as 'personalPlans' | 'OdontCloudPlans');
   const [selectedPage, setSelectedPage] = React.useState(1);
   const [query, setQuery] = React.useState('' as string);
 
@@ -45,7 +45,7 @@ const ModalTemplates = (props: ModalTemplatesProps) => {
     return pagesArray;
   }, [selectedPage]);
 
-  // const handleSetType = (type: 'personalPlans' | 'dietSystemPlans') => {
+  // const handleSetType = (type: 'personalPlans' | 'OdontCloudPlans') => {
   //   setSelectedPage(1);
   //   setType(type);
   // };
@@ -64,7 +64,7 @@ const ModalTemplates = (props: ModalTemplatesProps) => {
       case 'personalPlans':
         url = '/plano-alimentar-equivalente-historico/template/professional';
         break;
-      case 'dietSystemPlans':
+      case 'OdontCloudPlans':
         url = '/plano-alimentar-equivalente-historico/template/shared';
         break;
       default:
@@ -104,8 +104,8 @@ const ModalTemplates = (props: ModalTemplatesProps) => {
           <Button variant={type === 'personalPlans' ? 'primary' : 'outline-primary'} className="mb-1 ms-2" onClick={() => handleSetType('personalPlans')}>
             Meus modelos
           </Button>{' '}
-          <Button variant={type === 'dietSystemPlans' ? 'primary' : 'outline-primary'} className="mb-1 ms-2" onClick={() => handleSetType('dietSystemPlans')}>
-            Modelos do DietSystem
+          <Button variant={type === 'OdontCloudPlans' ? 'primary' : 'outline-primary'} className="mb-1 ms-2" onClick={() => handleSetType('OdontCloudPlans')}>
+            Modelos do OdontCloud
           </Button>{' '}
         </div> */}
 

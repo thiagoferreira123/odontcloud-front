@@ -163,7 +163,7 @@ export default function Recipe() {
               <div className="d-flex mb-4 justify-content-end">
                 <OverlayTrigger
                   placement="top"
-                  overlay={<Tooltip id="tooltip-add">Cadastre uma receita que não existe no DietSystem e compartilhe com a comunidade.</Tooltip>}
+                  overlay={<Tooltip id="tooltip-add">Cadastre uma receita que não existe no OdontCloud e compartilhe com a comunidade.</Tooltip>}
                 >
                   <Button variant="outline-secondary" size="sm" className="btn-icon btn-icon-only ms-auto" onClick={() => setShowModalAddRecipe(true)}>
                     <CsLineIcons icon="plus" />

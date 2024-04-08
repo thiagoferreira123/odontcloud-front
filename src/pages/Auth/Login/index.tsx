@@ -134,7 +134,7 @@ const Login = () => {
               </Button>
             </div>
             <div className='d-flex justify-content-center mt-3 '>
-              <Button size="sm" className="mb-1 btn btn-dark" type="button" onClick={() => window.location.href = 'https://dietsystem.com.br/app'}>
+              <Button size="sm" className="mb-1 btn btn-dark" type="button" onClick={() => window.location.href = 'https://OdontCloud.com.br/app'}>
                 Usar versão anterior
               </Button>
             </div>

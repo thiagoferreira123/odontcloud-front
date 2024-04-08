@@ -15,7 +15,7 @@ interface ModalTemplatesProps {
 }
 
 const ModalTemplates = (props: ModalTemplatesProps) => {
-  const [type, setType] = React.useState('personalPlans' as 'personalPlans' | 'dietSystemPlans' | 'reminder');
+  const [type, setType] = React.useState('personalPlans' as 'personalPlans' | 'OdontCloudPlans' | 'reminder');
   const [selectedPage, setSelectedPage] = React.useState(1);
   const [query, setQuery] = React.useState('' as string);
 
@@ -43,7 +43,7 @@ const ModalTemplates = (props: ModalTemplatesProps) => {
     return pagesArray;
   }, [selectedPage]);
 
-  const handleSetType = (type: 'personalPlans' | 'dietSystemPlans' | 'reminder') => {
+  const handleSetType = (type: 'personalPlans' | 'OdontCloudPlans' | 'reminder') => {
     setSelectedPage(1);
     setType(type);
   };
@@ -62,7 +62,7 @@ const ModalTemplates = (props: ModalTemplatesProps) => {
       case 'personalPlans':
         url = '/plano_alimentar/template/professional';
         break;
-      case 'dietSystemPlans':
+      case 'OdontCloudPlans':
         url = '/plano_alimentar/template/shared';
         break;
       case 'reminder':
@@ -101,8 +101,8 @@ const ModalTemplates = (props: ModalTemplatesProps) => {
           <Button variant={type === 'personalPlans' ? 'primary' : 'outline-primary'} className="mb-1 ms-2" onClick={() => handleSetType('personalPlans')}>
             Meus modelos
           </Button>{' '}
-          <Button variant={type === 'dietSystemPlans' ? 'primary' : 'outline-primary'} className="mb-1 ms-2" onClick={() => handleSetType('dietSystemPlans')}>
-            Modelos do DietSystem
+          <Button variant={type === 'OdontCloudPlans' ? 'primary' : 'outline-primary'} className="mb-1 ms-2" onClick={() => handleSetType('OdontCloudPlans')}>
+            Modelos do OdontCloud
           </Button>{' '}
           <Button variant={type === 'reminder' ? 'primary' : 'outline-primary'} className="mb-1 ms-2" onClick={() => handleSetType('reminder')}>
             Recordatórios

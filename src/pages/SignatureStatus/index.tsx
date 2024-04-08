@@ -38,7 +38,7 @@ const SignatureStatus = () => {
 
               <p>{blockReason.message}</p>
 
-              <p>Para manter seu acesso às funcionalidades do DietSystem, por favor, atualize sua assinatura clicando no botão abaixo.</p>
+              <p>Para manter seu acesso às funcionalidades do OdontCloud, por favor, atualize sua assinatura clicando no botão abaixo.</p>
 
               <p className="text-center">
                 <a href="https://purchase.hotmart.com/" target="_blank" className="mb-1 btn btn-primary" role="button" rel="noreferrer">
@@ -55,7 +55,7 @@ const SignatureStatus = () => {
                   <p>Digite sua senha (se esqueceu, selecione "esqueci minha senha").</p>
                 </li>
                 <li>
-                  <p>Acesse suas compras e selecione o DietSystem.</p>
+                  <p>Acesse suas compras e selecione o OdontCloud.</p>
                 </li>
                 <li>
                   <p>Verifique suas faturas pendentes e realize o pagamento.</p>
@@ -77,7 +77,7 @@ const SignatureStatus = () => {
               </p>
               <p>
                 Se tiver dúvidas, consulte nossa{' '}
-                <a href="https://dietsystem.com.br/politica-de-pagamentos" target="_blank" rel="noreferrer">
+                <a href="https://OdontCloud.com.br/politica-de-pagamentos" target="_blank" rel="noreferrer">
                   política de pagamentos
                 </a>
                 .

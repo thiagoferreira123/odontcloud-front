@@ -62,7 +62,7 @@ const PatientRegisteredForm = ({ form }: Props) => {
     answer_id ? await updateFormAnswer(+answer_id, payload) : await addReplyForm(payload, queryClient);
 
     setIsSaving(false);
-    answer_id ? window.location.replace('https://www.dietsystem.com.br') : window.location.replace('/painel-paciente');
+    answer_id ? window.location.replace('https://www.OdontCloud.com.br') : window.location.replace('/painel-paciente');
   };
 
   const handleChangeStatus = (file: IFileWithMeta, status: StatusValue) => {

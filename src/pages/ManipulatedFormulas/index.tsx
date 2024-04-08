@@ -140,7 +140,7 @@ const Manipulatedfórmulas = () => {
                 As fórmulas não estão acessíveis no aplicativo móvel; portanto, devem ser enviadas por e-mail ou entregues impressas durante a consulta.
               </label>
               <div className="d-flex justify-content-end mb-2 text-end">
-                <OverlayTrigger placement="bottom" overlay={<Tooltip id="button-tooltip-4">Cadastrar uma nova fórmula que não existe no DietSystem</Tooltip>}>
+                <OverlayTrigger placement="bottom" overlay={<Tooltip id="button-tooltip-4">Cadastrar uma nova fórmula que não existe no OdontCloud</Tooltip>}>
                   <Button variant="outline-primary" size="sm" className="btn-icon btn-icon-only ms-1" onClick={showModalAddFormulated}>
                     <CsLineIcons icon="plus" />
                   </Button>

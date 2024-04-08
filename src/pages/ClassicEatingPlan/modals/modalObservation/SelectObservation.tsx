@@ -18,7 +18,7 @@ interface SelectObservationProps {
 const SelectObservation = (props: SelectObservationProps) => {
   const [value, setValue] = useState<Option>();
   const [options, setOptions] = useState<Option[]>([{ label: 'Carregando orientações...', value: '' }]);
-  const [type, setType] = useState<'personal' | 'dietSystem'>('personal');
+  const [type, setType] = useState<'personal' | 'OdontCloud'>('personal');
 
   const getOrientations = async (): Promise<OrientationTemplate[]> => {
     try {
@@ -54,8 +54,8 @@ const SelectObservation = (props: SelectObservationProps) => {
         <Button variant={type === 'personal' ? 'primary' : 'outline-primary'} className="mb-1 ms-2" onClick={() => setType('personal')}>
           Meus modelos
         </Button>{' '}
-        <Button variant={type === 'dietSystem' ? 'primary' : 'outline-primary'} className="mb-1 ms-2" onClick={() => setType('dietSystem')}>
-          Modelos do DietSystem
+        <Button variant={type === 'OdontCloud' ? 'primary' : 'outline-primary'} className="mb-1 ms-2" onClick={() => setType('OdontCloud')}>
+          Modelos do OdontCloud
         </Button>{' '}
       </div>
       {orientationsResult.isLoading ? (

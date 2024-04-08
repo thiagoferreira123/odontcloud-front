@@ -36,7 +36,7 @@ export default React.memo(function PatientRow({ data, index, style }: ListChildC
                       <Popover id="popover-basic-top" className="custom-popover">
                         <Popover.Body>
                           Paciente de gênero <strong>{patient_sex[patient.patient_sex]?.label ?? patient_sex[0]}</strong>, com{' '}
-                          <strong>{calculateYearsDiffByDateISO(patient.patient_birth_date)}</strong> anos de idade, foi registrado(a) no DietSystem em{' '}
+                          <strong>{calculateYearsDiffByDateISO(patient.patient_birth_date)}</strong> anos de idade, foi registrado(a) no OdontCloud em{' '}
                           <strong>{new Date(patient.patient_last_interaction).toLocaleDateString()}</strong>.<br />
                           <br />A última interação registrada com o sistema ocorreu em{' '}
                           <strong>{new Date(patient.patient_last_interaction).toLocaleDateString()}</strong>.<br />

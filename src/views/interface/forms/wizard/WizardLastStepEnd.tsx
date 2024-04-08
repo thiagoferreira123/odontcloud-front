@@ -186,7 +186,7 @@ const WizardLastStepEnd = () => {
                         <tr>
                           <th scope="row">1</th>
                           <td>Email</td>
-                          <td>E-mail já existe no DietSystem.</td>
+                          <td>E-mail já existe no OdontCloud.</td>
                         </tr>
                         <tr>
                           <th scope="row">2</th>
