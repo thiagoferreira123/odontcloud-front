@@ -24,72 +24,72 @@ export default React.memo(function PatientRow({ data, index, style }: ListChildC
   const { updatePatient } = usePatients();
   const { handleSelectPatientForPanelPatientModal } = usePanelPatientModalStore();
 
-  const handleToggleActivePatient = async (patient: Patient & { id: number }) => {
-    try {
-      const payload: Patient = {
-        ...patient,
-        patientActiveOrInactive: Number(patient.patientActiveOrInactive) ? 0 : 1,
-        inactivateAppDate: Number(patient.patientActiveOrInactive) ? new Date().toISOString() : null,
-      };
+  // const handleToggleActivePatient = async (patient: Patient & { id: number }) => {
+  //   try {
+  //     const payload: Patient = {
+  //       ...patient,
+  //       patientActiveOrInactive: Number(patient.patientActiveOrInactive) ? 0 : 1,
+  //       inactivateAppDate: Number(patient.patientActiveOrInactive) ? new Date().toISOString() : null,
+  //     };
 
-      const response = await updatePatient(payload as Patient & { id: number }, queryClient, true);
+  //     const response = await updatePatient(payload as Patient & { id: number }, queryClient, true);
 
-      if (!response) throw new Error('Erro ao inativar paciente');
+  //     if (!response) throw new Error('Erro ao inativar paciente');
 
-      notify('Sucesso', `Paciente ${!Number(patient.patientActiveOrInactive) ? 'ativado' : 'inativado'} com sucesso`, 'check', 'success');
-    } catch (error) {
-      console.error(error);
-      notify('Erro', 'Ocorreu um erro ao inativar o paciente', 'close', 'danger');
-    }
-  };
+  //     notify('Sucesso', `Paciente ${!Number(patient.patientActiveOrInactive) ? 'ativado' : 'inativado'} com sucesso`, 'check', 'success');
+  //   } catch (error) {
+  //     console.error(error);
+  //     notify('Erro', 'Ocorreu um erro ao inativar o paciente', 'close', 'danger');
+  //   }
+  // };
 
-  const handleToggleConsultationPendingPatient = async (patient: Patient & { id: number }) => {
-    try {
-      const payload = {
-        ...patient,
-        consultationCompletedOrPending: patient.consultationCompletedOrPending === 'Pendente' ? 'Finalizada' : ('Pendente' as 'Finalizada' | 'Pendente'),
-      };
+  // const handleToggleConsultationPendingPatient = async (patient: Patient & { id: number }) => {
+  //   try {
+  //     const payload = {
+  //       ...patient,
+  //       consultationCompletedOrPending: patient.consultationCompletedOrPending === 'Pendente' ? 'Finalizada' : ('Pendente' as 'Finalizada' | 'Pendente'),
+  //     };
 
-      const response = await updatePatient(payload, queryClient, true);
+  //     const response = await updatePatient(payload, queryClient, true);
 
-      if (!response) throw new Error('Erro ao sinalizar pendência ao paciente');
+  //     if (!response) throw new Error('Erro ao sinalizar pendência ao paciente');
 
-      notify(
-        `Pendência ${patient.consultationCompletedOrPending === 'Finalizada' ? 'sinalizada' : 'removida'} ao paciente com sucesso`,
-        'Sucesso',
-        'flag',
-        'success'
-      );
-    } catch (error) {
-      console.error(error);
-      notify('Ocorreu um erro ao sinalizar pendência ao paciente', 'Erro', 'close', 'danger');
-    }
-  };
+  //     notify(
+  //       `Pendência ${patient.consultationCompletedOrPending === 'Finalizada' ? 'sinalizada' : 'removida'} ao paciente com sucesso`,
+  //       'Sucesso',
+  //       'flag',
+  //       'success'
+  //     );
+  //   } catch (error) {
+  //     console.error(error);
+  //     notify('Ocorreu um erro ao sinalizar pendência ao paciente', 'Erro', 'close', 'danger');
+  //   }
+  // };
 
   return (
     <div className="border-bottom border-separator-light mb-2 pb-2" key={patient.id} style={style}>
       <Row className="g-0 sh-6 row">
         <Col xs="auto">
-          <img src={patient.photoLink ? patient.photoLink : getAvatarByGender(patient.gender)} className="card-img rounded-xl sh-6 sw-6" alt="thumb" />
+          <img src={patient.patient_photo ? patient.patient_photo : getAvatarByGender(patient.patient_sex)} className="card-img rounded-xl sh-6 sw-6" alt="thumb" />
         </Col>
         <Col>
           <div className="d-flex flex-row pt-0 pb-0 ps-3 pe-0 h-100 align-items-center justify-content-between">
             <div className="d-flex flex-column text-alternate">
-              <div>{patient.name}</div>
+              <div>{patient.patient_full_name}</div>
               <Row>
                 <Col className="d-flex align-items-center">
-                  <OverlayTrigger
+                  {/* <OverlayTrigger
                     placement="top"
                     overlay={
                       <Tooltip id="tooltip-top">
-                        Paciente {patient.consultationCompletedOrPending !== 'Pendente' ? 'não' : null}possui pedências 😎 (clique para alterar)
+                        Paciente {patient.patient_marital_status !== 'Pendente' ? 'não' : null}possui pedências 😎 (clique para alterar)
                       </Tooltip>
                     }
                   >
                     <span onClick={() => handleToggleConsultationPendingPatient(patient)} role="button" tabIndex={0}>
-                      <Icon.Flag className={`text-${patient.consultationCompletedOrPending === 'Pendente' ? 'warning' : 'primary'}`} size={16} />
+                      <Icon.Flag className={`text-${patient.patient_marital_status === 'Pendente' ? 'warning' : 'primary'}`} size={16} />
                     </span>
-                  </OverlayTrigger>
+                  </OverlayTrigger> */}
 
                   <OverlayTrigger
                     rootClose
@@ -98,15 +98,15 @@ export default React.memo(function PatientRow({ data, index, style }: ListChildC
                     overlay={
                       <Popover id="popover-basic-top" className="custom-popover">
                         <Popover.Body>
-                          Paciente de gênero <strong>{genders[patient.gender].label}</strong>, com{' '}
-                          <strong>{calculateYearsDiffByDateISO(patient.dateOfBirth)}</strong> anos de idade, foi registrado(a) no DietSystem em{' '}
-                          <strong>{new Date(patient.dateOfFirstConsultation).toLocaleDateString()}</strong>.<br />
+                          Paciente de gênero <strong>{genders[patient.patient_sex]?.label ?? genders[0]}</strong>, com{' '}
+                          <strong>{calculateYearsDiffByDateISO(patient.patient_birth_date)}</strong> anos de idade, foi registrado(a) no DietSystem em{' '}
+                          <strong>{new Date(patient.patient_last_interaction).toLocaleDateString()}</strong>.<br />
                           <br />A última interação registrada com o sistema ocorreu em{' '}
-                          <strong>{new Date(patient.dateOfLastConsultation).toLocaleDateString()}</strong>.<br />
-                          <br />O tratamento adotado foi: <strong>{patient.reasonForConsultation}</strong>, realizado no local:{' '}
-                          <strong>{patient.localAtendimento?.nome ?? ''}</strong>.<br />
+                          <strong>{new Date(patient.patient_last_interaction).toLocaleDateString()}</strong>.<br />
+                          {/* <br />O tratamento adotado foi: <strong>{patient.reasonForConsultation}</strong>, realizado no local:{' '}
+                          <strong>{patient.localAtendimento?.nome ?? ''}</strong>.<br /> */}
                           <br />
-                          Observa-se um período de <strong>{calculateDaysDiffByDateISO(patient.dateOfLastConsultation)}</strong> dias sem interações com o(a)
+                          Observa-se um período de <strong>{calculateDaysDiffByDateISO(patient.patient_last_interaction)}</strong> dias sem interações com o(a)
                           paciente.
                         </Popover.Body>
                       </Popover>
@@ -118,7 +118,7 @@ export default React.memo(function PatientRow({ data, index, style }: ListChildC
                   </OverlayTrigger>
 
                   <div>
-                    {patient.passwordMobileAndWeb && (
+                    {/* {patient.passwordMobileAndWeb && (
                       <OverlayTrigger
                         placement="top"
                         overlay={
@@ -131,10 +131,10 @@ export default React.memo(function PatientRow({ data, index, style }: ListChildC
                           <Icon.Whatsapp className='text-alternate' size={14}/>
                         </span>
                       </OverlayTrigger>
-                    )}
+                    )} */}
                   </div>
 
-                  <OverlayTrigger
+                  {/* <OverlayTrigger
                     placement="top"
                     overlay={
                       <Tooltip id="tooltip-top-switch"> Paciente {patient.patientActiveOrInactive ? 'ativo 😎' : 'inativo 😴'} (clique para alterar)</Tooltip>
@@ -147,7 +147,7 @@ export default React.memo(function PatientRow({ data, index, style }: ListChildC
                       onChange={() => handleToggleActivePatient(patient)}
                       className="ms-2 pointer"
                     />
-                  </OverlayTrigger>
+                  </OverlayTrigger> */}
                 </Col>
               </Row>
             </div>

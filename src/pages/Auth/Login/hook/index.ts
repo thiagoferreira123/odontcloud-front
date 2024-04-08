@@ -9,7 +9,7 @@ export const useAuth = create<CreateAuthStore>((set) => ({
   user: user ? JSON.parse(user) : null,
 
   login: async (values) => {
-    const { data } = await api.post('/auth/login', values);
+    const { data } = await api.post('/clinic/login', values);
 
     localStorage.setItem('user', JSON.stringify(data));
 
@@ -18,17 +18,8 @@ export const useAuth = create<CreateAuthStore>((set) => ({
     return data;
   },
 
-  register: async (values) => {
-
-    const payload = {
-      nome_completo: values.name,
-      email: values.email,
-      telefone: values.telefone,
-      senha: values.password,
-      data_cadastro: new Date().toISOString().slice(0, 19).replace('T', ' '),
-    };
-
-    const response = await api.post('/auth/register', payload);
+  register: async (payload) => {
+    const response = await api.post('/clinic', payload);
 
     localStorage.setItem('user', JSON.stringify(response.data));
 
@@ -36,30 +27,34 @@ export const useAuth = create<CreateAuthStore>((set) => ({
   },
 
   logout: async () => {
-    await api.get('/auth/logout');
+    await api.get('/clinic/logout');
     localStorage.removeItem('user');
 
     set(() => ({ isLoggedIn: false, user: null }));
   },
 
   forgotPassword: async (values) => {
-    await api.post('/users/check-email', values);
+    await api.post('/clinic/request-password-reset', values);
   },
 
   resetPassword: async (values) => {
-
     const payload = {
-      email: values.email,
       token: values.token,
       newPassword: values.password,
-    }
+      confirmPassword: values.passwordConfirm
+  }
+    // const payload = {
+    //   email: values.email,
+    //   token: values.token,
+    //   newPassword: values.password,
+    // }
 
-    await api.put('/users/update-password', payload);
+    await api.post('/clinic/reset-password', payload);
   },
 
   checkAuth: async () => {
     try {
-      const { data } = await api.get('/auth/check-auth');
+      const { data } = await api.get('/clinic/check-auth');
       set(() => ({ isLoggedIn: true, user: data }));
       localStorage.setItem('user', JSON.stringify(data));
 

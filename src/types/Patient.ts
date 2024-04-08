@@ -2,46 +2,35 @@ import { checkIfDateIsValid } from "../helpers/DateHelper";
 import { isObject } from "../helpers/Utils";
 
 export type Patient = {
-  id?: number;
-  professional?: number;
-  name: string;
-  photoLink: string;
-  email: string;
-  gender: number;
-  pregnant: number;
-  dateOfBirth: string; // ou Date, se você estiver usando objetos Date
-  dateOfFirstConsultation: Date; // ou Date, se você estiver usando objetos Date
-  dateOfLastConsultation: Date; // ou Date, se você estiver usando objetos Date
-  reasonForConsultation: string;
-  consultationLocation: number;
-  consultationCompletedOrPending: null | 'Finalizada' | 'Pendente'; // Assumindo que pode ser um número ou nulo
-  patientActiveOrInactive: number;
-  passwordMobileAndWeb: number;
-  cpf: null | string; // Assumindo que pode ser um string ou nulo
-  ddiCountry: string;
-  ddiCountryNumber: string;
-  phone: null | string; // Assumindo que pode ser um string ou nulo
-  cep: null | string; // Assumindo que pode ser um string ou nulo
-  state: null | string; // Assumindo que pode ser um string ou nulo
-  city: string;
-  neighborhood: null | string; // Assumindo que pode ser um string ou nulo
-  street: null | string; // Assumindo que pode ser um string ou nulo
-  houseNumber: null | string; // Assumindo que pode ser um string ou nulo
-  observation: null | string; // Assumindo que pode ser um string ou nulo
-  appPlansOnOrOff: number;
-  appAnthropometryOnOrOff: number;
-  appGoalsOnOrOff: number;
-  appRecipesOnOrOff: number;
-  appSuplementationOnOrOff: number;
-  appDialyOnOrOff: number;
-  inactivateAppDate: null | string; // ou Date, se você estiver usando objetos Date
-  deviceToken: null | string; // Assumindo que pode ser um string ou nulo
-  age: number;
-  localAtendimento?: ConsultationLocationResume;
-
-  key?: string; // Adicionando a chave para uso no IndexedDB
-
-  [key: string]: unknown;
+  patient_id: string;
+  patient_clinic_id: string;
+  patient_last_interaction: string;
+  patient_full_name: string;
+  patient_photo?: string;
+  patient_birth_date: string;
+  patient_cpf: string;
+  patient_rg?: string;
+  patient_issuer?: string;
+  patient_sex: number;
+  patient_marital_status: string;
+  patient_health_insurance?: string;
+  patient_health_insurance_number?: string;
+  patient_medical_record_number?: string;
+  patient_reference?: string;
+  patient_mobile_phone?: string;
+  patient_phone?: string;
+  patient_email?: string;
+  patient_extra_contact_full_name?: string;
+  patient_extra_contact_cpf?: string;
+  patient_extra_contact_mobile_phone?: string;
+  patient_extra_contact_relationship: string;
+  patient_zip_code?: string;
+  patient_number?: string;
+  patient_street?: string;
+  patient_complement?: string;
+  patient_neighborhood?: string;
+  patient_city?: string;
+  patient_state?: string;
 }
 
 export type ReasonForConsultation = {

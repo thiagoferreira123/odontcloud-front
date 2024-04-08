@@ -14,11 +14,9 @@ import ModalReport from './modals/ModalReport.tsx';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { useAuth } from '../../Auth/Login/hook/index.ts';
-import api from '../../../services/useAxios.ts';
 import ModalPremium from '../ModalPremium.tsx';
 import Empty from '../../../components/Empty.tsx';
 import PanelPatientModal from './modals/PanelPatientModal.tsx';
-
 
 // Componente Skeleton para simular um item da lista de pacientes
 const PatientItemSkeleton = () => {
@@ -42,24 +40,24 @@ const filterPatient = (patients: (Patient & { id: number })[], query: string, ca
 
     // Filtra por nome do paciente se uma query foi fornecida
     if (query.length) {
-      matchesQuery = patient.name.toLowerCase().includes(query.toLowerCase());
+      matchesQuery = patient.patient_full_name.toLowerCase().includes(query.toLowerCase());
     }
 
     // Filtra por categoria
     switch (category) {
-      case 'Ativos':
-        matchesCategory = patient.patientActiveOrInactive === 1;
-        break;
-      case 'Inativos':
-        matchesCategory = patient.patientActiveOrInactive === 0;
-        break;
-      case 'Com pedências':
-        matchesCategory = patient.consultationCompletedOrPending === 'Pendente';
-        break;
-      case 'Sem pedências':
-        matchesCategory = patient.consultationCompletedOrPending !== 'Pendente';
-        break;
-      case 'Todos':
+      // case 'Ativos':
+      //   matchesCategory = patient.patientActiveOrInactive === 1;
+      //   break;
+      // case 'Inativos':
+      //   matchesCategory = patient.patientActiveOrInactive === 0;
+      //   break;
+      // case 'Com pedências':
+      //   matchesCategory = patient.consultationCompletedOrPending === 'Pendente';
+      //   break;
+      // case 'Sem pedências':
+      //   matchesCategory = patient.consultationCompletedOrPending !== 'Pendente';
+      //   break;
+      // case 'Todos':
       default:
         // Não aplica filtro de categoria
         matchesCategory = true;
@@ -78,17 +76,17 @@ const ListPatient = () => {
   const [showModalReport, setShowModalReport] = useState(false);
   const [showModalPremium, setShowModalPremium] = useState(false);
 
-  const user = useAuth((state) => state.user);
+  // const user = useAuth((state) => state.user);
 
   const { getPatients } = usePatients();
 
   const handleClickOpenModalAddPatient = async () => {
-    if (!user?.subscriptionStatus?.status || user.subscriptionStatus.status !== 'approved') {
-      // return setShowModalPremium(true);
-      const { data } = await api.get('/paciente/search/');
+    // if (!user?.subscriptionStatus?.status || user.subscriptionStatus.status !== 'approved') {
+    //   // return setShowModalPremium(true);
+    //   const { data } = await api.get('/paciente/search/');
 
-      if (data.statusCode === 900) return setShowModalPremium(true);
-    }
+    //   if (data.statusCode === 900) return setShowModalPremium(true);
+    // }
 
     handleOpenModal();
   };

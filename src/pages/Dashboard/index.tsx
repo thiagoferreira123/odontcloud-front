@@ -21,57 +21,57 @@ const actualDate = new Date();
 const actualYear = actualDate.getFullYear();
 
 const Dashboard = () => {
-  const user = useAuth((state) => state.user);
-  const { getServiceLocations } = useServiceLocationStore();
+  // const user = useAuth((state) => state.user);
+  // const { getServiceLocations } = useServiceLocationStore();
 
-  const getServiceLocations_ = async () => {
-    try {
-      const response = await getServiceLocations();
-      if (response === false) throw new Error('Error on get service locations');
-      return response;
-    } catch (error) {
-      console.error('Error on get service locations', error);
-      throw error;
-    }
-  };
+  // const getServiceLocations_ = async () => {
+  //   try {
+  //     const response = await getServiceLocations();
+  //     if (response === false) throw new Error('Error on get service locations');
+  //     return response;
+  //   } catch (error) {
+  //     console.error('Error on get service locations', error);
+  //     throw error;
+  //   }
+  // };
 
-  const { getTransactions } = useTransactionStore();
+  // const { getTransactions } = useTransactionStore();
 
-  const getTransactions_ = async () => {
-    try {
-      const response = await getTransactions(monthOptions[actualDate.getMonth()].value, actualYear.toString());
+  // const getTransactions_ = async () => {
+  //   try {
+  //     const response = await getTransactions(monthOptions[actualDate.getMonth()].value, actualYear.toString());
 
-      if (response === false) throw new Error('Error');
+  //     if (response === false) throw new Error('Error');
 
-      return response;
-    } catch (error) {
-      console.error(error);
-      error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
-      throw error;
-    }
-  };
+  //     return response;
+  //   } catch (error) {
+  //     console.error(error);
+  //     error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
+  //     throw error;
+  //   }
+  // };
 
-  const resultLocals = useQuery({ queryKey: ['my-locals'], queryFn: getServiceLocations_ });
+  // const resultLocals = useQuery({ queryKey: ['my-locals'], queryFn: getServiceLocations_ });
 
-  const selectedLocation = resultLocals.data?.find((local) => local.ativo);
+  // const selectedLocation = resultLocals.data?.find((local) => local.ativo);
 
-  const financialResult = useQuery({
-    queryKey: ['my-transactions', monthOptions[actualDate.getMonth()].value, actualYear.toString()],
-    queryFn: getTransactions_,
-  });
+  // const financialResult = useQuery({
+  //   queryKey: ['my-transactions', monthOptions[actualDate.getMonth()].value, actualYear.toString()],
+  //   queryFn: getTransactions_,
+  // });
 
-  const totalEntrance =
-    financialResult.data?.reduce((acc, transaction) => {
-      return transaction.transaction_type === 'entrada' ? acc + Number(transaction.value) : acc;
-    }, 0) ?? 0;
-  const totalExpense =
-    financialResult.data?.reduce((acc, transaction) => {
-      return transaction.transaction_type === 'saida' ? acc + Number(transaction.value) : acc;
-    }, 0) ?? 0;
+  // const totalEntrance =
+  //   financialResult.data?.reduce((acc, transaction) => {
+  //     return transaction.transaction_type === 'entrada' ? acc + Number(transaction.value) : acc;
+  //   }, 0) ?? 0;
+  // const totalExpense =
+  //   financialResult.data?.reduce((acc, transaction) => {
+  //     return transaction.transaction_type === 'saida' ? acc + Number(transaction.value) : acc;
+  //   }, 0) ?? 0;
 
   return (
     <>
-      <Col xs="12" sm={20} className="text-center mb-3">
+      {/* <Col xs="12" sm={20} className="text-center mb-3">
         {resultLocals.isLoading ? (
           <Skeleton height={77} width={230} />
         ) : (
@@ -81,7 +81,7 @@ const Dashboard = () => {
             alt="Fluid image"
           />
         )}
-      </Col>
+      </Col> */}
 
       <Row>
         <Col lg="7">
@@ -94,9 +94,9 @@ const Dashboard = () => {
             </Row>
           </div>
 
-          <PatientsAnalysis />
+          {/* <PatientsAnalysis /> */}
 
-          <Row className='mt-4'>
+          {/* <Row className='mt-4'>
             <Col xl="6">
               <Card>
                 <Card.Body className="py-4">
@@ -135,10 +135,10 @@ const Dashboard = () => {
                 </Card.Body>
               </Card>
             </Col>
-          </Row>
+          </Row> */}
         </Col>
 
-        <Col lg="5" className="mb-5">
+        {/* <Col lg="5" className="mb-5">
           <div className="mb-2">{!user?.subscriptionStatus?.status || user.subscriptionStatus.status !== 'approved' ? <CtaIntrodutionVideo /> : null}</div>
 
           <div className="mb-n2">
@@ -152,14 +152,14 @@ const Dashboard = () => {
           <div className="mb-n2 mt-4">
             <ForumPreview />
           </div>
-        </Col>
+        </Col> */}
       </Row>
 
       <a
         href="https://api.whatsapp.com/send?phone=5567981490781"
         style={{
           position: 'fixed',
-          right: '20px', 
+          right: '20px',
           bottom: '20px',
           backgroundColor: '#25D366',
           color: 'white',

@@ -5,8 +5,8 @@ import { RoutesAndMenuItems } from '../routes';
 import { Role, User } from '../pages/Auth/Login/hook/types';
 
 const userHasRole = (routeRoles: string[], userRole: string) => {
-  if (!userRole) return false;
-  return routeRoles.includes(userRole);
+  if (!userRole && routeRoles?.length) return false;
+  return !routeRoles?.length || routeRoles.includes(userRole);
 };
 
 const clearRoute = (route: Partial<RouteItemProps>) => {
@@ -77,7 +77,7 @@ export const convertToRoutes = ({
             tempItem.redirect = true;
             tempItem.to = DEFAULT_PATHS.LOGIN;
           } else if (tempItem.roles) {
-            if (!userRole || !userHasRole(tempItem.roles, userRole)) {
+            if (!userRole && !userHasRole(tempItem.roles, userRole ?? '')) {
               tempItem.redirect = true;
               tempItem.to = DEFAULT_PATHS.LOGIN;
             }
@@ -195,7 +195,7 @@ export const convertToMenuItems = ({ data = [], authGuardActive = IS_AUTH_GUARD_
           return undefined;
         }
         if (tempItem.roles) {
-          if (userRole && !userHasRole(tempItem.roles, userRole)) {
+          if (userRole && !userHasRole(tempItem.roles, userRole ?? '')) {
             return undefined;
           }
         }
@@ -279,7 +279,7 @@ export const convertToSearchItems = ({ data = [], authGuardActive = IS_AUTH_GUAR
           if (!isLogin) {
             return undefined;
           } else if (tempItem.roles) {
-            if (!userRole || !userHasRole(tempItem.roles, userRole)) {
+            if (!userRole && !userHasRole(tempItem.roles, userRole ?? '')) {
               return undefined;
             }
           }

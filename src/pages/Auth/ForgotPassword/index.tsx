@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import {  Col, Form } from 'react-bootstrap';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
-import LayoutFullpage from '/src/layout/LayoutFullpage';
-import CsLineIcons from '/src/cs-line-icons/CsLineIcons';
-import HtmlHead from '/src/components/html-head/HtmlHead';
 import { useAuth } from '../Login/hook';
 import AsyncButton from '../../../components/AsyncButton';
 import { AxiosError } from 'axios';
 import { notify } from '../../../components/toast/NotificationIcon';
+import CsLineIcons from '../../../cs-line-icons/CsLineIcons';
+import HtmlHead from '../../../components/html-head/HtmlHead';
+import LayoutFullpage from '../../../layout/LayoutFullpage';
 
 interface FormValues {
   email: string;
@@ -75,7 +75,7 @@ const ForgotPassword = () => {
   const rightSide = (
     <div className="sw-lg-70 min-h-100 bg-foreground d-flex justify-content-center align-items-center shadow-deep py-5 full-page-content-right-border">
       <div className="sw-lg-50 px-5">
-        <Col xs="12" sm="25" className='text-center'>
+        <Col xs="12" sm={25} className='text-center'>
           <img src="/img/logo/logo.webp" className="img-fluid rounded-md" alt="Fluid image" />
         </Col>
         <div className="mb-5">

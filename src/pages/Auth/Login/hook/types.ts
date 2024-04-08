@@ -6,19 +6,18 @@ export interface LoginValues {
 }
 
 export interface ResetPasswordValues {
-  email: string;
   password: string;
   passwordConfirm: string;
   token: string;
 }
 
 export interface RegisterValues {
-  name: string;
-  email: string;
-  password: string;
-  passwordConfirm: string;
-  telefone: string;
-  terms: boolean;
+  clinic_full_name: string;
+  clinic_email: string;
+  clinic_password: string;
+  clinic_password_confirm: string;
+  clinic_phone: string;
+  clinic_terms: boolean;
 }
 
 export type CreateAuthStore = {

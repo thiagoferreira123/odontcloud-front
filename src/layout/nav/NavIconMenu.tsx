@@ -44,7 +44,7 @@ const NavIconMenu = () => {
           </a>
         </li>
         <IconMenuNotifications />
-        <IconMenuChatNotifications />
+        {/* <IconMenuChatNotifications /> */}
       </ul>
       <SearchModal show={showSearchModal} setShow={setShowSearchModal} />
     </>

@@ -3,38 +3,39 @@ import { useNavigate } from 'react-router-dom';
 import { Col, Form } from 'react-bootstrap';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
-import LayoutFullpage from '/src/layout/LayoutFullpage';
-import CsLineIcons from '/src/cs-line-icons/CsLineIcons';
-import HtmlHead from '/src/components/html-head/HtmlHead';
 import { ResetPasswordValues } from '../Login/hook/types';
 import AsyncButton from '../../../components/AsyncButton';
 import { useAuth } from '../Login/hook';
 import { notify } from '../../../components/toast/NotificationIcon';
 import { AxiosError } from 'axios';
+import CsLineIcons from '../../../cs-line-icons/CsLineIcons';
+import HtmlHead from '../../../components/html-head/HtmlHead';
+import LayoutFullpage from '../../../layout/LayoutFullpage';
 
 const ResetPassword = () => {
   const title = 'Reset Password';
   const description = 'Reset Password Page';
   const validationSchema = Yup.object().shape({
-    email: Yup.string().email('Insira um e-mail válido').required('Email é obrigatório'),
     password: Yup.string()
       .min(6, 'Deve ter pelo menos 6 caracteres')
       .matches(/[a-z]/, 'Deve conter pelo menos uma letra')
       .matches(/[^a-zA-Z0-9]/, 'Deve conter pelo menos um símbolo.')
       .required('Digite uma senha válida.'),
     passwordConfirm: Yup.string()
-      .oneOf([Yup.ref('password'), null], 'As senhas devem coincidir.')
-      .required('Confirme a senha.'),
+      .min(6, 'Deve ter pelo menos 6 caracteres')
+      .matches(/[a-z]/, 'Deve conter pelo menos uma letra')
+      .matches(/[^a-zA-Z0-9]/, 'Deve conter pelo menos um símbolo.')
+      .required('Digite uma senha válida.'),
     token: Yup.string()
-      .matches(/^\d{4}$/, 'Deve conter apenas 4 dígitos.')
+      .matches(/^\d{5}$/, 'Deve conter apenas 5 dígitos.')
       .required('O token é obrigatório.'),
   });
 
   const [isSaving, setIsSaving] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false);
   const history = useNavigate();
 
-  const initialValues: ResetPasswordValues = { email: '', password: '', passwordConfirm: '', token: '' };
+  const initialValues: ResetPasswordValues = { password: '', passwordConfirm: '', token: '' };
 
   const { resetPassword } = useAuth();
 
@@ -89,7 +90,7 @@ const ResetPassword = () => {
   const rightSide = (
     <div className="sw-lg-70 min-h-100 bg-foreground d-flex justify-content-center align-items-center shadow-deep py-5 full-page-content-right-border">
       <div className="sw-lg-50 px-5">
-        <Col xs="12" sm="25" className='text-center'>
+        <Col xs="12" sm={25} className='text-center'>
           <img src="/img/logo/logo.webp" className="img-fluid rounded-md" alt="Fluid image" />
         </Col>
         <div className="mb-5">
@@ -100,13 +101,6 @@ const ResetPassword = () => {
         </div>
         <div>
           <form id="resetForm" className="tooltip-end-bottom" onSubmit={handleSubmit}>
-
-            <div className="mb-3 filled">
-              <CsLineIcons icon="email" />
-              <Form.Control type="text" name="email" onChange={handleChange} value={values.email} placeholder="Insira seu e-mail" />
-              {errors.email && touched.email && <div className="d-block invalid-tooltip">{errors.email}</div>}
-            </div>
-
             <div className="mb-3 filled">
               <CsLineIcons icon="key" />
               <Form.Control type="text" name="token" onChange={handleChange} value={values.token} placeholder="Insira o token de 4 números" />

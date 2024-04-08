@@ -35,7 +35,7 @@ const Login = () => {
 
       setIsLoging(false);
 
-      history(user.role === Role.PROFESSIONAL ? '/app/' : '/app/calendar/');
+      history('/app/');
     } catch (error) {
       setIsLoging(false);
 

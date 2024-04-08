@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Col, Form } from 'react-bootstrap';
 import * as Yup from 'yup';
@@ -9,8 +9,6 @@ import { useAuth } from '../Login/hook';
 import AsyncButton from '../../../components/AsyncButton';
 import { AxiosError } from 'axios';
 import { notify } from '../../../components/toast/NotificationIcon';
-import SelectCountry from './SelectCountry';
-import { Option } from '../../../types/inputs';
 import CsLineIcons from '../../../cs-line-icons/CsLineIcons';
 import HtmlHead from '../../../components/html-head/HtmlHead';
 import LayoutFullpage from '../../../layout/LayoutFullpage';
@@ -23,38 +21,29 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false); // Definindo o estado showPassword
   const history = useNavigate();
 
-  const nacionalidades = [
-    { label: 'Portugal', value: 'PT' },
-    { label: 'Brasil', value: 'BR' },
-  ];
-
-  const [telefoneMask, setTelefoneMask] = useState('');
-
-  const handleNacionalidadeChange = (option: Option) => {
-    if (option) {
-      const mask = option.value === 'PT' ? '351 999 999 999' : '55 99 99999-9999'; // Define a máscara com base na nacionalidade
-      setTelefoneMask(mask);
-    } else {
-      setTelefoneMask('');
-    }
-  };
-
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required('Digite um nome valido.'),
-    email: Yup.string().email().required('Digite um email valido.'),
-    telefone: Yup.string().required('Digite um WhatsApp válido.'),
-    terms: Yup.bool().required().oneOf([true], 'Os termos devem ser aceitos!'),
-    password: Yup.string()
+    clinic_full_name: Yup.string().required('Digite um nome valido.'),
+    clinic_email: Yup.string().email().required('Digite um email valido.'),
+    clinic_phone: Yup.string().required('Digite um WhatsApp válido.'),
+    clinic_terms: Yup.bool().required().oneOf([true], 'Os termos devem ser aceitos!'),
+    clinic_password: Yup.string()
       .min(6, 'Deve ter pelo menos 6 caracteres')
       .matches(/[a-z]/, 'Deve conter pelo menos uma letra')
       .matches(/[^a-zA-Z0-9]/, 'Deve conter pelo menos um símbolo.')
       .required('Digite uma senha válida.'),
-    passwordConfirm: Yup.string()
-      .oneOf([Yup.ref('password'), undefined], 'As senhas devem coincidir.')
+    clinic_password_confirm: Yup.string()
+      .oneOf([Yup.ref('clinic_password'), undefined], 'As senhas devem coincidir.')
       .required('Confirme a senha.'),
   });
 
-  const initialValues: RegisterValues = { name: '', email: '', password: '', passwordConfirm: '', telefone: '', terms: false };
+  const initialValues: RegisterValues = {
+    clinic_full_name: '',
+    clinic_email: '',
+    clinic_password: '',
+    clinic_password_confirm: '',
+    clinic_phone: '',
+    clinic_terms: false,
+  };
 
   const { register } = useAuth();
 
@@ -85,15 +74,14 @@ const Register = () => {
 
   const leftSide = (
     <div className="min-h-100 d-flex align-items-center">
-      <div className="w-100 w-lg-75 w-xxl-50">
-      </div>
+      <div className="w-100 w-lg-75 w-xxl-50"></div>
     </div>
   );
 
   const rightSide = (
     <div className="sw-lg-70 min-h-100 bg-foreground d-flex justify-content-center align-items-center shadow-deep py-5 full-page-content-right-border">
       <div className="sw-lg-50 px-5">
-        <Col xs="12" sm={25} className='text-center'>
+        <Col xs="12" sm={25} className="text-center">
           <img src="/img/logo/logo.webp" className="img-fluid rounded-md" alt="Fluid image" />
         </Col>
         <div className="mb-2 mt-3">
@@ -104,32 +92,31 @@ const Register = () => {
         </div>
         <div>
           <form id="registerForm" className="tooltip-end-bottom" onSubmit={handleSubmit}>
-
             <div className="mb-3 filled form-group tooltip-end-top">
               <CsLineIcons icon="user" />
-              <Form.Control type="text" name="name" placeholder="Nome completo" value={values.name} onChange={handleChange} />
-              {errors.name && touched.name && <div className="d-block invalid-tooltip">{errors.name}</div>}
+              <Form.Control type="text" name="clinic_full_name" placeholder="Nome completo" value={values.clinic_full_name} onChange={handleChange} />
+              {errors.clinic_full_name && touched.clinic_full_name && <div className="d-block invalid-tooltip">{errors.clinic_full_name}</div>}
             </div>
 
             <div className="mb-3 filled form-group tooltip-end-top">
               <CsLineIcons icon="email" />
-              <Form.Control type="text" name="email" placeholder="Email profissional" value={values.email} onChange={handleChange} />
-              {errors.email && touched.email && <div className="d-block invalid-tooltip">{errors.email}</div>}
+              <Form.Control type="text" name="clinic_email" placeholder="Email profissional" value={values.clinic_email} onChange={handleChange} />
+              {errors.clinic_email && touched.clinic_email && <div className="d-block invalid-tooltip">{errors.clinic_email}</div>}
             </div>
 
             <div>
-
-              <div className="mb-3 filled form-group tooltip-end-top text-alternate">
-                <CsLineIcons icon="pin" />
-                <SelectCountry options={nacionalidades} onChange={option => handleNacionalidadeChange(option as Option)} />
-              </div>
-
               <div className="mb-3 filled form-group tooltip-end-top">
                 <CsLineIcons icon="phone" />
-                <InputMask mask={telefoneMask} value={values.telefone} onChange={(e) => setFieldValue('telefone', e.target.value)} className="form-control" name="telefone" placeholder="WhatsApp">
-                  {(inputProps) => <Form.Control {...inputProps} />}
+                <InputMask
+                  mask="55 99 99999-9999"
+                  value={values.clinic_phone}
+                  onChange={handleChange}
+                  className="form-control"
+                  name="clinic_phone"
+                  placeholder="WhatsApp"
+                >
                 </InputMask>
-                {errors.telefone && touched.telefone && <div className="d-block invalid-tooltip">{errors.telefone}</div>}
+                {errors.clinic_phone && touched.clinic_phone && <div className="d-block invalid-tooltip">{errors.clinic_phone}</div>}
               </div>
             </div>
 
@@ -137,9 +124,9 @@ const Register = () => {
               <CsLineIcons icon="lock-on" />
               <Form.Control
                 type={passwordType}
-                name="password"
+                name="clinic_password"
                 onChange={handleChange}
-                value={values.password}
+                value={values.clinic_password}
                 placeholder="Senha (6 dígitos, símbolo e letra)"
               />
               <div
@@ -149,16 +136,16 @@ const Register = () => {
               >
                 <CsLineIcons icon={eyeIcon} />
               </div>
-              {errors.password && touched.password && <div className="d-block invalid-tooltip">{errors.password}</div>}
+              {errors.clinic_password && touched.clinic_password && <div className="d-block invalid-tooltip">{errors.clinic_password}</div>}
             </div>
 
             <div className="mb-3 filled form-group tooltip-end-top position-relative">
               <CsLineIcons icon="lock-on" />
               <Form.Control
                 type={passwordType}
-                name="passwordConfirm"
+                name="clinic_password_confirm"
                 onChange={handleChange}
-                value={values.passwordConfirm}
+                value={values.clinic_password_confirm}
                 placeholder="Confirme sua senha"
               />
               <div
@@ -168,12 +155,21 @@ const Register = () => {
               >
                 <CsLineIcons icon={eyeIcon} />
               </div>
-              {errors.passwordConfirm && touched.passwordConfirm && <div className="d-block invalid-tooltip">{errors.passwordConfirm}</div>}
+              {errors.clinic_password_confirm && touched.clinic_password_confirm && (
+                <div className="d-block invalid-tooltip">{errors.clinic_password_confirm}</div>
+              )}
             </div>
 
             <div className="mb-3 position-relative form-group">
               <div className="form-check">
-                <input type="checkbox" className="form-check-input" name="terms" onChange={handleChange} value={values.terms ? 1 : 0} checked={values.terms} />
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  name="clinic_terms"
+                  onChange={handleChange}
+                  value={values.clinic_terms ? 1 : 0}
+                  checked={values.clinic_terms}
+                />
                 <label className="form-check-label">
                   Eu li e aceito os{' '}
                   <NavLink to="https://dietsystem.com.br/termos-de-uso" target="_blank" className="text-alternate">
@@ -190,11 +186,11 @@ const Register = () => {
                   </NavLink>
                 </label>
 
-                {errors.terms && touched.terms && <div className="d-block invalid-tooltip">{errors.terms}</div>}
+                {errors.clinic_terms && touched.clinic_terms && <div className="d-block invalid-tooltip">{errors.clinic_terms}</div>}
               </div>
             </div>
 
-            <div className='text-center'>
+            <div className="text-center">
               <AsyncButton isSaving={isLoging} size="lg" type="submit">
                 Criar conta gratuita
               </AsyncButton>

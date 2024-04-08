@@ -17,7 +17,7 @@ const usePatients = create<createPatients>(() => {
     patients: [],
 
     getPatients: async () => {
-      const { data } = await api.get<(Patient & { id: number })[]>('/paciente')
+      const { data } = await api.get<(Patient & { id: number })[]>('/clinic-patient/by-clinic')
 
       return data;
     },
@@ -26,9 +26,9 @@ const usePatients = create<createPatients>(() => {
       try {
         let newPatient: Patient & { id: number };
 
-        if(!payload.id) {
-          const { data } = await api.post<Patient & { id: number }>('/paciente', payload);
-          newPatient = {...data, name: data.name || ''}; // Ensure name is not undefined
+        if(!payload.patient_id) {
+          const { data } = await api.post<Patient & { id: number }>('/clinic-patient', payload);
+          newPatient = {...data, patient_full_name: data.patient_full_name || ''}; // Ensure name is not undefined
         } else {
           newPatient = payload as Patient & { id: number };
         }
@@ -41,7 +41,7 @@ const usePatients = create<createPatients>(() => {
           return patients?.length ? [value, ...patients] : [value];
         });
 
-        !payload.id && notify('Sucesso', 'Paciente cadastrado com sucesso', 'check', 'success');
+        !payload.patient_id && notify('Sucesso', 'Paciente cadastrado com sucesso', 'check', 'success');
 
         return true;
       } catch (error) {
@@ -62,12 +62,12 @@ const usePatients = create<createPatients>(() => {
         const value: (Patient & { key: string }) = { ...patient, key: patient.id.toString() };
 
         queryClient.setQueryData(['my-patients'], (patients: Patient[]) => {
-          const updatedExams = patients.filter((e) => e.id !== patient.id);
+          const updatedExams = patients.filter((e) => e.patient_id !== patient.patient_id);
 
           return updatedExams?.length ? [...updatedExams] : [];
         });
 
-        await api.delete('/paciente/' + value.id)
+        await api.delete('/paciente/' + value.patient_id)
 
         return true;
       } catch (error) {
@@ -84,7 +84,7 @@ const usePatients = create<createPatients>(() => {
       try {
         queryClient.setQueryData(['my-patients'], (patients: Patient[]) => {
           const updatedExams = patients?.length ? patients.map((e) => {
-            if (e.id === payload.id) {
+            if (e.patient_id === payload.patient_id) {
               return {...e, ...payload};
             }
 

@@ -141,7 +141,7 @@ const routesAndMenuItems: RoutesAndMenuItems = {
       label: 'home',
       icon: 'home',
       component: dashboard,
-      roles: [Role.PROFESSIONAL],
+      roles: [],
     },
     {
       path: `${appRoot}/calendar`,
