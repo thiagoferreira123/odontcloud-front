@@ -1,5 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
 import { CarePlan } from "../../../CarePlan/hooks/CarePlanStore/types";
+import { CarePlanBudgetHistoryItem } from "../CarePlanBudgetHistoryItem/types";
 
 export interface CarePlanBudget {
   budget_id: string;
@@ -18,11 +19,10 @@ export interface CarePlanBudget {
   budget_entry_payment: string;
   budget_pay_day: string;
   budget_observations: string;
-  paymentHistorics: CarePlan[];
+  paymentHistorics: CarePlanBudgetHistoryItem[];
 }
 
 export type CarePlanBudgetActions = {
-  addCarePlanBudget: (careplanDetailData: Partial<CarePlanBudget>, queryClient: QueryClient) => Promise<CarePlanBudget | false>;
   updateCarePlanBudget: (careplanDetailData: CarePlanBudget, queryClient: QueryClient) => Promise<boolean>;
   removeCarePlanBudget: (careplan: CarePlanBudget, queryClient: QueryClient) => Promise<boolean>;
 };

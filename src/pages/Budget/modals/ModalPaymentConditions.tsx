@@ -11,6 +11,10 @@ registerLocale('pt-BR', ptBR);
 import { useFormik } from 'formik';
 import useCarePlanBudgetStore from '../hooks/CarePlanBudgetStore';
 import { useQueryClient } from '@tanstack/react-query';
+import { CarePlanBudgetHistoryItem } from '../hooks/CarePlanBudgetHistoryItem/types';
+import { parseToBrValue } from '../../../helpers/StringHelpers';
+import useCarePlanBudgetHistoryItemStore from '../hooks/CarePlanBudgetHistoryItem';
+import { parseDateToIso } from '../../../helpers/DateHelper';
 
 interface ModalPaymentConditionsProps {
   showModal: boolean;
@@ -33,6 +37,7 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
   const queryClient = useQueryClient();
 
   const { updateCarePlanBudget } = useCarePlanBudgetStore();
+  const { createMenyCarePlanBudgetHistoryItems } = useCarePlanBudgetHistoryItemStore();
 
   const onSubmit = async (values: any) => {
     try {
@@ -49,9 +54,28 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
         budget_pay_day: values.budget_pay_day,
       };
 
-      console.log('payload', payload);
-
       const response = await updateCarePlanBudget(payload, queryClient);
+
+      const installments = values.budget_number_installments ? Number(values.budget_number_installments) : 1;
+
+      const parsedDiscountValue = values.budget_discount_value ? values.budget_discount_value.replace('.', '').replace(',', '.') : '0';
+      const valueWithDiscount =
+        values.budget_discount_type === 'percentage'
+          ? parseFloat(carePlanBudget.budget_value.replace('.', '').replace(',', '.')) -
+            (parseFloat(carePlanBudget.budget_value.replace('.', '').replace(',', '.')) * parseFloat(parsedDiscountValue)) / 100
+          : parseFloat(carePlanBudget.budget_value.replace('.', '').replace(',', '.')) - parseFloat(parsedDiscountValue);
+
+      console.log('valueWithDiscount', valueWithDiscount)
+
+      const responseItems = await createMenyCarePlanBudgetHistoryItems(
+        {
+          paymentBudgetId: carePlanBudget.budget_id,
+          totalAmount: Number(valueWithDiscount),
+          installments: installments,
+          firstPaymentDate: parseDateToIso(values.budget_due_first_installment),
+        },
+        queryClient
+      );
 
       setIsSaving(false);
 

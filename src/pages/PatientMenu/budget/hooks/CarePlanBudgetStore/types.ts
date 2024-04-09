@@ -1,5 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
 import { CarePlan } from "../../../../CarePlan/hooks/CarePlanStore/types";
+import { CarePlanBudgetHistoryItem } from "../../../../Budget/hooks/CarePlanBudgetHistoryItem/types";
 
 export interface CarePlanBudget {
   budget_id: string;
@@ -18,7 +19,7 @@ export interface CarePlanBudget {
   budget_entry_payment: string;
   budget_pay_day: string;
   budget_observations: string;
-  paymentHistorics: CarePlan[];
+  paymentHistorics: CarePlanBudgetHistoryItem[];
 }
 
 export type CarePlanBudgetActions = {
