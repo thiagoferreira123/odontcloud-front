@@ -10,12 +10,43 @@ import Empty from '../../components/Empty';
 import { useModalNewProcedureStore } from './hooks/ModalNewProcedureStore';
 import { Procedure } from './hooks/CarePlanStore/types';
 import { TranslatedProcedureStatus } from './hooks/ProcedureStore/types';
+import useProfessionalStore from '../MySettings/hooks/ProfessionalStore';
+import { AppException } from '../../helpers/ErrorHelpers';
+import { useAuth } from '../Auth/Login/hook';
+import { notify } from '../../components/toast/NotificationIcon';
+import { Professional } from '../MySettings/hooks/ProfessionalStore/types';
+
+const getProfessionalName = (professionalId: string, professionals: Professional[]) => {
+  return professionals.find((professional: any) => professional.professional_id === professionalId)?.professional_full_name;
+};
 
 export default function CarePlan() {
   const { id } = useParams();
 
+  const user = useAuth((state) => state.user);
+
   const { getCarePlan } = useCarePlanStore();
   const { handleShowModalNewProcedure, handleSelectProcedureToEdit } = useModalNewProcedureStore();
+
+  const { getProfessionals } = useProfessionalStore();
+
+  const getProfessionals_ = async () => {
+    try {
+      if (!user) throw new AppException('Usuário não encontrado');
+
+      const response = await getProfessionals(user.clinic_id);
+
+      if (response === false) throw new Error('Erro ao buscar profissionais');
+
+      return response;
+    } catch (error) {
+      console.error(error);
+      error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
+      throw error;
+    }
+  };
+
+  const resultProfessionals = useQuery({ queryKey: ['professionals'], queryFn: getProfessionals_, enabled: !!user?.clinic_id });
 
   const getCarePlan_ = async () => {
     try {
@@ -36,7 +67,7 @@ export default function CarePlan() {
 
   const totalValue =
     result.data?.procedures.reduce((acc: number, procedure: Procedure) => {
-      return acc + (Number(procedure.procedure_value.replace('.', '').replace(',', '.')) * procedure.teeth.length);
+      return acc + Number(procedure.procedure_value.replace('.', '').replace(',', '.')) * procedure.teeth.length;
     }, 0) ?? 0;
 
   const procedureNumber = result.data?.procedures.length ?? 0;
@@ -46,7 +77,7 @@ export default function CarePlan() {
     <>
       <h2 className="medium-title">Plano de tratamento</h2>
       <Card body className="mb-2">
-        {result.isLoading ? (
+        {result.isLoading || resultProfessionals.isLoading ? (
           <div className="sh-30 d-flex align-items-center">
             <StaticLoading />
           </div>
@@ -75,7 +106,12 @@ export default function CarePlan() {
                       {procedure.procedure_name}
                       <OverlayTrigger
                         placement="top"
-                        overlay={<Tooltip id="button-tooltip-3">O procedimento será realizado pelo profissional Thiago Ferreira</Tooltip>}
+                        overlay={
+                          <Tooltip id="button-tooltip-3">
+                            O procedimento será realizado pelo profissional{' '}
+                            {resultProfessionals.data && getProfessionalName(procedure.procedure_professional_id, resultProfessionals.data)}
+                          </Tooltip>
+                        }
                       >
                         <Icon.InfoCircle className="ms-2" />
                       </OverlayTrigger>{' '}

@@ -55,7 +55,11 @@ const Professionals = () => {
             <div className="border-bottom border-separator-light mb-2 pb-2" key={professional.professional_id}>
               <Row className="g-0 sh-6">
                 <Col xs="auto">
-                  <img src={professional.professional_photo_link ?? '/img/profile/profile-11.webp'} className="card-img rounded-xl sh-6 sw-6" alt="thumb" />
+                  <img
+                    src={professional.professional_photo_link ? professional.professional_photo_link : '/img/profile/profile-11.webp'}
+                    className="card-img rounded-xl sh-6 sw-6"
+                    alt="thumb"
+                  />
                 </Col>
                 <Col>
                   <div className="d-flex flex-row pt-0 pb-0 ps-3 pe-0 h-100 align-items-center justify-content-between">
