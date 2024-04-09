@@ -5,25 +5,30 @@ export interface CarePlan {
   care_plan_clinic_id: string;
   care_plan_patient_id: string;
   care_plan_date_creation: string;
-  teeth: Procedure[];
+  procedures: Procedure[];
 }
 export interface Tooth {
-  tooth_id: string;
-  tooth_procedure_id: string;
+  tooth_id?: string;
+  tooth_procedure_id?: string;
   tooth_number: string;
-  tooth_quadrant: string;
   tooth_faces: string;
 }
 export interface Procedure {
   procedure_id: string;
   procedure_name: string;
   procedure_care_plan_id: string;
-  procedure_professional_id: string;
+  procedure_professional_id?: string;
   procedure_value: string;
   procedure_deciduous_or_permanent: "deciduos" | "permanent";
   procedure_observations: string;
-  procedure_status: "pending" | "realized" | "pre-existing"; 
-  procedures: Tooth[];
+  procedure_status: "pending" | "realized" | "pre-existing";
+  teeth: Tooth[];
+}
+
+export enum TranslatedProcedureStatus {
+  pending = "Pendente",
+  realized = "Realizado",
+  "pre-existing" = "Pré-existente",
 }
 
 export type ProcedureActions = {

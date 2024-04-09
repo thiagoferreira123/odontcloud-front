@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import { Col, Form, Modal, Row } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useModalNewProcedureStore } from '../hooks/ModalNewProcedureStore';
@@ -10,11 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { notify } from '../../../components/toast/NotificationIcon';
 import useProcedureStore from '../hooks/ProcedureStore';
 import { useParams } from 'react-router-dom';
-
-interface ModalNewProcedure {
-  showModal: boolean;
-  onHide: () => void;
-}
+import { AppException } from '../../../helpers/ErrorHelpers';
 
 export interface ModalNewProcedureFormValues {
   procedure_name: string;
@@ -25,27 +21,26 @@ export interface ModalNewProcedureFormValues {
   procedure_status: 'pending' | 'realized' | 'pre-existing';
   teeth: {
     tooth_number: string;
-    tooth_quadrant?: string;
+    tooth_faces: string[];
   }[];
-  tooth_faces: string[];
 }
 
-const ModalNewProcedure = ({ showModal, onHide }: ModalNewProcedure) => {
+const ModalNewProcedure = () => {
   const { id } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
 
+  const showModal = useModalNewProcedureStore((state) => state.showModal);
   const selectedProcedure = useModalNewProcedureStore((state) => state.selectedProcedure);
   const showOnlyClinicProcedures = useModalNewProcedureStore((state) => state.showOnlyClinicProcedures);
 
   const initialValues: ModalNewProcedureFormValues = {
     procedure_name: '',
     procedure_value: '',
-    procedure_deciduous_or_permanent: 'deciduos',
+    procedure_deciduous_or_permanent: 'permanent',
     procedure_observations: '',
     procedure_status: 'pending',
     teeth: [],
-    tooth_faces: [],
   };
 
   const validationSchema = Yup.object().shape({
@@ -56,11 +51,10 @@ const ModalNewProcedure = ({ showModal, onHide }: ModalNewProcedure) => {
       .of(
         Yup.object().shape({
           tooth_number: Yup.string(),
-          tooth_quadrant: Yup.string(),
+          tooth_faces: Yup.array().of(Yup.string()),
         })
       )
       .min(1, 'Selecione pelo menos um dente'),
-    // tooth_faces: Yup.array().of(Yup.string()).min(1, 'Selecione pelo menos uma face'),
   });
 
   const handleChangeMaskMoney = (event: { target: { value: string } }) => {
@@ -76,16 +70,17 @@ const ModalNewProcedure = ({ showModal, onHide }: ModalNewProcedure) => {
     setIsSaving(true);
 
     try {
+      if (!id) throw new AppException('ID do plano de tratamento não encontrado');
+
       const payload = {
         procedure_name: values.procedure_name,
         procedure_value: values.procedure_value,
         procedure_deciduous_or_permanent: values.procedure_deciduous_or_permanent,
         procedure_observations: values.procedure_observations,
         procedure_status: values.procedure_status,
-        teeth: values.teeth.map(tooth => ({
+        teeth: values.teeth.map((tooth) => ({
           tooth_number: tooth.tooth_number,
-          tooth_quadrant: tooth.tooth_quadrant,
-          tooth_faces: JSON.stringify(values.tooth_faces),
+          tooth_faces: JSON.stringify(tooth.tooth_faces),
         })),
         procedure_care_plan_id: id,
       };
@@ -93,10 +88,18 @@ const ModalNewProcedure = ({ showModal, onHide }: ModalNewProcedure) => {
       if (!selectedProcedure) {
         const response = await addProcedure(payload, queryClient);
 
-        if (response !== false) hideModal();
+        if (response === false) throw new Error('Erro ao adicionar procedimento');
+
+        resetForm();
+      } else {
+        const response = await updateProcedure({ ...payload, procedure_id: selectedProcedure.procedure_id, procedure_care_plan_id: id }, queryClient);
+
+        if (response === false) throw new Error('Erro ao atualizar procedimento');
 
         resetForm();
       }
+
+      hideModal();
 
       setIsSaving(false);
     } catch (error) {
@@ -106,24 +109,57 @@ const ModalNewProcedure = ({ showModal, onHide }: ModalNewProcedure) => {
     }
   };
 
-  const handleToggleToothFaces = (face: string, checked: boolean) => {
+  const handleToggleToothFaces = (face: string, checked: boolean, index: number) => {
     if (checked) {
-      setFieldValue('tooth_faces', [...values.tooth_faces, face]);
+      setFieldValue('teeth', [
+        ...values.teeth.slice(0, index),
+        {
+          ...values.teeth[index],
+          tooth_faces: [...values.teeth[index].tooth_faces, face],
+        },
+        ...values.teeth.slice(index + 1),
+      ]);
     } else {
       setFieldValue(
-        'tooth_faces',
-        values.tooth_faces.filter((f) => f !== face)
+        'teeth',
+        values.teeth.map((tooth, i) => {
+          if (i === index) {
+            return {
+              ...tooth,
+              tooth_faces: tooth.tooth_faces.filter((item) => item !== face),
+            };
+          }
+
+          return tooth;
+        })
       );
     }
   };
 
   const formik = useFormik({ initialValues, validationSchema, onSubmit });
-  const { handleChange, handleSubmit, setFieldValue, resetForm, values, touched, errors } = formik;
+  const { handleChange, handleSubmit, setFieldValue, setValues, resetForm, values, touched, errors } = formik;
   const { setShowOnlyClinicProcedures, hideModal } = useModalNewProcedureStore();
-  const { addProcedure } = useProcedureStore();
+  const { addProcedure, updateProcedure } = useProcedureStore();
+
+  useEffect(() => {
+    setValues({
+      procedure_name: selectedProcedure?.procedure_name || '',
+      procedure_value: selectedProcedure?.procedure_value || '',
+      procedure_deciduous_or_permanent: selectedProcedure?.procedure_deciduous_or_permanent || 'permanent',
+      procedure_observations: selectedProcedure?.procedure_observations || '',
+      procedure_status: selectedProcedure?.procedure_status || 'pending',
+      teeth:
+        selectedProcedure?.teeth.map((tooth) => {
+          return {
+            tooth_number: tooth.tooth_number,
+            tooth_faces: JSON.parse(tooth.tooth_faces),
+          };
+        }) || [],
+    });
+  }, [selectedProcedure]);
 
   return (
-    <Modal size="lg" className="modal-close-out" backdrop="static" show={showModal} onHide={onHide}>
+    <Modal size="lg" className="modal-close-out" backdrop="static" show={showModal} onHide={hideModal}>
       <Modal.Header closeButton>
         <Modal.Title>Novo procedimento</Modal.Title>
       </Modal.Header>
@@ -191,53 +227,55 @@ const ModalNewProcedure = ({ showModal, onHide }: ModalNewProcedure) => {
               {errors.teeth && touched.teeth && <div className="error">{errors.teeth.toString()}</div>}
             </Col>
           </Row>
-          <Row>
-            <Form.Label className="d-block">
-              <strong>Faces do dente 51:</strong>
-            </Form.Label>
-            <Col xs="12" className="mb-3 d-flex">
-              <Form.Check
-                type="checkbox"
-                label="Oclusal/Incisal"
-                id="tooth_faces1"
-                className="me-4"
-                checked={values.tooth_faces.includes('Oclusal/Incisal')}
-                onChange={(e) => handleToggleToothFaces('Oclusal/Incisal', e.target.checked)}
-              />
-              <Form.Check
-                type="checkbox"
-                label="Lingual/Palatina"
-                id="tooth_faces2"
-                className="me-4"
-                checked={values.tooth_faces.includes('Lingual/Palatina')}
-                onChange={(e) => handleToggleToothFaces('Lingual/Palatina', e.target.checked)}
-              />
-              <Form.Check
-                type="checkbox"
-                label="Vestibular"
-                id="tooth_faces3"
-                className="me-4"
-                checked={values.tooth_faces.includes('Vestibular')}
-                onChange={(e) => handleToggleToothFaces('Vestibular', e.target.checked)}
-              />
-              <Form.Check
-                type="checkbox"
-                label="Mesial"
-                id="tooth_faces4"
-                className="me-4"
-                checked={values.tooth_faces.includes('Mesial')}
-                onChange={(e) => handleToggleToothFaces('Mesial', e.target.checked)}
-              />
-              <Form.Check
-                type="checkbox"
-                label="Distal"
-                id="tooth_faces5"
-                className="me-4"
-                checked={values.tooth_faces.includes('Distal')}
-                onChange={(e) => handleToggleToothFaces('Distal', e.target.checked)}
-              />
-            </Col>
-          </Row>
+          {values.teeth.map((tooth, index) => (
+            <Row key={index}>
+              <Form.Label className="d-block">
+                <strong>Faces do dente {tooth.tooth_number}:</strong>
+              </Form.Label>
+              <Col xs="12" className="mb-3 d-flex">
+                <Form.Check
+                  type="checkbox"
+                  label="Oclusal/Incisal"
+                  id="tooth_faces1"
+                  className="me-4"
+                  checked={values.teeth[index].tooth_faces.includes('Oclusal/Incisal')}
+                  onChange={(e) => handleToggleToothFaces('Oclusal/Incisal', e.target.checked, index)}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Lingual/Palatina"
+                  id="tooth_faces2"
+                  className="me-4"
+                  checked={values.teeth[index].tooth_faces.includes('Lingual/Palatina')}
+                  onChange={(e) => handleToggleToothFaces('Lingual/Palatina', e.target.checked, index)}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Vestibular"
+                  id="tooth_faces3"
+                  className="me-4"
+                  checked={values.teeth[index].tooth_faces.includes('Vestibular')}
+                  onChange={(e) => handleToggleToothFaces('Vestibular', e.target.checked, index)}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Mesial"
+                  id="tooth_faces4"
+                  className="me-4"
+                  checked={values.teeth[index].tooth_faces.includes('Mesial')}
+                  onChange={(e) => handleToggleToothFaces('Mesial', e.target.checked, index)}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Distal"
+                  id="tooth_faces5"
+                  className="me-4"
+                  checked={values.teeth[index].tooth_faces.includes('Distal')}
+                  onChange={(e) => handleToggleToothFaces('Distal', e.target.checked, index)}
+                />
+              </Col>
+            </Row>
+          ))}
           <Row>
             <Form.Label className="d-block">
               <strong>Estado</strong>

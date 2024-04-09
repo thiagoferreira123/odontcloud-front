@@ -11,7 +11,7 @@ interface ModalNewProcedureStore {
   hideModal: () => void;
   handleSelectProcedureToEdit: (Procedure: Procedure) => void;
   handleChangeProcedure: (Procedure: Partial<Procedure>) => void;
-  handleShowModal: () => void;
+  handleShowModalNewProcedure: () => void;
 }
 
 export const useModalNewProcedureStore = create<ModalNewProcedureStore>((set) => ({
@@ -37,7 +37,7 @@ export const useModalNewProcedureStore = create<ModalNewProcedureStore>((set) =>
     });
   },
 
-  handleShowModal: () => {
+  handleShowModalNewProcedure: () => {
     set({ showModal: true, selectedProcedure: null });
   },
 }));

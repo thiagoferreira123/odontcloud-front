@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import { procedures } from '../constants';
 import useClinicProcedureStore from '../hooks/ClinicProcedureStore';
@@ -23,6 +23,7 @@ type ProcedureSelectProps = {
 
 const ProcedureSelect = ({ formik }: ProcedureSelectProps) => {
   const [value, setValue] = useState<Option>();
+  const [options, setOptions] = useState<Option[]>([]);
   const showOnlyClinicProcedures = useModalNewProcedureStore((state) => state.showOnlyClinicProcedures);
 
   const user = useAuth((state) => state.user);
@@ -48,29 +49,39 @@ const ProcedureSelect = ({ formik }: ProcedureSelectProps) => {
 
   const result = useQuery({ queryKey: ['clinic-procedures'], queryFn: getClinicProcedure_, enabled: !!user?.clinic_id });
 
-  if (result.isLoading) return <StaticLoading />;
-
-  const apiOptions =
-    result.data?.map((procedure) => ({
-      label: procedure.clinic_procedure_description,
-      value: procedure.clinic_procedure_description,
-    })) ?? [];
-
-  const procedureOptions = procedures.map((procedure) => ({
-    label: procedure.procedures,
-    value: procedure.procedures,
-  }));
-
-  const options = showOnlyClinicProcedures ? apiOptions : [...procedureOptions, ...apiOptions];
+  let apiOptions = []; // Certifique-se de que este estado não cause re-renderizações desnecessárias.
+  let procedureOptions = []; // Ajustado conforme lógica necessária.
 
   const handleChange = (option: Option) => {
-    setValue(option);
-
     const apiObject = result.data?.find((procedure) => procedure.clinic_procedure_description === option.value);
 
     setFieldValue('procedure_name', option.value);
     apiObject && setFieldValue('procedure_value', apiObject.clinic_procedure_value);
   }
+
+  useEffect(() => {
+    // Esta parte é executada para calcular as opções baseadas nos dados da API.
+    apiOptions = result.data?.map(procedure => ({
+      label: procedure.clinic_procedure_description,
+      value: procedure.clinic_procedure_description,
+    })) ?? [];
+
+    procedureOptions = procedures.map(procedure => ({
+      label: procedure.procedures,
+      value: procedure.procedures,
+    }));
+
+    setOptions(showOnlyClinicProcedures ? apiOptions : [...procedureOptions, ...apiOptions]);
+  }, [result.data, showOnlyClinicProcedures]);
+
+  useEffect(() => {
+    if (values.procedure_name) {
+      const option = options.find((o) => o.value === values.procedure_name);
+      option && setValue(option);
+    }
+  }, [values.procedure_name, options]);
+
+  if (result.isLoading) return <StaticLoading />;
 
   return <Select classNamePrefix="react-select" options={options} value={value} onChange={o => handleChange(o as Option)} placeholder="" />;
 };

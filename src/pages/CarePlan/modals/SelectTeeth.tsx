@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Select, { MultiValue } from 'react-select';
 import { ModalNewProcedureFormValues } from './ModalNewProcedure';
 import { FormikErrors, FormikTouched } from 'formik';
@@ -10,7 +10,6 @@ type ProcedureSelectProps = {
       field: string,
       value: {
         tooth_number: string;
-        tooth_quadrant?: string;
       }[],
       shouldValidate?: boolean | undefined
     ) => void;
@@ -84,15 +83,23 @@ const SelectTeeth = ({ formik }: ProcedureSelectProps) => {
   ];
 
   const handleChange = (option: MultiValue<Option>) => {
-    setValue(option);
-
     setFieldValue(
       'teeth',
       option.map((o) => ({
         tooth_number: o.value,
+        tooth_faces: [],
       }))
     );
   };
+
+  useEffect(() => {
+    setValue(
+      values.teeth.map((tooth) => ({
+        value: tooth.tooth_number,
+        label: tooth.tooth_number,
+      }))
+    );
+  }, [values.teeth]);
 
   return (
     <Select

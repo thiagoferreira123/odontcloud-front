@@ -7,14 +7,15 @@ import useCarePlanStore from './hooks/CarePlanStore';
 import { useQuery } from '@tanstack/react-query';
 import StaticLoading from '../../components/loading/StaticLoading';
 import Empty from '../../components/Empty';
+import { useModalNewProcedureStore } from './hooks/ModalNewProcedureStore';
+import { Procedure } from './hooks/CarePlanStore/types';
+import { TranslatedProcedureStatus } from './hooks/ProcedureStore/types';
 
 export default function CarePlan() {
   const { id } = useParams();
 
-  const [showModal, setShowModal] = useState(false);
-  const handleClose = () => setShowModal(false);
-
   const { getCarePlan } = useCarePlanStore();
+  const { handleShowModalNewProcedure, handleSelectProcedureToEdit } = useModalNewProcedureStore();
 
   const getCarePlan_ = async () => {
     try {
@@ -33,21 +34,27 @@ export default function CarePlan() {
 
   const result = useQuery({ queryKey: ['careplan', id], queryFn: getCarePlan_, enabled: !!id });
 
+  const totalValue =
+    result.data?.procedures.reduce((acc: number, procedure: Procedure) => {
+      return acc + (Number(procedure.procedure_value.replace('.', '').replace(',', '.')) * procedure.teeth.length);
+    }, 0) ?? 0;
+
+  const procedureNumber = result.data?.procedures.length ?? 0;
+  const teethNumber = result.data?.procedures.reduce((acc: number, procedure: Procedure) => acc + procedure.teeth.length, 0) ?? 0;
+
   return (
     <>
       <h2 className="medium-title">Plano de tratamento</h2>
       <Card body className="mb-2">
         {result.isLoading ? (
-          <div className='sh-30 d-flex align-items-center'>
+          <div className="sh-30 d-flex align-items-center">
             <StaticLoading />
           </div>
         ) : result.isError ? (
-          <div className='sh-30 d-flex align-items-center justify-content-center'>
-            Erro ao buscar plano de tratamento
-          </div>
+          <div className="sh-30 d-flex align-items-center justify-content-center">Erro ao buscar plano de tratamento</div>
         ) : !result.data?.procedures.length ? (
-          <div className='sh-30 d-flex align-items-center justify-content-center'>
-            <Empty message='Nenhum procedimento cadastrado' classNames='mt-0' />
+          <div className="sh-30 d-flex align-items-center justify-content-center">
+            <Empty message="Nenhum procedimento cadastrado" classNames="mt-0" />
           </div>
         ) : (
           <Table striped>
@@ -61,75 +68,62 @@ export default function CarePlan() {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <th>
-                  Acompanhamento de tratamento/procedimento cirúrgico em odontologia
-                  <OverlayTrigger
-                    placement="top"
-                    overlay={<Tooltip id="button-tooltip-3">O procedimento será realizado pelo profissional Thiago Ferreira</Tooltip>}
-                  >
-                    <Icon.InfoCircle className="ms-2" />
-                  </OverlayTrigger>{' '}
-                </th>
-                <td>15 O, P, V, M, D</td>
-                <td>R$ 250,00</td>
-                <td>
-                  <Badge bg="danger">Pendente</Badge>
-                </td>
-                <td>
-                  <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Editar procedimento</Tooltip>}>
-                    <Button size="sm" className="me-1" variant="outline-primary">
-                      <Icon.Pencil />
-                    </Button>
-                  </OverlayTrigger>{' '}
-                  <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Remover procedimento</Tooltip>}>
-                    <Button size="sm" className="me-1" variant="outline-primary">
-                      <Icon.TrashFill />
-                    </Button>
-                  </OverlayTrigger>{' '}
-                </td>
-              </tr>
-              <tr>
-                <th>
-                  Acompanhamento de tratamento/procedimento cirúrgico em odontologia
-                  <OverlayTrigger
-                    placement="top"
-                    overlay={<Tooltip id="button-tooltip-3">O procedimento será realizado pelo profissional Thiago Ferreira</Tooltip>}
-                  >
-                    <Icon.InfoCircle className="ms-2" />
-                  </OverlayTrigger>{' '}
-                </th>
-                <td>30 P, V, M, D</td>
-                <td>R$ 350,00</td>
-                <td>
-                  <Badge bg="danger">Pendente</Badge>
-                </td>
-                <td>
-                  <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Editar procedimento</Tooltip>}>
-                    <Button size="sm" className="me-1" variant="outline-primary">
-                      <Icon.Pencil />
-                    </Button>
-                  </OverlayTrigger>{' '}
-                  <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Remover procedimento</Tooltip>}>
-                    <Button size="sm" className="me-1" variant="outline-primary">
-                      <Icon.TrashFill />
-                    </Button>
-                  </OverlayTrigger>{' '}
-                </td>
-              </tr>
+              {result.data.procedures.map((procedure: Procedure) =>
+                procedure.teeth.map((tooth) => (
+                  <tr key={tooth.tooth_id}>
+                    <th>
+                      {procedure.procedure_name}
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={<Tooltip id="button-tooltip-3">O procedimento será realizado pelo profissional Thiago Ferreira</Tooltip>}
+                      >
+                        <Icon.InfoCircle className="ms-2" />
+                      </OverlayTrigger>{' '}
+                    </th>
+                    <td>
+                      {tooth.tooth_number}{' '}
+                      {tooth.tooth_faces &&
+                        JSON.parse(tooth.tooth_faces)
+                          .map((f: string) => f[0])
+                          .join(', ')}
+                    </td>
+                    <td>
+                      {Number(procedure.procedure_value.replace('.', '').replace(',', '.')).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    </td>
+                    <td>
+                      <Badge bg={procedure.procedure_status === 'realized' ? 'success' : procedure.procedure_status === 'pre-existing' ? 'warning' : 'danger'}>
+                        {TranslatedProcedureStatus[procedure.procedure_status]}
+                      </Badge>
+                    </td>
+                    <td>
+                      <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Editar procedimento</Tooltip>}>
+                        <Button size="sm" className="me-1" variant="outline-primary" onClick={() => handleSelectProcedureToEdit(procedure)}>
+                          <Icon.Pencil />
+                        </Button>
+                      </OverlayTrigger>{' '}
+                      <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Remover procedimento</Tooltip>}>
+                        <Button size="sm" className="me-1" variant="outline-primary">
+                          <Icon.TrashFill />
+                        </Button>
+                      </OverlayTrigger>{' '}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </Table>
         )}
       </Card>
       <div className="text-center">
-        <Button size="lg" className="me-1 mb-4" onClick={() => setShowModal(true)}>
+        <Button size="lg" className="me-1 mb-4" onClick={handleShowModalNewProcedure}>
           Cadastrar procedimento
           <Icon.Plus />
         </Button>
       </div>
       <div className="text-center mt-4">
         <h5>
-          <strong>1</strong> procedimento(s), em <strong>2</strong> dente(s), totalizando um valor de: <strong>R$ 600,00</strong>
+          <strong>{procedureNumber}</strong> procedimento(s), em <strong>{teethNumber}</strong> dente(s), totalizando um valor de: 
+          <strong>{totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
           <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Crie um prçamento para encaminhar para o paciente.</Tooltip>}>
             <Button size="sm" className="ms-3 mb-3 mt-3" variant="primary">
               Gerar orçamento
@@ -139,7 +133,7 @@ export default function CarePlan() {
         </h5>
       </div>
       <div className="text-center mt1"></div>
-      <ModalNewProcedure showModal={showModal} onHide={handleClose} />
+      <ModalNewProcedure />
     </>
   );
 }

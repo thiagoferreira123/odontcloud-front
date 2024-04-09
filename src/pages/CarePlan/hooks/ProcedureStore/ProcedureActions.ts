@@ -1,14 +1,21 @@
 import { notify } from "../../../../components/toast/NotificationIcon";
 import api from "../../../../services/useAxios";
-import { Procedure, ProcedureActions } from "./types";
+import { CarePlan, Procedure, ProcedureActions } from "./types";
 
 const useProcedureActions = (): ProcedureActions => ({
 
-  addProcedure: async (procedureDetailData, queryClient) => {
+  addProcedure: async (payload, queryClient) => {
     try {
-      const { data } = await api.post<Procedure>('/procedure/', procedureDetailData);
+      const { data } = await api.post<Procedure>('/procedure/', payload);
 
-      queryClient.setQueryData<Procedure[]>(['procedures', procedureDetailData.procedure_id ], (oldData) => [...(oldData || []), data]);
+      queryClient.setQueryData<CarePlan>(['careplan', payload.procedure_care_plan_id ], (oldData) => {
+        if (oldData) {
+          return {
+            ...oldData,
+            procedures: [...oldData.procedures, data],
+          };
+        }
+      });
 
       notify('Procedimento adicionado com sucesso', 'Sucesso', 'check', 'success');
 
@@ -20,13 +27,18 @@ const useProcedureActions = (): ProcedureActions => ({
     }
   },
 
-  updateProcedure: async (procedureDetailData, queryClient) => {
+  updateProcedure: async (payload, queryClient) => {
     try {
-      const { data } = await api.patch<Procedure>(`/procedure/${procedureDetailData.procedure_id }`, procedureDetailData);
+      const { data } = await api.patch<Procedure>(`/procedure/${payload.procedure_id }`, payload);
 
-      queryClient.setQueryData<Procedure[]>(['procedures', procedureDetailData.procedure_id ], (oldData) =>
-        oldData ? oldData.map(detail => detail.procedure_id  === data.procedure_id  ? data : detail) : []
-      );
+      queryClient.setQueryData<CarePlan>(['careplan', payload.procedure_care_plan_id ], (oldData) => {
+        if (oldData) {
+          return {
+            ...oldData,
+            procedures: oldData.procedures.map(detail => detail.procedure_id  === payload.procedure_id  ? data : detail),
+          };
+        }
+      });
 
       notify('Procedimento atualizado com sucesso', 'Sucesso', 'check', 'success');
 
@@ -42,7 +54,7 @@ const useProcedureActions = (): ProcedureActions => ({
     try {
       await api.delete(`/procedure/${procedure.procedure_id }`);
 
-      queryClient.setQueryData<Procedure[]>(['procedures', procedure.procedure_id ], (oldData) =>
+      queryClient.setQueryData<Procedure[]>(['careplan', procedure.procedure_care_plan_id ], (oldData) =>
         oldData ? oldData.filter(detail => detail.procedure_id  !== procedure.procedure_id ) : []
       );
 
