@@ -25,33 +25,23 @@ export default function Budget() {
                 <Table striped>
                     <thead>
                         <tr>
-                            <th scope="col">Procedimentos</th>
-                            <th scope="col">Dente e faces</th>
+                            <th scope="col">Data</th>
+                            <th scope="col">Plano de tratamento</th>
+                            <th scope="col">Realizado por</th>
                             <th scope="col">Valor R$</th>
                             <th scope="col">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <th>
-                                Acompanhamento de tratamento/procedimento cirúrgico em odontologia
-                            </th>
-                            <td>15 C, D, O, M, P, V</td>
-                            <td><Form.Control type="text" name="observation" className="w-40" /></td>
+                            <th>09/04/2024</th>
+                            <td>Tratamento inicial</td>
+                            <td>Thiago Ferreira</td>
                             <td>
-                                <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Remover procedimento</Tooltip>}>
-                                    <Button size="sm" className="me-1" variant="outline-primary">
-                                        <Icon.TrashFill />
-                                    </Button>
-                                </OverlayTrigger>{" "}
+                                <td>
+                                    <Form.Control type="text" name="observation" className="w-40" />
+                                </td>
                             </td>
-                        </tr>
-                        <tr>
-                            <th>
-                                Acompanhamento de tratamento/procedimento cirúrgico em odontologia
-                            </th>
-                            <td>15 C, D, O, M, P, V</td>
-                            <td><Form.Control type="text" name="observation" className="w-40" /></td>
                             <td>
                                 <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Remover procedimento</Tooltip>}>
                                     <Button size="sm" className="me-1" variant="outline-primary">
@@ -70,7 +60,6 @@ export default function Budget() {
                     </OverlayTrigger>{" "}
                 </div>
                 <div className="text-center mt-5">
-                    <h5> O valor total do orçamento é de <strong>R$ 3.000,00</strong></h5>
                     <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Crie condições de pagamento para o paciente</Tooltip>}>
                         <Button size="sm" className="me-1" variant="primary" onClick={() => setShowModal(true)}>
                             Criar condições <Icon.Cash />
@@ -87,10 +76,14 @@ export default function Budget() {
                         </Button>
                     </OverlayTrigger>{" "}
                 </div>
+                <h5 className="mt-4 text-center">
+                    {" "}
+                    O valor total do orçamento é de <strong>R$ 3.000,00</strong> com um desconto de <strong>R$ 350</strong> já aplicado. Será parcelado em <strong>10x de 300 R$ </strong>
+                </h5>
             </Card>
 
-            <h3 className="medium-title mt-4">Histórico de pagamentos</h3> 
-            
+            <h3 className="medium-title mt-4">Histórico de pagamentos</h3>
+
             <div>
                 <Row className="g-2">
                     <Col lg="6" xxl="3">
@@ -99,7 +92,7 @@ export default function Budget() {
                                 <Row className="g-0 align-items-center">
                                     <Col xs="auto">
                                         <div className="bg-gradient-danger sw-6 sh-6 rounded-md d-flex justify-content-center align-items-center">
-                                            <Icon.Clock className="text-white" size={20}/>
+                                            <Icon.Clock className="text-white" size={20} />
                                         </div>
                                     </Col>
                                     <Col className="sh-6 ps-3 d-flex flex-column justify-content-center">
@@ -120,7 +113,7 @@ export default function Budget() {
                                 <Row className="g-0 align-items-center">
                                     <Col xs="auto">
                                         <div className="bg-gradient-warning sw-6 sh-6 rounded-md d-flex justify-content-center align-items-center">
-                                        <Icon.Calendar className="text-white" size={20}/>
+                                            <Icon.Calendar className="text-white" size={20} />
                                         </div>
                                     </Col>
                                     <Col className="sh-6 ps-3 d-flex flex-column justify-content-center">
@@ -141,7 +134,7 @@ export default function Budget() {
                                 <Row className="g-0 align-items-center">
                                     <Col xs="auto">
                                         <div className="bg-gradient-light    sw-6 sh-6 rounded-md d-flex justify-content-center align-items-center">
-                                            <Icon.ClockHistory className="text-white" size={20}/>
+                                            <Icon.ClockHistory className="text-white" size={20} />
                                         </div>
                                     </Col>
                                     <Col className="sh-6 ps-3 d-flex flex-column justify-content-center">
@@ -162,7 +155,7 @@ export default function Budget() {
                                 <Row className="g-0 align-items-center">
                                     <Col xs="auto">
                                         <div className="bg-gradient-light sw-6 sh-6 rounded-md d-flex justify-content-center align-items-center">
-                                        <Icon.Check className="text-white" size={20}/>
+                                            <Icon.Check className="text-white" size={20} />
                                         </div>
                                     </Col>
                                     <Col className="sh-6 ps-3 d-flex flex-column justify-content-center">
@@ -207,7 +200,7 @@ export default function Budget() {
                                 <DropdownButton as={ButtonGroup} variant="outline-primary" className="mb-1">
                                     <Dropdown.Item href="#/action-1">Confirmar pagamento</Dropdown.Item>
                                     <Dropdown.Item href="#/action-2">Remover pagamento</Dropdown.Item>
-                                </DropdownButton>{' '}
+                                </DropdownButton>{" "}
                             </td>
                         </tr>
                     </tbody>
@@ -216,4 +209,4 @@ export default function Budget() {
             <ModalPaymentConditions showModal={showModal} onHide={handleClose} />
         </>
     );
-} 
+}
