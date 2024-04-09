@@ -48,7 +48,7 @@ const ModalNewProcedure = () => {
   const validationSchema = Yup.object().shape({
     // procedure_name: Yup.string().required('Insira um procedimento válido'),
     procedure_value: Yup.string().required('Insira um valor válido'),
-    procedure_professional_id: Yup.string().required('Insira um profissional válido'),
+    procedure_professional_id: Yup.string(),
     procedure_status: Yup.string().required('Insira um estado válido'),
     teeth: Yup.array()
       .of(
