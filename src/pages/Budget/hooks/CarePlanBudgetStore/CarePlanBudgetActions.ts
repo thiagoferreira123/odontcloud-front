@@ -1,13 +1,13 @@
-import api from "../../../../../services/useAxios";
+import { notify } from "../../../../components/toast/NotificationIcon";
+import api from "../../../../services/useAxios";
 import { CarePlanBudget, CarePlanBudgetActions } from "./types";
-import { notify } from "../../../../../components/toast/NotificationIcon";
 
 const useCarePlanBudgetActions = (): CarePlanBudgetActions => ({
   addCarePlanBudget: async (payload, queryClient) => {
     try {
       const { data } = await api.post<CarePlanBudget>('/budget/', payload);
 
-      queryClient.setQueryData<CarePlanBudget[]>(['carePlanBudgets', payload.budget_care_plan_patient_id], (oldData) => [...(oldData || []), data]);
+      queryClient.setQueryData<CarePlanBudget[]>(['carePlanBudget'], (oldData) => [...(oldData || []), data]);
 
       notify('Orçamento criado com sucesso', 'Sucesso', 'check', 'success');
 
@@ -23,7 +23,7 @@ const useCarePlanBudgetActions = (): CarePlanBudgetActions => ({
     try {
       const { data } = await api.patch<CarePlanBudget>(`/budget/${payload.budget_id}`, payload);
 
-      queryClient.setQueryData<CarePlanBudget[]>(['carePlanBudgets', payload.budget_care_plan_patient_id], (oldData) =>
+      queryClient.setQueryData<CarePlanBudget[]>(['carePlanBudget'], (oldData) =>
         oldData ? oldData.map(detail => detail.budget_id === data.budget_id ? data : detail) : []
       );
 
@@ -41,7 +41,7 @@ const useCarePlanBudgetActions = (): CarePlanBudgetActions => ({
     try {
       await api.delete(`/budget/${careplan.budget_id}`);
 
-      queryClient.setQueryData<CarePlanBudget[]>(['carePlanBudgets', careplan.budget_care_plan_patient_id], (oldData) =>
+      queryClient.setQueryData<CarePlanBudget[]>(['carePlanBudget'], (oldData) =>
         oldData ? oldData.filter(detail => detail.budget_id !== careplan.budget_id) : []
       );
 

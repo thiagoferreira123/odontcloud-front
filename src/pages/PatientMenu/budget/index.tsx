@@ -66,212 +66,104 @@ export default function CarePlanBudget() {
     result.data?.length && selectedPage > Math.ceil(result.data.length / 7) && setSelectedPage(Math.ceil(result.data.length / 7));
   }, [result.data?.length, selectedPage]);
 
-    return (
-        <>
-            <h3 className="medium-title">Orçamento</h3>
-            <Icon.InfoCircleFill /> Não é feito nenhum tipo de cobrança ao gerar um orçamento; <br></br>
-            <Icon.InfoCircleFill /> O orçamento será registrado em nosso sistema para sua consulta, orientação e controle a qualquer momento.
-            <Card body className="mb-2 mt-3">
-                <div>
-                    <Col xs="4" className="mb-3">
-                        <Form.Label className="d-block">
-                            <strong>Profissional</strong>
-                        </Form.Label>
-                        <SelectMultiple />
-                    </Col>
-                </div>
-                <Table striped>
-                    <thead>
-                        <tr>
-                            <th scope="col">Procedimentos</th>
-                            <th scope="col">Dente e faces</th>
-                            <th scope="col">Valor R$</th>
-                            <th scope="col">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th>
-                                Acompanhamento de tratamento/procedimento cirúrgico em odontologia
-                            </th>
-                            <td>15 C, D, O, M, P, V</td>
-                            <td><Form.Control type="text" name="observation" className="w-40" /></td>
-                            <td>
-                                <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Remover procedimento</Tooltip>}>
-                                    <Button size="sm" className="me-1" variant="outline-primary">
-                                        <Icon.TrashFill />
-                                    </Button>
-                                </OverlayTrigger>{" "}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>
-                                Acompanhamento de tratamento/procedimento cirúrgico em odontologia
-                            </th>
-                            <td>15 C, D, O, M, P, V</td>
-                            <td><Form.Control type="text" name="observation" className="w-40" /></td>
-                            <td>
-                                <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Remover procedimento</Tooltip>}>
-                                    <Button size="sm" className="me-1" variant="outline-primary">
-                                        <Icon.TrashFill />
-                                    </Button>
-                                </OverlayTrigger>{" "}
-                            </td>
-                        </tr>
-                    </tbody>
-                </Table>
-                <div className="text-end">
-                    <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Adicionar procedimento</Tooltip>}>
-                        <Button size="sm" className="me-1" variant="outline-primary">
-                            <Icon.Plus />
-                        </Button>
-                    </OverlayTrigger>{" "}
-                </div>
-                <div className="text-center mt-5">
-                    <h5> O valor total do orçamento é de <strong>R$ 3.000,00</strong></h5>
-                    <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Crie condições de pagamento para o paciente</Tooltip>}>
-                        <Button size="sm" className="me-1" variant="primary" onClick={() => setShowModal(true)}>
-                            Criar condições <Icon.Cash />
-                        </Button>
-                    </OverlayTrigger>{" "}
-                    <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Remover procedimento</Tooltip>}>
-                        <Button size="sm" className="me-1" variant="outline-primary">
-                            <Icon.TrashFill />
-                        </Button>
-                    </OverlayTrigger>{" "}
-                    <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Download do Orçamento</Tooltip>}>
-                        <Button size="sm" className="me-1" variant="outline-primary">
-                            <Icon.Printer />
-                        </Button>
-                    </OverlayTrigger>{" "}
-                </div>
-            </Card>
-
-            <h3 className="medium-title mt-4">Histórico de pagamentos</h3>
-
-            <div>
-                <Row className="g-2">
-                    <Col lg="6" xxl="3">
-                        <Card>
-                            <Card.Body>
-                                <Row className="g-0 align-items-center">
-                                    <Col xs="auto">
-                                        <div className="bg-gradient-danger sw-6 sh-6 rounded-md d-flex justify-content-center align-items-center">
-                                            <Icon.Clock className="text-white" size={20}/>
-                                        </div>
-                                    </Col>
-                                    <Col className="sh-6 ps-3 d-flex flex-column justify-content-center">
-                                        <div className="heading mb-0 d-flex align-items-center lh-1-25">Total atrasado</div>
-                                        <Row className="g-0">
-                                            <Col xs="auto">
-                                                <div className="cta-3 text-primary">R$ 350,0</div>
-                                            </Col>
-                                        </Row>
-                                    </Col>
-                                </Row>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col lg="6" xxl="3">
-                        <Card>
-                            <Card.Body>
-                                <Row className="g-0 align-items-center">
-                                    <Col xs="auto">
-                                        <div className="bg-gradient-warning sw-6 sh-6 rounded-md d-flex justify-content-center align-items-center">
-                                        <Icon.Calendar className="text-white" size={20}/>
-                                        </div>
-                                    </Col>
-                                    <Col className="sh-6 ps-3 d-flex flex-column justify-content-center">
-                                        <div className="heading mb-0 d-flex align-items-center lh-1-25">Total a vencer hoje</div>
-                                        <Row className="g-0">
-                                            <Col xs="auto">
-                                                <div className="cta-3 text-primary">R$ 12,50</div>
-                                            </Col>
-                                        </Row>
-                                    </Col>
-                                </Row>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col lg="6" xxl="3">
-                        <Card>
-                            <Card.Body>
-                                <Row className="g-0 align-items-center">
-                                    <Col xs="auto">
-                                        <div className="bg-gradient-light    sw-6 sh-6 rounded-md d-flex justify-content-center align-items-center">
-                                            <Icon.ClockHistory className="text-white" size={20}/>
-                                        </div>
-                                    </Col>
-                                    <Col className="sh-6 ps-3 d-flex flex-column justify-content-center">
-                                        <div className="heading mb-0 d-flex align-items-center lh-1-25">Total em aberto</div>
-                                        <Row className="g-0">
-                                            <Col xs="auto">
-                                                <div className="cta-3 text-primary">R$ 66,0</div>
-                                            </Col>
-                                        </Row>
-                                    </Col>
-                                </Row>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col lg="6" xxl="3">
-                        <Card>
-                            <Card.Body>
-                                <Row className="g-0 align-items-center">
-                                    <Col xs="auto">
-                                        <div className="bg-gradient-light sw-6 sh-6 rounded-md d-flex justify-content-center align-items-center">
-                                        <Icon.Check className="text-white" size={20}/>
-                                        </div>
-                                    </Col>
-                                    <Col className="sh-6 ps-3 d-flex flex-column justify-content-center">
-                                        <div className="heading mb-0 d-flex align-items-center lh-1-25">Total pago</div>
-                                        <Row className="g-0">
-                                            <Col xs="auto">
-                                                <div className="cta-3 text-primary">R$ 284,0</div>
-                                            </Col>
-                                            <Col className="d-flex align-items-center justify-content-end">
-                                                <Badge bg="primary">11.4%</Badge>
-                                            </Col>
-                                        </Row>
-                                    </Col>
-                                </Row>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
+  return (
+    <>
+      <Card>
+        <Card.Body className="mb-n3 border-last-none">
+          {result.isLoading ? (
+            <div className="h-50 d-flex justify-content-center align-items-center">
+              <StaticLoading />
             </div>
-            <Card body className="mb-2 mt-3">
-                <Table striped>
-                    <thead>
-                        <tr>
-                            <th scope="col">Nº da parcela</th>
-                            <th scope="col">Vencimento</th>
-                            <th scope="col">Valor (R$)</th>
-                            <th scope="col">Data do recebimento</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1/10</td>
-                            <td>04/04/2024</td>
-                            <td>30,00 </td>
-                            <td>04/04/2024</td>
-                            <td>
-                                <Badge bg="warning">Em aberto</Badge>
-                            </td>
-                            <td>
-                                <DropdownButton as={ButtonGroup} variant="outline-primary" className="mb-1">
-                                    <Dropdown.Item href="#/action-1">Confirmar pagamento</Dropdown.Item>
-                                    <Dropdown.Item href="#/action-2">Remover pagamento</Dropdown.Item>
-                                </DropdownButton>{' '}
-                            </td>
-                        </tr>
-                    </tbody>
-                </Table>
-            </Card>
-            <ModalPaymentConditions showModal={showModal} onHide={handleClose} />
-        </>
-    );
+          ) : result.isError ? (
+            <div className="h-50 d-flex justify-content-center align-items-center">Ocorreu um erro ao tentar buscar orçamentos</div>
+          ) : !result.data?.length ? (
+            <div className="h-50 d-flex justify-content-center align-items-center">
+              <Empty message="Nenhuma orçamento encontrado" classNames="m-0" />
+            </div>
+          ) : (
+            slicedResult.map((careplan) => (
+              <div className="border-bottom border-separator-light mb-2 pb-2" key={careplan.budget_id}>
+                <Row className="g-0 sh-6">
+                  <Col>
+                    <div className="d-flex flex-row pt-0 pb-0 ps-3 pe-0 h-100 align-items-center justify-content-between">
+                      <div className="d-flex flex-column">
+                        <div>Identificação: {careplan.budget_name}</div>
+                        <div>Plano de tratamento criado em: {new Date(careplan.budget_date_creation).toLocaleDateString()}</div>
+                      </div>
+                      <div className="d-flex">
+                        <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Excluir</Tooltip>}>
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            className="btn-icon btn-icon-only mb-1 me-1"
+                            onClick={() => handleSelectCarePlanBudgetToRemove(careplan)}
+                          >
+                            <CsLineIcons icon="bin" />
+                          </Button>
+                        </OverlayTrigger>{' '}
+                        <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-1">Editar o plano alimentar</Tooltip>}>
+                          <Link
+                            to={{
+                              pathname: `${appRoot}/orcamento/${careplan.budget_id}`,
+                            }}
+                            className="btn btn-outline-primary btn-sm btn-icon btn-icon-only mb-1 me-1"
+                          >
+                            <CsLineIcons icon="edit" />
+                          </Link>
+                        </OverlayTrigger>{' '}
+                        <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-2">Alterar as configurações</Tooltip>}>
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            className="btn-icon btn-icon-only mb-1 me-1"
+                            onClick={() => handleSelectCarePlanBudget(careplan)}
+                          >
+                            <CsLineIcons icon="gear" />
+                          </Button>
+                        </OverlayTrigger>{' '}
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
+              </div>
+            ))
+          )}
+
+          <Row className="mt-3 mb-3 justify-content-center">
+            {result.data && result.data.length > 7 ? (
+              <nav>
+                <Pagination className="bordered">
+                  <Pagination.Prev onClick={() => setSelectedPage(selectedPage - 1)} disabled={selectedPage === 1}>
+                    <CsLineIcons icon="chevron-left" />
+                  </Pagination.Prev>
+                  {pages.map((page) => (
+                    <Pagination.Item
+                      key={page}
+                      onClick={() => setSelectedPage(page)}
+                      active={selectedPage === page}
+                      disabled={page > Math.ceil(result.data.length / 7)}
+                    >
+                      {page}
+                    </Pagination.Item>
+                  ))}
+                  <Pagination.Next onClick={() => setSelectedPage(selectedPage + 1)} disabled={selectedPage >= Math.ceil(result.data.length / 7)}>
+                    <CsLineIcons icon="chevron-right" />
+                  </Pagination.Next>
+                </Pagination>
+              </nav>
+            ) : null}
+          </Row>
+        </Card.Body>
+      </Card>
+
+      <div className="d-flex justify-content-center mt-3">
+        <Button variant="primary" className="mb-1 hover-scale-up"  onClick={handleShowModal}>
+          Criar um novo orçamento
+        </Button>
+      </div>
+
+      <DeleteConfirmationModal />
+      <ConfigModal />
+    </>
+  );
 }

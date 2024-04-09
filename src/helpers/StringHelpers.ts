@@ -32,3 +32,13 @@ export const urlRegex = /^((https?|ftp):\/\/)?(www.)?(((([a-z]|\d|-|\.|_|~|[\u00
 export function convertPlainTextToHTML(text: string) {
   return `<p>${text.replace(/\n/g, '<br>')}</p>`;
 }
+
+export function parseBrValueToNumber(value: string) {
+  return Number(value.replace('.', '').replace(',', '.'));
+}
+
+export function parseToBrValue(value: string | number) {
+  return typeof value === 'string' ?
+    Number(parseBrValueToNumber(value)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) :
+    value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
