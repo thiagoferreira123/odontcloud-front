@@ -11,10 +11,11 @@ import { notify } from '../../../components/toast/NotificationIcon';
 import useProcedureStore from '../hooks/ProcedureStore';
 import { useParams } from 'react-router-dom';
 import { AppException } from '../../../helpers/ErrorHelpers';
+import ProfessionalSelect from './ProfessionalSelect';
 
 export interface ModalNewProcedureFormValues {
   procedure_name: string;
-  // procedure_professional_id: string;
+  procedure_professional_id: string;
   procedure_value: string;
   procedure_deciduous_or_permanent: 'deciduos' | 'permanent';
   procedure_observations: string;
@@ -37,6 +38,7 @@ const ModalNewProcedure = () => {
   const initialValues: ModalNewProcedureFormValues = {
     procedure_name: '',
     procedure_value: '',
+    procedure_professional_id: '',
     procedure_deciduous_or_permanent: 'permanent',
     procedure_observations: '',
     procedure_status: 'pending',
@@ -46,6 +48,7 @@ const ModalNewProcedure = () => {
   const validationSchema = Yup.object().shape({
     // procedure_name: Yup.string().required('Insira um procedimento válido'),
     procedure_value: Yup.string().required('Insira um valor válido'),
+    procedure_professional_id: Yup.string().required('Insira um profissional válido'),
     procedure_status: Yup.string().required('Insira um estado válido'),
     teeth: Yup.array()
       .of(
@@ -78,6 +81,7 @@ const ModalNewProcedure = () => {
         procedure_deciduous_or_permanent: values.procedure_deciduous_or_permanent,
         procedure_observations: values.procedure_observations,
         procedure_status: values.procedure_status,
+        procedure_professional_id: values.procedure_professional_id,
         teeth: values.teeth.map((tooth) => ({
           tooth_number: tooth.tooth_number,
           tooth_faces: JSON.stringify(tooth.tooth_faces),
@@ -148,6 +152,7 @@ const ModalNewProcedure = () => {
       procedure_deciduous_or_permanent: selectedProcedure?.procedure_deciduous_or_permanent || 'permanent',
       procedure_observations: selectedProcedure?.procedure_observations || '',
       procedure_status: selectedProcedure?.procedure_status || 'pending',
+      procedure_professional_id: selectedProcedure?.procedure_professional_id || '',
       teeth:
         selectedProcedure?.teeth.map((tooth) => {
           return {
@@ -165,15 +170,15 @@ const ModalNewProcedure = () => {
       </Modal.Header>
       <Modal.Body>
         <form onSubmit={handleSubmit}>
-          {/* <Row>
+          <Row>
           <Col xs="12" className="mb-3">
             <Form.Label className="d-block">
               <strong>Profissional</strong>
             </Form.Label>
-            <ProcedureSelect />
-            {errors.titulo && touched.titulo && <div className="error">{errors.titulo}</div>}
+            <ProfessionalSelect formik={formik} />
+            {errors.procedure_professional_id && touched.procedure_professional_id && <div className="error">{errors.procedure_professional_id}</div>}
           </Col>
-        </Row> */}
+        </Row>
           <Row>
             <Form.Label className="d-flex">
               <strong>Procedimentos </strong>

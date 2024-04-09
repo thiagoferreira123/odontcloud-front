@@ -19,6 +19,36 @@ type ProcedureSelectProps = {
   };
 };
 
+export const procedureGroupValues: {
+  [key: string]: {
+    [key: string]: number[];
+  };
+} = {
+  permanent: {
+    superior: [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28],
+    inferior: [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38],
+  },
+  deciduos: {
+    superior: [55, 54, 53, 52, 51, 61, 62, 63, 64, 65],
+    inferior: [85, 84, 83, 82, 81, 71, 72, 73, 74, 75],
+  },
+};
+
+const defaultOptions = [
+  {
+    label: 'Todos',
+    value: 'todos',
+  },
+  {
+    label: 'Arcada Superior',
+    value: 'superior',
+  },
+  {
+    label: 'Arcada Inferior',
+    value: 'inferior',
+  },
+];
+
 const SelectTeeth = ({ formik }: ProcedureSelectProps) => {
   const [value, setValue] = useState<MultiValue<Option>>();
 
@@ -83,13 +113,38 @@ const SelectTeeth = ({ formik }: ProcedureSelectProps) => {
   ];
 
   const handleChange = (option: MultiValue<Option>) => {
-    setFieldValue(
-      'teeth',
-      option.map((o) => ({
-        tooth_number: o.value,
-        tooth_faces: [],
-      }))
-    );
+    if(!option.length) {
+      setFieldValue(
+        'teeth',
+        []
+      );
+    } else if(option.find((o) => o.value === 'todos')) {
+      const teeth = values.procedure_deciduous_or_permanent === 'deciduos' ? deciduos : permanent;
+      setFieldValue(
+        'teeth',
+        teeth.map((toothOption) => ({
+          tooth_number: toothOption.value,
+          tooth_faces: [],
+        }))
+      );
+    } else if (defaultOptions.find((o) => o.value === option[option.length - 1].value)) {
+      const teeth = procedureGroupValues[values.procedure_deciduous_or_permanent][option[option.length - 1].value];
+      setFieldValue(
+        'teeth',
+        teeth.map((toothNumber) => ({
+          tooth_number: toothNumber.toString(),
+          tooth_faces: [],
+        }))
+      );
+    } else {
+      setFieldValue(
+        'teeth',
+        option.map((o) => ({
+          tooth_number: o.value,
+          tooth_faces: [],
+        }))
+      );
+    }
   };
 
   useEffect(() => {
@@ -105,7 +160,7 @@ const SelectTeeth = ({ formik }: ProcedureSelectProps) => {
     <Select
       classNamePrefix="react-select"
       isMulti
-      options={values.procedure_deciduous_or_permanent === 'deciduos' ? deciduos : permanent}
+      options={[...defaultOptions, ...(values.procedure_deciduous_or_permanent === 'deciduos' ? deciduos : permanent)]}
       value={value}
       onChange={(e) => handleChange(e as MultiValue<Option>)}
       placeholder=""

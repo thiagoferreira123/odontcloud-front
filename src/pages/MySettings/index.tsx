@@ -5,6 +5,8 @@ import SignatureIimage from './SignatureIimage';
 import Password from './Password';
 import { useAuth } from '../Auth/Login/hook';
 import CsLineIcons from '../../cs-line-icons/CsLineIcons';
+import Professionals from './Professionals';
+import ClinicProcedures from './ClinicProcedures';
 
 const ProfileStandard = () => {
   const user = useAuth((state) => state.user);
@@ -29,6 +31,14 @@ const ProfileStandard = () => {
                   <Nav.Link className="px-0 border-bottom border-separator-light cursor-pointer" eventKey="signatureimage">
                     <CsLineIcons icon="file-image" className="me-2" size={17} />
                     <span className="align-middle">Imagem da assinatura</span>
+                  </Nav.Link>
+                  <Nav.Link className="px-0 border-bottom border-separator-light cursor-pointer" eventKey="professionals">
+                    <CsLineIcons icon="file-image" className="me-2" size={17} />
+                    <span className="align-middle">Profissionais</span>
+                  </Nav.Link>
+                  <Nav.Link className="px-0 border-bottom border-separator-light cursor-pointer" eventKey="ClinicProcedures">
+                    <CsLineIcons icon="file-image" className="me-2" size={17} />
+                    <span className="align-middle">Procedimentos da clínica</span>
                   </Nav.Link>
                 </Nav>
               </Card.Body>
@@ -59,6 +69,22 @@ const ProfileStandard = () => {
                 <Card>
                   <Card.Body className="mb-n2">
                     <SignatureIimage />
+                  </Card.Body>
+                </Card>
+              </Tab.Pane>
+
+              <Tab.Pane eventKey="professionals">
+                <Card>
+                  <Card.Body className="mb-n2">
+                    <Professionals />
+                  </Card.Body>
+                </Card>
+              </Tab.Pane>
+
+              <Tab.Pane eventKey="ClinicProcedures">
+                <Card>
+                  <Card.Body className="mb-n2">
+                    <ClinicProcedures />
                   </Card.Body>
                 </Card>
               </Tab.Pane>
