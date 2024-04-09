@@ -1,26 +1,26 @@
 import { create } from "zustand";
-import { CarePlanDetails } from "./CarePlanDetailsStore/types";
+import { CarePlanBudget } from "./CarePlanBudgetStore/types";
 
 interface DeleteConfirmationModalStore {
   showModal: boolean;
 
-  selectedCarePlan: CarePlanDetails | null;
+  selectedCarePlanBudget: CarePlanBudget | null;
 
   // eslint-disable-next-line no-unused-vars
-  handleSelectCarePlanToRemove: (careplan: CarePlanDetails) => void;
+  handleSelectCarePlanBudgetToRemove: (careplan: CarePlanBudget) => void;
   hideModal: () => void;
 }
 
 export const useDeleteConfirmationModalStore = create<DeleteConfirmationModalStore>((set) => ({
   showModal: false,
 
-  selectedCarePlan: null,
+  selectedCarePlanBudget: null,
 
-  handleSelectCarePlanToRemove(careplan) {
-    set({ selectedCarePlan: careplan, showModal: true });
+  handleSelectCarePlanBudgetToRemove(careplan) {
+    set({ selectedCarePlanBudget: careplan, showModal: true });
   },
 
   hideModal() {
-    set({ showModal: false, selectedCarePlan: null });
+    set({ showModal: false, selectedCarePlanBudget: null });
   },
 }));

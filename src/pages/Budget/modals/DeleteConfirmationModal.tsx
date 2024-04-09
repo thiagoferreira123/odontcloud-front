@@ -1,17 +1,17 @@
+import CsLineIcons from '../../../../cs-line-icons/CsLineIcons';
 import React, { useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useQueryClient } from '@tanstack/react-query';
 import { useDeleteConfirmationModalStore } from '../hooks/DeleteConfirmationModalStore';
-import useCarePlanBudgetStore from '../hooks/CarePlanBudgetStore';
-import CsLineIcons from '../../../../cs-line-icons/CsLineIcons';
+import useCarePlanDetailsStore from '../hooks/CarePlanDetailsStore';
 
 const DeleteConfirmationModal = () => {
   const showModal = useDeleteConfirmationModalStore((state) => state.showModal);
 
-  const selectedCarePlanBudget = useDeleteConfirmationModalStore((state) => state.selectedCarePlanBudget);
-  const { removeCarePlanBudget } = useCarePlanBudgetStore();
+  const selectedCarePlan = useDeleteConfirmationModalStore((state) => state.selectedCarePlan);
+  const { removeCarePlan } = useCarePlanDetailsStore();
   const [isLoading, setIsLoading] = useState(false);
 
   const queryClient = useQueryClient();
@@ -28,11 +28,11 @@ const DeleteConfirmationModal = () => {
     setIsLoading(true);
 
     try {
-      if (!selectedCarePlanBudget) throw new Error('selectedCarePlanBudget is not defined');
+      if (!selectedCarePlan) throw new Error('selectedCarePlan is not defined');
 
-      const response = await removeCarePlanBudget(selectedCarePlanBudget, queryClient);
+      const response = await removeCarePlan(selectedCarePlan, queryClient);
 
-      if (response === false) throw new Error('Erro ao remover orçamento');
+      if (response === false) throw new Error('Erro ao remover atestado');
 
       resetForm();
       setIsLoading(false);
@@ -53,7 +53,7 @@ const DeleteConfirmationModal = () => {
         <Modal.Title>Confirmação de exclusão</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        Você realmente deseja excluir o orçamento? Se sim, digite 'excluir'. Atenção: esta ação é irreversível.
+        Você realmente deseja excluir o atestado? Se sim, digite 'excluir'. Atenção: esta ação é irreversível.
         <Form onSubmit={handleSubmit} className="tooltip-end-top">
           <div className="filled mt-4">
             <CsLineIcons icon="bin" />

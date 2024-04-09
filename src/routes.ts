@@ -1,7 +1,6 @@
 import { lazy } from 'react';
 import { DEFAULT_PATHS } from './config';
 import { RouteItemProps } from './routing/protocols/RouteIdentifier';
-import { Role } from './pages/Auth/Login/hook/types';
 
 const dashboard = lazy(() => import('./pages/Dashboard'));
 
@@ -71,6 +70,7 @@ const pages = {
   MetabolicTracking: lazy(() => import('./pages/MetabolicTracking')),
   SignSymptom: lazy(() => import('./pages/SignSymptom')),
   CarePlan: lazy(() => import('./pages/CarePlan')),
+  Budget: lazy(() => import('./pages/Budget')),
 };
 
 const patientMenu = {
@@ -184,6 +184,12 @@ const routesAndMenuItems: RoutesAndMenuItems = {
     {
       path: `${appRoot}/plano-de-tratamento/:id`,
       component: pages.CarePlan,
+      hideInMenu: true,
+      roles: [],
+    },
+    {
+      path: `${appRoot}/orcamento/:id`,
+      component: pages.Budget,
       hideInMenu: true,
       roles: [],
     },
