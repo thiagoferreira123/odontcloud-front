@@ -1368,3 +1368,8 @@ export const procedures = [
     id: 342
   }
 ]
+
+export interface ProcedureTemplate {
+  procedures: string;
+  id: number;
+}

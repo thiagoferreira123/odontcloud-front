@@ -60,6 +60,7 @@ const PersonalData = () => {
     clinic_state: '',
     clinic_city: '',
     clinic_neighborhood: '',
+    clinic_number: '',
   };
 
   const { setUser } = useAuth();
@@ -184,7 +185,7 @@ const PersonalData = () => {
           </div>
 
           <div className="mb-3 top-label">
-            <Form.Control type="text" name="clinic_email" value={values.clinic_email} onChange={handleChange} readOnly />
+            <Form.Control type="text" name="clinic_email" value={values.clinic_email} readOnly />
             <Form.Label className='bg-transparent'>EMAIL</Form.Label>
             {errors.clinic_email && touched.clinic_email && <div className="error">{errors.clinic_email}</div>}
           </div>
