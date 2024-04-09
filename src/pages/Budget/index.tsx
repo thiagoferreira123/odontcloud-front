@@ -89,8 +89,6 @@ export default function Budget() {
   return (
     <>
       <h3 className="medium-title">Orçamento</h3>
-      <Icon.InfoCircleFill /> Não é feito nenhum tipo de cobrança ao gerar um orçamento; <br></br>
-      <Icon.InfoCircleFill /> O orçamento será registrado em nosso sistema para sua consulta, orientação e controle a qualquer momento.
       <Card body className="mb-2 mt-3">
         <div>
           <Col xs="4" className="mb-3">

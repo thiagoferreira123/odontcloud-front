@@ -18,7 +18,7 @@ export const RADIUS = {
 export const THEME_COLOR = {
   LightBlue: 'blue-light-mode',
   DarkBlue: 'blue-dark-mode',
-  LightRed: 'red-light-mode',
+  LightRed: 'red-light-mode', 
   DarkRed: 'red-dark-mode',
   LightGreen: 'green-light-mode',
   DarkGreen: 'green-dark-mode',

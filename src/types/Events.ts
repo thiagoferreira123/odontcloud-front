@@ -9,7 +9,7 @@ export enum EventType {
 }
 
 export enum EventColor {
-  CONSULTA = '#4ad395',
+  CONSULTA = '#0eb0f2',
   RETORNO = '#ebb71a',
   POSSIVEL_RETORNO = '#cf2637',
   OUTROS = '#558df3',
@@ -33,7 +33,7 @@ export enum EventPrint {
 }
 
 export enum EventStatusColor {
-  CONFIRMADO = '#4ad395',
+  CONFIRMADO = '#0eb0f2',
   PENDENTE = '#ebb71a',
   AGENDADO = '#ebb71a',
   CANCELADO = '#cf2637',
