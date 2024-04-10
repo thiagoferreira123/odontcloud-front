@@ -54,9 +54,14 @@ const useProcedureActions = (): ProcedureActions => ({
     try {
       await api.delete(`/procedure/${procedure.procedure_id }`);
 
-      queryClient.setQueryData<Procedure[]>(['careplan', procedure.procedure_care_plan_id ], (oldData) =>
-        oldData ? oldData.filter(detail => detail.procedure_id  !== procedure.procedure_id ) : []
-      );
+      queryClient.setQueryData<CarePlan>(['careplan', procedure.procedure_care_plan_id ], (oldData) => {
+        if (oldData) {
+          return {
+            ...oldData,
+            procedures: oldData.procedures.filter(detail => detail.procedure_id  !== procedure.procedure_id ),
+          };
+        }
+      });
 
       notify('Procedimento removido com sucesso', 'Sucesso', 'check', 'success');
       return true;

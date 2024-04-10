@@ -15,6 +15,8 @@ import { AppException } from '../../helpers/ErrorHelpers';
 import { useAuth } from '../Auth/Login/hook';
 import { notify } from '../../components/toast/NotificationIcon';
 import { Professional } from '../MySettings/hooks/ProfessionalStore/types';
+import DeleteConfirmationModal from './modals/DeleteConfirmationModal';
+import { useDeleteConfirmationModalStore } from './hooks/DeleteConfirmationModalStore';
 
 const getProfessionalName = (professionalId: string, professionals: Professional[]) => {
   return professionals.find((professional: any) => professional.professional_id === professionalId)?.professional_full_name;
@@ -26,9 +28,9 @@ export default function CarePlan() {
   const user = useAuth((state) => state.user);
 
   const { getCarePlan } = useCarePlanStore();
-  const { handleShowModalNewProcedure, handleSelectProcedureToEdit } = useModalNewProcedureStore();
-
   const { getProfessionals } = useProfessionalStore();
+  const { handleShowModalNewProcedure, handleSelectProcedureToEdit } = useModalNewProcedureStore();
+  const { handleSelectProcedureToRemove } = useDeleteConfirmationModalStore();
 
   const getProfessionals_ = async () => {
     try {
@@ -138,7 +140,7 @@ export default function CarePlan() {
                         </Button>
                       </OverlayTrigger>{' '}
                       <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Remover procedimento</Tooltip>}>
-                        <Button size="sm" className="me-1" variant="outline-primary">
+                        <Button size="sm" className="me-1" variant="outline-primary" onClick={() => handleSelectProcedureToRemove(procedure)}>
                           <Icon.TrashFill />
                         </Button>
                       </OverlayTrigger>{' '}
@@ -169,7 +171,9 @@ export default function CarePlan() {
         </h5>
       </div>
       <div className="text-center mt1"></div>
+
       <ModalNewProcedure />
+      <DeleteConfirmationModal />
     </>
   );
 }

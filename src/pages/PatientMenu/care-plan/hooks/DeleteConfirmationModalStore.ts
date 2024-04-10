@@ -1,13 +1,13 @@
 import { create } from "zustand";
-import { CarePlanDetails } from "./CarePlanStore/types";
+import { CarePlan } from "./CarePlanStore/types";
 
 interface DeleteConfirmationModalStore {
   showModal: boolean;
 
-  selectedCarePlan: CarePlanDetails | null;
+  selectedCarePlan: CarePlan | null;
 
   // eslint-disable-next-line no-unused-vars
-  handleSelectCarePlanToRemove: (careplan: CarePlanDetails) => void;
+  handleSelectCarePlanToRemove: (careplan: CarePlan) => void;
   hideModal: () => void;
 }
 
