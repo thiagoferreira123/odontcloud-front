@@ -6,7 +6,7 @@ import Dropzone, { defaultClassNames, IFileWithMeta, StatusValue } from 'react-d
 import 'react-dropzone-uploader/dist/styles.css';
 import useFormStore from './hook';
 import { useQueryClient } from '@tanstack/react-query';
-import usePatientFolderStore from '../PatientMenu/patient-folder/hooks';
+import usePatientFolderStore from '../PatientMenu/patient-folder/hooks/PatientFolderStore';
 import { Form } from '../../types/FormBuilder';
 import { notify } from '../../components/toast/NotificationIcon';
 import CsLineIcons from '../../cs-line-icons/CsLineIcons';

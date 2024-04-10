@@ -1,11 +1,11 @@
-import CsLineIcons from '/src/cs-line-icons/CsLineIcons';
 import React, { useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useQueryClient } from '@tanstack/react-query';
 import { useDeleteConfirmationModalStore } from '../hooks/modals/DeleteConfirmationModalStore';
-import usePatientFolderStore from '../hooks';
+import usePatientFolderStore from '../hooks/PatientFolderStore';
+import CsLineIcons from '../../../../cs-line-icons/CsLineIcons';
 
 const DeleteConfirmationModal = () => {
   const showModal = useDeleteConfirmationModalStore((state) => state.showModal);

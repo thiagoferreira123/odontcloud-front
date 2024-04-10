@@ -3,7 +3,7 @@ import { Alert, Card, Col, OverlayTrigger, Pagination, Row, Tooltip } from 'reac
 import { Button } from 'react-bootstrap';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
-import usePatientFolderStore from './hooks';
+import usePatientFolderStore from './hooks/PatientFolderStore';
 import StaticLoading from '../../../components/loading/StaticLoading';
 import Empty from '../../../components/Empty';
 import PatientFolderDropzone from './PatientFolderDropzone';
@@ -14,6 +14,7 @@ import EditFileNameModal from './modals/EditFileNameModal';
 import { useEditFileNameModalStore } from './hooks/modals/EditFileNameModalStore';
 import { Link } from 'react-router-dom';
 import CsLineIcons from '../../../cs-line-icons/CsLineIcons';
+import { AppException } from '../../../helpers/ErrorHelpers';
 
 export default function HistoryPatientFolder() {
   const queryClient = useQueryClient();
@@ -30,7 +31,9 @@ export default function HistoryPatientFolder() {
 
   const getPatientFiles_ = async () => {
     try {
-      const response = await getPatientFiles(Number(id));
+      if (!id) throw new AppException('Id do paciente não encontrado');
+
+      const response = await getPatientFiles(id);
 
       if (response === false) throw new Error('Erro ao buscar arquivos');
 
@@ -72,10 +75,10 @@ export default function HistoryPatientFolder() {
     <>
       <Card>
         <Card.Body className="mb-n3 border-last-none">
-            <Alert className="text-center">
-              Use essa área para salvar arquivos importantes, como resultado de exames, foto de remédios ou suplementos, etc. Os materiais inseridos nessa área
-              não serão compartilhados com o paciente.
-            </Alert>
+          <Alert className="text-center">
+            Use essa área para salvar arquivos importantes, como resultado de exames, foto de remédios ou suplementos, etc. Os materiais inseridos nessa área
+            não serão compartilhados com o paciente.
+          </Alert>
           {result.isLoading ? (
             <div className="h-50 d-flex justify-content-center align-items-center">
               <StaticLoading />
@@ -88,19 +91,20 @@ export default function HistoryPatientFolder() {
             </div>
           ) : (
             slicedResult.map((file) => (
-              <div className="border-bottom border-separator-light mb-2 pb-2" key={file.id}>
+              <div className="border-bottom border-separator-light mb-2 pb-2" key={file.documents_id}>
                 <Row className="g-0 sh-6 mt-3">
                   <Col>
                     <div className="d-flex flex-row pt-0 pb-0 ps-3 pe-0 h-100 align-items-center justify-content-between">
                       <div className="d-flex flex-column">
                         <div>
-                          <CsLineIcons icon="attachment" /> {file.fileName} - anexado em {new Date(file.createdAt).toLocaleDateString()}
+                          <CsLineIcons icon="attachment" /> {file.documents_folder_name} - anexado em{' '}
+                          {file.documents_upload_date && new Date(file.documents_upload_date).toLocaleDateString()}
                         </div>
                       </div>
                       <div className="d-flex">
                         <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-2">Visualizar</Tooltip>}>
                           <Link
-                            to={`https://anexo-material-profissionais.s3.amazonaws.com/${file.awsFileName}`}
+                            to={file.documents_aws_link ?? '#'}
                             target="_blank"
                             className="btn btn-sm btn-outline-primary btn-icon btn-icon-only mb-1 me-1"
                             rel="noreferrer"

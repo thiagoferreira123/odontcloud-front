@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { PatientFile } from "../types";
+import { PatientFile } from "../PatientFolderStore/types";
 
 interface DeleteConfirmationModalStore {
   showModal: boolean;

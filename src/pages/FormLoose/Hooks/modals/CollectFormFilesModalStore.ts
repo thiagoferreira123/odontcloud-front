@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { AnsweredForm } from "../../../../types/FormBuilder";
 import { Patient } from "../../../../types/Patient";
 import api from "../../../../services/useAxios";
-import { PatientFile } from "../../../PatientMenu/patient-folder/hooks/types";
+import { PatientFile } from "../../../PatientMenu/patient-folder/hooks/PatientFolderStore/types";
 import { notify } from "../../../../components/toast/NotificationIcon";
 
 interface CollectFormFilesModalStore {
