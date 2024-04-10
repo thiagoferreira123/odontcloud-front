@@ -1,12 +1,12 @@
 import { create } from "zustand";
-import { CertificateDetails } from "./CertificateStore/types";
+import { Certificate } from "./CertificateStore/types";
 
 interface CreateAndEditModalStore {
   showModal: boolean;
 
-  selectedCertificate: CertificateDetails | null;
+  selectedCertificate: Certificate | null;
 
-  handleSelectCertificateToEdit: (expenditure: CertificateDetails) => void;
+  handleSelectCertificateToEdit: (expenditure: Certificate) => void;
   openModal: () => void;
   hideModal: () => void;
 }

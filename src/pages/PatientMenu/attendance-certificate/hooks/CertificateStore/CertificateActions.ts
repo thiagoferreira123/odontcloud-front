@@ -3,11 +3,11 @@ import { Certificate, CertificateActions } from "./types";
 import { notify } from "../../../../../components/toast/NotificationIcon";
 
 const useCertificateActions = (): CertificateActions => ({
-  addCertificate: async (patientDetailData, queryClient) => {
+  addCertificate: async (payload, queryClient) => {
     try {
-      const { data } = await api.post<Certificate>('/atestado/', patientDetailData);
+      const { data } = await api.post<Certificate>('/patient-certificate/', payload);
 
-      queryClient.setQueryData<Certificate[]>(['attendances', patientDetailData.patient_id], (oldData) => [...(oldData || []), data]);
+      queryClient.setQueryData<Certificate[]>(['patient-certificate', payload.certificate_patient_id], (oldData) => [...(oldData || []), data]);
 
       notify('Atestado adicionado com sucesso', 'Sucesso', 'check', 'success');
 
@@ -19,12 +19,12 @@ const useCertificateActions = (): CertificateActions => ({
     }
   },
 
-  updateCertificate: async (patientDetailData, queryClient) => {
+  updateCertificate: async (payload, queryClient) => {
     try {
-      const { data } = await api.patch<Certificate>(`/atestado/${patientDetailData.id}`, patientDetailData);
+      const { data } = await api.patch<Certificate>(`/patient-certificate/${payload.certificate_id}`, payload);
 
-      queryClient.setQueryData<Certificate[]>(['attendances', patientDetailData.patient_id], (oldData) =>
-        oldData ? oldData.map(detail => detail.id === data.id ? data : detail) : []
+      queryClient.setQueryData<Certificate[]>(['patient-certificate', payload.certificate_patient_id], (oldData) =>
+        oldData ? oldData.map(detail => detail.certificate_id === data.certificate_id ? data : detail) : []
       );
 
       notify('Atestado atualizado com sucesso', 'Sucesso', 'check', 'success');
@@ -39,10 +39,10 @@ const useCertificateActions = (): CertificateActions => ({
 
   removeCertificate: async (certificate, queryClient) => {
     try {
-      await api.delete(`/atestado/${certificate.id}`);
+      await api.delete(`/patient-certificate/${certificate.certificate_id}`);
 
-      queryClient.setQueryData<Certificate[]>(['attendances', certificate.patient_id], (oldData) =>
-        oldData ? oldData.filter(detail => detail.id !== certificate.id) : []
+      queryClient.setQueryData<Certificate[]>(['patient-certificate', certificate.certificate_patient_id], (oldData) =>
+        oldData ? oldData.filter(detail => detail.certificate_id !== certificate.certificate_id) : []
       );
 
       notify('Atestado removido com sucesso', 'Sucesso', 'check', 'success');

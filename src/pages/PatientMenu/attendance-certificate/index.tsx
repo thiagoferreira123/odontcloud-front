@@ -26,7 +26,7 @@ export default function AttendanceCertificate() {
     try {
       if (!id) throw new AppException('Id is required');
 
-      const response = await getCertificates(+id);
+      const response = await getCertificates(id);
 
       if (response === false) throw new Error('Erro ao buscar atestados');
 
@@ -58,7 +58,7 @@ export default function AttendanceCertificate() {
     return pagesArray;
   }, [selectedPage]);
 
-  const result = useQuery({ queryKey: ['attendances', Number(id)], queryFn: getCertificates_, enabled: !!id });
+  const result = useQuery({ queryKey: ['patient-certificate', id], queryFn: getCertificates_, enabled: !!id });
 
   const slicedResult = result.data ? (result.data.length > 7 ? result.data.slice(actualPage[0], actualPage[1]) : result.data) : [];
 
@@ -82,12 +82,12 @@ export default function AttendanceCertificate() {
             </div>
           ) : (
             slicedResult.map((attendance) => (
-              <div className="border-bottom border-separator-light mb-2 pb-2" key={attendance.id}>
+              <div className="border-bottom border-separator-light mb-2 pb-2" key={attendance.certificate_id}>
                 <Row className="g-0 sh-6">
                   <Col>
                     <div className="d-flex flex-row pt-0 pb-0 ps-3 pe-0 h-100 align-items-center justify-content-between">
                       <div className="d-flex flex-column">
-                        <div>Emitido em: {attendance.date_issue}</div>
+                        <div>Emitido em: {attendance.certificate_date_emission}</div>
                       </div>
                       <div className="d-flex">
                         <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Excluir</Tooltip>}>

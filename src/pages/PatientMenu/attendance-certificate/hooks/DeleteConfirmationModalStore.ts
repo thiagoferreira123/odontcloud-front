@@ -1,13 +1,13 @@
 import { create } from "zustand";
-import { CertificateDetails } from "./CertificateStore/types";
+import { Certificate } from "./CertificateStore/types";
 
 interface DeleteConfirmationModalStore {
   showModal: boolean;
 
-  selectedCertificate: CertificateDetails | null;
+  selectedCertificate: Certificate | null;
 
   // eslint-disable-next-line no-unused-vars
-  handleSelectCertificateToRemove: (expenditure: CertificateDetails) => void;
+  handleSelectCertificateToRemove: (expenditure: Certificate) => void;
   hideModal: () => void;
 }
 

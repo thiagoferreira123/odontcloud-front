@@ -1,27 +1,27 @@
 import { QueryClient } from "@tanstack/react-query";
 
 export interface Certificate {
-  id: string;
-  patient_id: number;
-  patient_name: string;
-  cpf_cnpj_do_patient: string;
-  permanence_start: string;
-  permanencia_end: string;
-  cep: string;
-  state: string;
-  city: string;
-  neighborhood: string;
-  street: string;
-  number: string;
-  date_issue: string;
+  certificate_id: string;
+  certificate_patient_id: string;
+  certificate_patient_name: string;
+  certificate_cpf_or_cnpj: string;
+  certificate_permanence_start: string;
+  certificate_permanence_end: string;
+  certificate_date_emission: string;
+  certificate_cep: string;
+  certificate_state: string;
+  certificate_city: string;
+  certificate_neighborhood: string;
+  certificate_street: string;
+  certificate_number: string;
 }
 
 export type CertificateActions = {
-  addCertificate: (patientDetailData: Partial<Certificate>, queryClient: QueryClient) => Promise<Certificate | false>;
-  updateCertificate: (patientDetailData: Certificate, queryClient: QueryClient) => Promise<boolean>;
+  addCertificate: (payload: Partial<Certificate>, queryClient: QueryClient) => Promise<Certificate | false>;
+  updateCertificate: (payload: Certificate, queryClient: QueryClient) => Promise<boolean>;
   removeCertificate: (certificate: Certificate, queryClient: QueryClient) => Promise<boolean>;
 };
 
 export type CertificateStore = {
-  getCertificates: (patient_id: number) => Promise<Certificate[] | false>;
+  getCertificates: (patient_id: string) => Promise<Certificate[] | false>;
 } & CertificateActions;
