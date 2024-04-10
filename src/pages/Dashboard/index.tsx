@@ -54,7 +54,7 @@ const Dashboard = () => {
   return (
     <>
       <Col xs="12" sm={20} className="text-center mb-3">
-        <img src={user?.clinic_logo_link ? user?.clinic_logo_link : '/img/logo/logo.webp'} className="img-fluid rounded-md sh-10" alt="Fluid image" />
+        <img src={user?.clinic_logo_link ? user?.clinic_logo_link : '/img/logo/logo.webp'} className="img-fluid sh-12" alt="Fluid image" />
       </Col>
 
       <Row>
