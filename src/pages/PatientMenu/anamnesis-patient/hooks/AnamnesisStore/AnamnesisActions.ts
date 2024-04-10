@@ -3,11 +3,11 @@ import api from "../../../../../services/useAxios";
 import { Anamnesis, AnamnesisActions } from "./types";
 
 const useAnamnesisActions = (): AnamnesisActions => ({
-  addAnamnesis: async (anamnesisData, queryClient) => {
+  addAnamnesis: async (payload, queryClient) => {
     try {
-      const { data } = await api.post<Anamnesis>('/anamnese/', anamnesisData);
+      const { data } = await api.post<Anamnesis>('/patient-anamnesis/', payload);
 
-      queryClient.setQueryData<Anamnesis[]>(['anamnesis', anamnesisData.patient_id?.toString()], (oldData) => [...(oldData || []), data]);
+      queryClient.setQueryData<Anamnesis[]>(['anamnesis', payload.anamnesis_patient_id?.toString()], (oldData) => [...(oldData || []), data]);
 
       notify('Anamnese adicionada com sucesso', 'Sucesso', 'check', 'success');
 
@@ -19,12 +19,12 @@ const useAnamnesisActions = (): AnamnesisActions => ({
     }
   },
 
-  updateAnamnesis: async (anamnesisData, queryClient) => {
+  updateAnamnesis: async (payload, queryClient) => {
     try {
-      const { data } = await api.patch<Anamnesis>(`/anamnese/${anamnesisData.id}`, anamnesisData);
+      const { data } = await api.patch<Anamnesis>(`/patient-anamnesis/${payload.anamnesis_id}`, payload);
 
-      queryClient.setQueryData<Anamnesis[]>(['anamnesis', anamnesisData.patient_id?.toString()], (oldData) =>
-        oldData ? oldData.map(anamnese => anamnese.id === data.id ? data : anamnese) : []
+      queryClient.setQueryData<Anamnesis[]>(['anamnesis', payload.anamnesis_patient_id?.toString()], (oldData) =>
+        oldData ? oldData.map(anamnese => anamnese.anamnesis_id === data.anamnesis_id ? data : anamnese) : []
       );
 
       notify('Anamnese atualizada com sucesso', 'Sucesso', 'check', 'success');
@@ -37,11 +37,11 @@ const useAnamnesisActions = (): AnamnesisActions => ({
     }
   },
 
-  removeAnamnesis: async (anamnesisData, queryClient) => {
+  removeAnamnesis: async (payload, queryClient) => {
     try {
-      await api.delete(`/anamnese/${anamnesisData.id}`);
+      await api.delete(`/patient-anamnesis/${payload.anamnesis_id}`);
 
-      queryClient.setQueryData<Anamnesis[]>(['anamnesis', anamnesisData.patient_id?.toString()], (oldData) => oldData?.filter(anamnese => anamnese.id !== anamnesisData.id) || []);
+      queryClient.setQueryData<Anamnesis[]>(['anamnesis', payload.anamnesis_patient_id?.toString()], (oldData) => oldData?.filter(anamnese => anamnese.anamnesis_id !== payload.anamnesis_id) || []);
 
       notify('Anamnese removida com sucesso', 'Sucesso', 'check', 'success');
       return true;

@@ -1,22 +1,12 @@
 import CsLineIcons from '../../cs-line-icons/CsLineIcons';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button, Col, Modal, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
-import ModalImportForm from './modals/ImportFormModal';
-import ModalBistrolScale from './modals/BistrolScaleModal';
-import ModalStoolColoring from './modals/StoolColoringModal';
-import ModalUrineColoring from './modals/ModalUrineColoring';
 import { useEditModalStore } from './hooks/EditModalStore';
 import { Editor } from '@tinymce/tinymce-react';
 import useAnamnesisStore from '../PatientMenu/anamnesis-patient/hooks/AnamnesisStore';
 import AsyncButton from '../../components/AsyncButton';
 import { useQueryClient } from '@tanstack/react-query';
 import TemplateSelect from './TemplateSelect';
-import { useFavoriteAnamnesisModalStore } from './hooks/modals/FavoriteAnamnesisModal';
-import FavoriteAnamnesisModal from './modals/FavoriteAnamnesisModal';
-import { useImportFormModalStore } from './hooks/modals/ImportFormModalStore';
-import { useBistrolScaleModalStore } from './hooks/modals/BistrolScaleModal';
-import { useStoolColoringModalStore } from './hooks/modals/StoolColoringModalStore';
-import { useUrineColoringModalStore } from './hooks/modals/UrineColoringModalStore';
 
 const ModalAnamnesis = () => {
   const queryClient = useQueryClient();
@@ -28,11 +18,6 @@ const ModalAnamnesis = () => {
 
   const { hideModal, handleChangeAnamnesis } = useEditModalStore();
   const { updateAnamnesis } = useAnamnesisStore();
-  const { showFavoriteAnamnesisModal } = useFavoriteAnamnesisModalStore();
-  const { showImportFormModal }= useImportFormModalStore();
-  const { showBistrolScaleModal }= useBistrolScaleModalStore();
-  const { showStoolColoringModal }= useStoolColoringModalStore();
-  const { showUrineColoringModal }= useUrineColoringModalStore();
 
   const onSubmit = async () => {
     try {
@@ -60,29 +45,6 @@ const ModalAnamnesis = () => {
             <TemplateSelect />
           </div>
         </Row>
-        <Col className="d-flex justify-content-between align-items-center">
-          <div>
-            <Button variant="primary" className="btn-icon btn-icon-start mb-2 me-1" onClick={showImportFormModal}>
-              <CsLineIcons icon="search" /> <span>Importar questionário pré-consulta</span>
-            </Button>
-            <Button variant="primary" className="btn-icon btn-icon-start mb-2 me-1" onClick={showBistrolScaleModal}>
-              Escala de bistrol
-            </Button>
-            <Button variant="primary" className="btn-icon btn-icon-start mb-2 me-1" onClick={showStoolColoringModal}>
-              Coloração das fezes
-            </Button>
-            <Button variant="primary" className="btn-icon btn-icon-start mb-2 me-1" onClick={showUrineColoringModal}>
-              Escala de hidratação
-            </Button>
-          </div>
-          <div>
-            <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Salvar anamnese como modelo</Tooltip>}>
-              <Button variant="outline-primary" size="sm" className="btn-icon btn-icon-only mb-1 me-1" onClick={showFavoriteAnamnesisModal}>
-                <CsLineIcons icon="star" />
-              </Button>
-            </OverlayTrigger>
-          </div>
-        </Col>
 
         <div>
           <Editor
@@ -97,8 +59,8 @@ const ModalAnamnesis = () => {
               },
               language: 'pt_BR',
             }}
-            value={selectedAnamnesis?.textFromAnamnesis || ''}
-            onEditorChange={(textFromAnamnesis) => handleChangeAnamnesis({ ...selectedAnamnesis, textFromAnamnesis })}
+            value={selectedAnamnesis?.anamnesis_text || ''}
+            onEditorChange={(anamnesis_text) => handleChangeAnamnesis({ ...selectedAnamnesis, anamnesis_text })}
           />
         </div>
         <div className="text-center mt-2">
@@ -106,12 +68,6 @@ const ModalAnamnesis = () => {
             <CsLineIcons icon="save" /> <span>Salvar anamnese</span>
           </AsyncButton>{' '}
         </div>
-
-        <FavoriteAnamnesisModal />
-        <ModalImportForm />
-        <ModalBistrolScale />
-        <ModalStoolColoring />
-        <ModalUrineColoring />
       </Modal.Body>
     </Modal>
   );

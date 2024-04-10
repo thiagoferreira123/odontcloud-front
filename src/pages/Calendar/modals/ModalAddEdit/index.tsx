@@ -19,7 +19,6 @@ import DatepickerTime from '../../../../views/interface/forms/controls/datepicke
 import { Option } from '../../../../types/inputs';
 import useScheduleStore from '../../hooks/ScheduleStore';
 import { EventType, Schedule } from '../../hooks/ScheduleStore/types';
-import usePatientStore from '../../../Dashboard/patientsPatientStore';
 import { AppException } from '../../../../helpers/ErrorHelpers';
 import { notify } from '../../../../components/toast/NotificationIcon';
 import useScheduleHistoryStore from '../../hooks/ScheduleHistoryStore';
@@ -28,6 +27,7 @@ import { useModalAddEditStore } from '../../hooks/modals/ModalAddEditStore';
 import { useDeleteScheduleConfirmationModalStore } from '../../hooks/modals/DeleteScheduleConfirmationModalStore';
 import { useModalDayOffModalStore } from '../../hooks/modals/ModalDayOffModalStore';
 import DayOffModal from '../DayOffModal';
+import usePatientStore from '../../../Dashboard/patients/hooks/PatientStore';
 
 const validationSchema = yup.object({
   calendar_name: yup

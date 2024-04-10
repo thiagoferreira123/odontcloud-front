@@ -14,12 +14,11 @@ import { useEditModalStore } from '../../../../Anamnesis/hooks/EditModalStore';
 import CsLineIcons from '../../../../../cs-line-icons/CsLineIcons';
 
 interface FormValues {
-  date: Date;
-  identification: string;
+  anamnesis_date_creation: Date;
+  anamnesis_identification: string;
 }
 
 const FormConfigAntropometricAnamnesis = (
-  // eslint-disable-next-line no-unused-vars
   props: { setIsLoading: (isLoading: boolean) => void; handleCloseModal: () => void },
   ref: React.Ref<unknown> | undefined
 ) => {
@@ -34,13 +33,13 @@ const FormConfigAntropometricAnamnesis = (
   const selectedAnamnesis = useConfigModalStore((state) => state.selectedAnamnesis);
 
   const validationSchema = Yup.object().shape({
-    date: Yup.date().required('A data de registro é obrigatória'),
-    identification: Yup.string().required('A identificação é obrigatória'),
+    anamnesis_date_creation: Yup.date().required('A data de registro é obrigatória'),
+    anamnesis_identification: Yup.string().required('A identificação é obrigatória'),
   });
 
   const initialValues: FormValues = {
-    date: new Date(),
-    identification: '',
+    anamnesis_date_creation: new Date(),
+    anamnesis_identification: '',
   };
 
   const { hideConfigModal } = useConfigModalStore();
@@ -54,16 +53,16 @@ const FormConfigAntropometricAnamnesis = (
       if (!id) throw new Error('patient_id (id) is not defined');
 
       const payload: Partial<Anamnesis> = {
-        date: values.date.toISOString(),
-        identification: values.identification,
+        anamnesis_date_creation: values.anamnesis_date_creation.toISOString(),
+        anamnesis_identification: values.anamnesis_identification,
       };
 
-      if (selectedAnamnesis?.id) {
+      if (selectedAnamnesis?.anamnesis_id) {
         const result = await updateAnamnesis({ ...selectedAnamnesis, ...payload }, queryClient);
 
         if (result === false) throw new Error('Error updating assessment');
       } else {
-        const result = await addAnamnesis({ ...payload, patient_id: +id }, queryClient);
+        const result = await addAnamnesis({ ...payload, anamnesis_patient_id: id }, queryClient);
 
         if (!result) throw new Error('Error adding assessment');
 
@@ -87,7 +86,7 @@ const FormConfigAntropometricAnamnesis = (
   useEffect(() => {
     if (!selectedAnamnesis) return resetForm();
 
-    setValues({ date: new Date(selectedAnamnesis.date), identification: selectedAnamnesis.identification });
+    setValues({ anamnesis_date_creation: new Date(selectedAnamnesis.anamnesis_date_creation), anamnesis_identification: selectedAnamnesis.anamnesis_identification });
   }, [resetForm, selectedAnamnesis, setValues]);
 
   return (
@@ -95,14 +94,14 @@ const FormConfigAntropometricAnamnesis = (
       <div className="mb-3 filled mt-2">
         <div className="mb-3 filled mt-2">
           <CsLineIcons icon="cupcake" />
-          <Form.Control type="text" name="identification" value={values.identification} onChange={handleChange} placeholder="Nome da anamnese" />
-          {errors.identification && touched.identification && <div className="error">{errors.identification as string}</div>}
+          <Form.Control type="text" name="anamnesis_identification" value={values.anamnesis_identification} onChange={handleChange} placeholder="Nome da anamnese" />
+          {errors.anamnesis_identification && touched.anamnesis_identification && <div className="error">{errors.anamnesis_identification as string}</div>}
         </div>
         <label>Data de cadastro</label>
         <div className="mb-3 filled mt-2">
           <CsLineIcons icon="cupcake" />
-          <Datepicker name="date" value={values.date} setFieldValue={setFieldValue} />
-          {errors.date && touched.date && <div className="error">{errors.date as string}</div>}
+          <Datepicker name="anamnesis_date_creation" value={values.anamnesis_date_creation} setFieldValue={setFieldValue} />
+          {errors.anamnesis_date_creation && touched.anamnesis_date_creation && <div className="error">{errors.anamnesis_date_creation as string}</div>}
         </div>
       </div>
     </Form>

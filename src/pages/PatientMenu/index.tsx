@@ -23,41 +23,12 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { isTitle: true, text: 'Questionários' },
 
   { to: 'plano-de-tratamento', text: 'Plano de tratamento', Icon: Icon.BookmarkHeart },
   { to: 'orcamento', text: 'Orçamento', Icon: Icon.CashCoin },
-  { to: 'formulario-pre-consulta', text: 'Formulário pré-consulta', Icon: Icon.Clipboard2Heart },
   { to: 'anamnese', text: 'Anamnese', Icon: Icon.ClipboardPlus },
-  { to: 'recordatorio', text: 'Recordatório alimentar', Icon: Icon.ClockHistory },
-  { to: 'prontuario', text: 'Prontuário', Icon: Icon.FileEarmarkMedical },
-  { to: 'sinais-sintomas', text: 'Sinais e sintomas', Icon: Icon.Thermometer},
-  { to: 'rastreamento-metabolico', text: 'Rastreamento metabólico', Icon: Icon.LungsFill },
 
-  { isTitle: true, text: 'Avaliações' },
-  { to: 'avaliacao-antropometrica', text: 'Avaliação antropométrica', Icon: Icon.BarChartLine },
-  { to: 'solicitacao-exames', text: 'Solicitação de exames', Icon: Icon.Droplet },
-  { to: 'gasto-calorico', text: 'Predição de gasto calórico', Icon: Icon.Fire },
-  { to: 'fotos-comparativas', text: 'Fotos comparativas', Icon: Icon.Camera2},
-
-  { isTitle: true, text: 'Prescrições' },
-  { to: 'plano-alimentar-classico', text: 'Plano alimentar clássico', Icon: Icon.EggFried },
-  { to: 'plano-alimentar-equivalante', text: 'Plano alimentar por grupos', Icon: Icon.EggFried },
-  { to: 'plano-alimentar-qualitativo', text: 'Plano alimentar qualitativo', Icon: Icon.EggFried },
-  { to: 'formulas-manipuladas', text: 'Fórmulas manipuladas', Icon: Icon.CapsulePill },
-  { to: 'receitas-culinarias', text: 'Receitas culinarias', Icon: Icon.JournalBookmark },
-  { to: 'orientacoes', text: 'Orientações', Icon: Icon.CardList },
-  { to: 'check-list', text: 'Checklist de condutas', Icon: Icon.CardChecklist},
-
-  { isTitle: true, text: 'Fidelização' },
-  { to: 'alerta-hidratacao', text: 'Alerta de hidratação', Icon: Icon.Bell},
-  { to: 'anexo-materiais', text: 'Compartilhar materiais', Icon: Icon.Share },
-  { to: 'Metas', text: 'Metas', Icon: Icon.Bullseye},
-
-  { isTitle: true, text: 'Outros' },
   { to: 'pasta-do-paciente', text: 'Arquivos do paciente', Icon: Icon.Folder },
-  { to: 'envio-de-materiais', text: "Entregar PDF's por e-mail", Icon: Icon.Send },
-  { to: 'configuracao-app', text: 'Aplicativo mobile', Icon: Icon.Phone },
   { to: 'atestado', text: 'Emissão de atestado', Icon: Icon.PostcardHeart },
   { to: 'recibo', text: 'Emissão de recibo', Icon: Icon.ReceiptCutoff },
 ];

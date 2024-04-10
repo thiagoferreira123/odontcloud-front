@@ -5,9 +5,9 @@ import useAnamnesisActions from './AnamnesisActions';
 import api from '../../../../../services/useAxios';
 
 const useAnamnesisStore = create<AnamnesisStore>(() => ({
-  getAnamnesis: async (patient_id) => {
+  getAnamnesis: async (anamnesis_patient_id) => {
     try {
-      const response = await api.get(`/anamnese/paciente/${patient_id}`);
+      const response = await api.get(`/patient-anamnesis/by-patient/${anamnesis_patient_id}`);
 
       return response.data;
     } catch (error) {

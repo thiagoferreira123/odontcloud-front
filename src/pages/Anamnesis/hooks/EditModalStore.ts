@@ -7,9 +7,7 @@ interface EditModalStore {
   selectedAnamnesis: Anamnesis | null;
 
   hideModal: () => void;
-  // eslint-disable-next-line no-unused-vars
   handleSelectAnamnesisToEdit: (anamnesis: Anamnesis) => void;
-  // eslint-disable-next-line no-unused-vars
   handleChangeAnamnesis: (anamnesis: Partial<Anamnesis>) => void;
   handleShowModal: () => void;
 }

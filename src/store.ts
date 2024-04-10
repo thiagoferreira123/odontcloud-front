@@ -1,10 +1,3 @@
-// import redux and persist plugins
-// import { combineReducers, configureStore } from '@reduxjs/toolkit';
-// import { persistReducer } from 'reduxjs-toolkit-persist';
-// import storage from 'reduxjs-toolkit-persist/lib/storage';
-// import persistStore from 'reduxjs-toolkit-persist/es/persistStore';
-// import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE } from 'reduxjs-toolkit-persist/es/constants';
-
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
@@ -19,7 +12,6 @@ import notificationReducer from './layout/nav/notifications/notificationSlice';
 import scrollspyReducer from './components/scrollspy/scrollspySlice';
 
 import contactsReducer from './views/apps/contacts/contactsSlice';
-import chatReducer from './pages/Chat/hooks/chatSlice';
 import mailboxReducer from './views/apps/mailbox/mailboxSlice';
 import tasksReducer from './views/apps/tasks/tasksSlice';
 
@@ -41,7 +33,6 @@ const rootReducer = combineReducers({
   notification: notificationReducer,
   scrollspy: scrollspyReducer,
   contacts: contactsReducer,
-  chat: chatReducer,
   mailbox: mailboxReducer,
   tasks: tasksReducer,
 });

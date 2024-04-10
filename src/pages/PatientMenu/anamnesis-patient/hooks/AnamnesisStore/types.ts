@@ -1,20 +1,20 @@
 import { QueryClient } from "@tanstack/react-query";
 
 export type AnamnesisStore = {
-  getAnamnesis: (patient_id: number) => Promise<Anamnesis[] | false>;
+  getAnamnesis: (anamnesis_patient_id: string) => Promise<Anamnesis[] | false>;
 } & AnamnesisActions;
 
 export type AnamnesisActions = {
-  addAnamnesis: (anamnesisData: Partial<Anamnesis>, queryClient: QueryClient) => Promise<Anamnesis | false>;
-  updateAnamnesis: (anamnesisData: Anamnesis, queryClient: QueryClient) => Promise<boolean>;
-  removeAnamnesis: (anamnesisData: Anamnesis, queryClient: QueryClient) => Promise<boolean>;
+  addAnamnesis: (payload: Partial<Anamnesis>, queryClient: QueryClient) => Promise<Anamnesis | false>;
+  updateAnamnesis: (payload: Anamnesis, queryClient: QueryClient) => Promise<boolean>;
+  removeAnamnesis: (payload: Anamnesis, queryClient: QueryClient) => Promise<boolean>;
 };
 
 export interface Anamnesis {
-  id: number;
-  date: string;
-  identification: string;
-  patient_id: number;
-  professional_id: number;
-  textFromAnamnesis: string | null;
+  anamnesis_id: string;
+  anamnesis_date_creation: string;
+  anamnesis_status: string;
+  anamnesis_text: string;
+  anamnesis_identification: string;
+  anamnesis_patient_id: string;
 }

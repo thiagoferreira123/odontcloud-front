@@ -7,13 +7,12 @@ registerLocale('pt-BR', ptBR);
 interface DatepickerProps {
   name: string;
   value: Date;
-  // eslint-disable-next-line no-unused-vars
   setFieldValue: (field: string, value: Date, shouldValidate?: boolean | undefined) => void;
 }
 
 const Datepicker = (props: DatepickerProps) => {
-  const handleChange = (date: Date) => {
-    props.setFieldValue('date', date);
+  const handleChange = (anamnesis_date_creation: Date) => {
+    props.setFieldValue('anamnesis_date_creation', anamnesis_date_creation);
   };
 
   return (

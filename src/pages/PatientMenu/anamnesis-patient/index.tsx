@@ -27,7 +27,7 @@ export default function AnamnesisHistory() {
     try {
       if (!id) throw new Error('Id is required');
 
-      const response = await getAnamnesis(+id);
+      const response = await getAnamnesis(id);
 
       if (response === false) throw new Error('Erro ao buscar anamneses');
 
@@ -82,13 +82,13 @@ export default function AnamnesisHistory() {
             </div>
           ) : (
             slicedResult.map((anamnesis) => (
-              <div className="border-bottom border-separator-light mb-2 pb-2" key={anamnesis.id}>
+              <div className="border-bottom border-separator-light mb-2 pb-2" key={anamnesis.anamnesis_id}>
                 <Row className="g-0 sh-6">
                   <Col>
                     <div className="d-flex flex-row pt-0 pb-0 ps-3 pe-0 h-100 align-items-center justify-content-between">
                       <div className="d-flex flex-column">
-                        <div>Identificação: {anamnesis.identification}</div>
-                        <div>Realizada em: {new Date(anamnesis.date).toLocaleDateString()}</div>
+                        <div>Identificação: {anamnesis.anamnesis_identification}</div>
+                        <div>Realizada em: {new Date(anamnesis.anamnesis_date_creation).toLocaleDateString()}</div>
                       </div>
                       <div className="d-flex">
                         <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Excluir</Tooltip>}>

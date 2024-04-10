@@ -7,6 +7,7 @@ import { useAuth } from '../Auth/Login/hook';
 import CsLineIcons from '../../cs-line-icons/CsLineIcons';
 import Professionals from './Professionals';
 import ClinicProcedures from './ClinicProcedures';
+import ClinicAnamnesis from './ClinicAnamnesis';
 
 const ProfileStandard = () => {
   const user = useAuth((state) => state.user);
@@ -39,6 +40,10 @@ const ProfileStandard = () => {
                   <Nav.Link className="px-0 border-bottom border-separator-light cursor-pointer" eventKey="ClinicProcedures">
                     <CsLineIcons icon="file-image" className="me-2" size={17} />
                     <span className="align-middle">Procedimentos da clínica</span>
+                  </Nav.Link>
+                  <Nav.Link className="px-0 border-bottom border-separator-light cursor-pointer" eventKey="ClinicAnamnesis">
+                    <CsLineIcons icon="file-image" className="me-2" size={17} />
+                    <span className="align-middle">Anamneses da clínica</span>
                   </Nav.Link>
                 </Nav>
               </Card.Body>
@@ -85,6 +90,14 @@ const ProfileStandard = () => {
                 <Card>
                   <Card.Body className="mb-n2">
                     <ClinicProcedures />
+                  </Card.Body>
+                </Card>
+              </Tab.Pane>
+
+              <Tab.Pane eventKey="ClinicAnamnesis">
+                <Card>
+                  <Card.Body className="mb-n2">
+                    <ClinicAnamnesis />
                   </Card.Body>
                 </Card>
               </Tab.Pane>

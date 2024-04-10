@@ -4,8 +4,8 @@ import * as XLSX from 'xlsx';
 import { SuccessResponse, useModalImportPatientStore } from '../hooks';
 import api from '../../../../../../services/useAxios';
 import { notify } from '../../../../../../components/toast/NotificationIcon';
-import usePatientStore from '../../.PatientStore';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import usePatientStore from '../../../hooks/PatientStore';
 
 interface Step {
   id: string;

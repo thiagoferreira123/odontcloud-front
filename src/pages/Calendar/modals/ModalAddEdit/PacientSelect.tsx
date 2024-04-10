@@ -3,8 +3,8 @@ import { Form } from 'react-bootstrap';
 import { ActionMeta, SingleValue } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import { Option } from '../../../../types/inputs';
-import usePatientStore from '../../../Dashboard/patientsPatientStore';
 import { useQuery } from '@tanstack/react-query';
+import usePatientStore from '../../../Dashboard/patients/hooks/PatientStore';
 
 type Props = {
   onChange: (option: Option | null, actionMeta: ActionMeta<Option>) => void;
