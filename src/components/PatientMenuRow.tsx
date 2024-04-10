@@ -8,18 +8,17 @@ import { Patient } from '../types/Patient';
 
 const PatientMenuRow = () => {
   const navigate = useNavigate();
-  const patientId = usePatientMenuStore((state) => state.patientId);
+  const patient_id = usePatientMenuStore((state) => state.patient_id);
 
   const { getPatient, updatePatient, persistUpdatePatient } = usePatientMenuStore();
 
   const getPatient_ = async () => {
     try {
-
-      const response = await getPatient(patientId, navigate);
+      const response = await getPatient(patient_id, navigate);
 
       if (response === false) throw new Error('Erro ao buscar paciente');
 
-      const payload: Partial<Patient> & { id: number } = {id: response.id, dateOfLastConsultation: new Date()};
+      const payload: Partial<Patient> & { patient_id: string } = { patient_id: response.patient_id, patient_last_interaction: new Date().toISOString() };
 
       await persistUpdatePatient(payload, true);
 
@@ -32,7 +31,7 @@ const PatientMenuRow = () => {
     }
   };
 
-  const result = useQuery({ queryKey: ['patient', patientId], queryFn: getPatient_, enabled: !!patientId});
+  const result = useQuery({ queryKey: ['patient', patient_id], queryFn: getPatient_, enabled: !!patient_id });
 
   return (
     <Row>
@@ -43,7 +42,7 @@ const PatientMenuRow = () => {
               <StaticLoading />
             ) : (
               <img
-                src={result.data?.photoLink ? result.data.photoLink : getAvatarByGender(result.data?.gender ?? 1)}
+                src={result.data?.patient_photo ? result.data.patient_photo : getAvatarByGender(result.data?.patient_sex ?? 1)}
                 className="card-img rounded-xl sh-6 sw-6"
                 alt="thumb"
               />
@@ -52,13 +51,13 @@ const PatientMenuRow = () => {
           <Col>
             <div className="d-flex flex-row pt-0 pb-0 ps-3 pe-0 h-100 align-items-center justify-content-between">
               <div className="d-flex flex-column">
-                <div>{result.data?.name}</div>
+                <div>{result.data?.patient_full_name}</div>
                 <div className="text-medium text-muted">
-                  {result.data?.reasonForConsultation ?? ''}, {result.data?.age ?? ''} anos
+                  {result.data?.patient_last_interaction ? new Date(result.data?.patient_last_interaction).toLocaleString() : ''}, {result.data?.age ?? ''} anos
                 </div>
               </div>
               <div className="d-flex">
-                <Link to={`${appRoot}/menu-paciente/${patientId}`} className="btn btn-sm btn-primary ms-1">
+                <Link to={`${appRoot}/menu-paciente/${patient_id}`} className="btn btn-sm btn-primary ms-1">
                   Menu do paciente
                 </Link>
                 {/* <Button variant="primary" size="sm" className="ms-1">

@@ -4,14 +4,17 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useQueryClient } from '@tanstack/react-query';
 import { useDeleteConfirmationModalStore } from '../hooks/DeleteConfirmationModalStore';
-import useProcedureStore from '../hooks/ProcedureStore';
 import CsLineIcons from '../../../cs-line-icons/CsLineIcons';
+import useToothStore from '../hooks/ToothStore';
+import { useParams } from 'react-router-dom';
+import { AppException } from '../../../helpers/ErrorHelpers';
 
 const DeleteConfirmationModal = () => {
+  const { id } = useParams();
   const showModal = useDeleteConfirmationModalStore((state) => state.showModal);
 
-  const selectedProcedure = useDeleteConfirmationModalStore((state) => state.selectedProcedure);
-  const { removeProcedure } = useProcedureStore();
+  const selectedTooth = useDeleteConfirmationModalStore((state) => state.selectedTooth);
+  const { removeTooth } = useToothStore();
   const [isLoading, setIsLoading] = useState(false);
 
   const queryClient = useQueryClient();
@@ -28,11 +31,12 @@ const DeleteConfirmationModal = () => {
     setIsLoading(true);
 
     try {
-      if (!selectedProcedure) throw new Error('selectedProcedure is not defined');
+      if (!selectedTooth) throw new AppException('selectedTooth is not defined');
+      if(!id) throw new AppException('id is not defined');
 
-      const response = await removeProcedure(selectedProcedure, queryClient);
+      const response = await removeTooth(selectedTooth, id, queryClient);
 
-      if (response === false) throw new Error('Erro ao remover procedimento');
+      if (response === false) throw new Error('Erro ao remover dente');
 
       resetForm();
       setIsLoading(false);
@@ -53,7 +57,7 @@ const DeleteConfirmationModal = () => {
         <Modal.Title>Confirmação de exclusão</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        Você realmente deseja excluir o procedimento? Se sim, digite 'excluir'. Atenção: esta ação é irreversível.
+        Você realmente deseja excluir o dente? Se sim, digite 'excluir'. Atenção: esta ação é irreversível.
         <Form onSubmit={handleSubmit} className="tooltip-end-top">
           <div className="filled mt-4">
             <CsLineIcons icon="bin" />

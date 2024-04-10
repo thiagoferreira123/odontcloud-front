@@ -7,15 +7,14 @@ const useCarePlanBudgetActions = (): CarePlanBudgetActions => ({
     try {
       const { data } = await api.patch<CarePlanBudget>(`/budget/${payload.budget_id}`, payload);
 
-      // queryClient.setQueryData<CarePlanBudget>(['carePlanBudget', payload.budget_id], (oldData) => {
-      //   // if (!oldData) return [data];
-
-      //   return {
-
-      //   };
-      // }
-
-      notify('Orçamento atualizado com sucesso', 'Sucesso', 'check', 'success');
+      queryClient.setQueryData<CarePlanBudget>(['carePlanBudget', payload.budget_id], (oldData) => {
+        if (oldData) {
+          return {
+            ...oldData,
+            ...data,
+          };
+        }
+      });
 
       return true;
     } catch (error) {

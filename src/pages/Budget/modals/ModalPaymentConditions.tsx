@@ -1,4 +1,4 @@
-import { Alert, Button, Col, Form, Modal, Row } from 'react-bootstrap';
+import { Alert, Col, Form, Modal, Row } from 'react-bootstrap';
 import SelectPaymentMethod from './SelectPaymentMethod';
 import { CarePlanBudget } from '../../PatientMenu/budget/hooks/CarePlanBudgetStore/types';
 import { useEffect, useState } from 'react';
@@ -11,10 +11,10 @@ registerLocale('pt-BR', ptBR);
 import { useFormik } from 'formik';
 import useCarePlanBudgetStore from '../hooks/CarePlanBudgetStore';
 import { useQueryClient } from '@tanstack/react-query';
-import { CarePlanBudgetHistoryItem } from '../hooks/CarePlanBudgetHistoryItem/types';
-import { parseToBrValue } from '../../../helpers/StringHelpers';
 import useCarePlanBudgetHistoryItemStore from '../hooks/CarePlanBudgetHistoryItem';
-import { parseDateToIso } from '../../../helpers/DateHelper';
+import { notify } from '../../../components/toast/NotificationIcon';
+import { getTotalValueWithDiscount } from '../helpers';
+import { parseToBrValue } from '../../../helpers/StringHelpers';
 
 interface ModalPaymentConditionsProps {
   showModal: boolean;
@@ -54,28 +54,27 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
         budget_pay_day: values.budget_pay_day,
       };
 
-      const response = await updateCarePlanBudget(payload, queryClient);
+      await updateCarePlanBudget(payload, queryClient);
 
       const installments = values.budget_number_installments ? Number(values.budget_number_installments) : 1;
 
-      const parsedDiscountValue = values.budget_discount_value ? values.budget_discount_value.replace('.', '').replace(',', '.') : '0';
-      const valueWithDiscount =
-        values.budget_discount_type === 'percentage'
-          ? parseFloat(carePlanBudget.budget_value.replace('.', '').replace(',', '.')) -
-            (parseFloat(carePlanBudget.budget_value.replace('.', '').replace(',', '.')) * parseFloat(parsedDiscountValue)) / 100
-          : parseFloat(carePlanBudget.budget_value.replace('.', '').replace(',', '.')) - parseFloat(parsedDiscountValue);
+      const valueWithDiscount = getTotalValueWithDiscount(
+        carePlanBudget.budget_value,
+        values.budget_discount_value ?? '0',
+        values.budget_discount_type ?? 'percentage'
+      );
 
-      console.log('valueWithDiscount', valueWithDiscount)
-
-      const responseItems = await createMenyCarePlanBudgetHistoryItems(
+      await createMenyCarePlanBudgetHistoryItems(
         {
           paymentBudgetId: carePlanBudget.budget_id,
           totalAmount: Number(valueWithDiscount),
           installments: installments,
-          firstPaymentDate: parseDateToIso(values.budget_due_first_installment),
+          firstPaymentDate: values.budget_due_first_installment,
         },
         queryClient
       );
+
+      notify('Orçamento atualizado com sucesso', 'Sucesso', 'check', 'success');
 
       setIsSaving(false);
 
@@ -145,23 +144,17 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
   const formik = useFormik({ initialValues, validationSchema, onSubmit });
   const { handleChange, handleSubmit, setFieldValue, setValues, values, touched, errors } = formik;
 
-  const parsedDiscountValue = values.budget_discount_value ? values.budget_discount_value.replace('.', '').replace(',', '.') : '0';
-  const valueWithDiscount =
-    values.budget_discount_type === 'percentage'
-      ? (
-          parseFloat(carePlanBudget.budget_value.replace('.', '').replace(',', '.')) -
-          (parseFloat(carePlanBudget.budget_value.replace('.', '').replace(',', '.')) * parseFloat(parsedDiscountValue)) / 100
-        ).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-      : (parseFloat(carePlanBudget.budget_value.replace('.', '').replace(',', '.')) - parseFloat(parsedDiscountValue)).toLocaleString('pt-BR', {
-          style: 'currency',
-          currency: 'BRL',
-        });
+  const valueWithDiscount = getTotalValueWithDiscount(
+    carePlanBudget.budget_value,
+    values.budget_discount_value ?? '0',
+    values.budget_discount_type ?? 'percentage'
+  );
 
   useEffect(() => {
     setValues({
       ...carePlanBudget,
-      budget_due_first_installment: new Date(carePlanBudget.budget_due_first_installment),
-      budget_entry_payment: new Date(carePlanBudget.budget_entry_payment),
+      budget_due_first_installment: carePlanBudget.budget_due_first_installment ? new Date(carePlanBudget.budget_due_first_installment) : new Date(),
+      budget_entry_payment: carePlanBudget.budget_entry_payment ? new Date(carePlanBudget.budget_entry_payment) : new Date(),
     });
   }, [carePlanBudget]);
 
@@ -189,7 +182,7 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
                 id="budget_discount_type1"
                 name="budget_discount_type"
                 className="ms-3"
-                onChange={(e) => handleChangeDiscountType('percentage')}
+                onChange={() => handleChangeDiscountType('percentage')}
                 checked={values.budget_discount_type == 'percentage'}
               />
               <Form.Check
@@ -198,7 +191,7 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
                 id="budget_discount_type2"
                 name="budget_discount_type"
                 className="ms-3"
-                onChange={(e) => handleChangeDiscountType('real')}
+                onChange={() => handleChangeDiscountType('real')}
                 checked={values.budget_discount_type == 'real'}
               />
             </Form.Label>
@@ -209,15 +202,13 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
               <strong>Valor</strong>
             </Form.Label>
             <Col xs="12" className="mb-3 d-flex">
-              <Form.Control type="text" name="budget_discount_value" value={values.budget_discount_value} onChange={handleChangeMaskMoney} />
+              <Form.Control type="text" name="budget_discount_value" value={values.budget_discount_value ?? ''} onChange={handleChangeMaskMoney} />
               {errors.budget_discount_value && touched.budget_discount_value && <div className="error">{errors.budget_discount_value}</div>}
             </Col>
           </Row>
           <Alert variant="light">
-            Valor total do orçamento:{' '}
-            {Number(carePlanBudget.budget_value.replace('.', '').replace(',', '.')).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} <br />{' '}
-            <br />
-            Valor com desconto: {valueWithDiscount}
+            Valor total do orçamento: {carePlanBudget.budget_value && parseToBrValue(carePlanBudget.budget_value)} <br /> <br />
+            Valor com desconto: {parseToBrValue(valueWithDiscount)}
           </Alert>
           <Row>
             <Col xs="6" className="mb-3">
@@ -225,7 +216,7 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
                 <strong>Quantidade de parcelas</strong>
               </Form.Label>
               <Col xs="12" className="mb-3 d-flex">
-                <Form.Control type="text" name="budget_number_installments" value={values.budget_number_installments} onChange={handleChange} />
+                <Form.Control type="text" name="budget_number_installments" value={values.budget_number_installments ?? ''} onChange={handleChange} />
                 {errors.budget_number_installments && touched.budget_number_installments && <div className="error">{errors.budget_number_installments}</div>}
               </Col>
             </Col>
@@ -237,7 +228,7 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
               <DatePicker
                 className="form-control"
                 placeholderText="Data"
-                selected={values.budget_due_first_installment}
+                selected={values.budget_due_first_installment ?? new Date()}
                 onChange={(date) => setFieldValue('budget_due_first_installment', date)}
                 locale="pt-BR"
                 dateFormat="dd/MM/yyyy"
@@ -251,7 +242,7 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
                 <strong>Entrada</strong>
               </Form.Label>
               <Col xs="12" className="mb-3 d-flex">
-                <Form.Control type="text" name="budget_pay_day" value={values.budget_pay_day} onChange={handleChange} />
+                <Form.Control type="text" name="budget_pay_day" value={values.budget_pay_day ?? ''} onChange={handleChange} />
                 {errors.budget_pay_day && touched.budget_pay_day && <div className="error">{errors.budget_pay_day}</div>}
               </Col>
             </Col>

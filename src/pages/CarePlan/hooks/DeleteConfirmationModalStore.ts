@@ -1,25 +1,25 @@
 import { create } from "zustand";
-import { Procedure } from "./ProcedureStore/types";
+import { Tooth } from "./CarePlanStore/types";
 
 interface DeleteConfirmationModalStore {
   showModal: boolean;
 
-  selectedProcedure: Procedure | null;
+  selectedTooth: Tooth | null;
 
-  handleSelectProcedureToRemove: (careplan: Procedure) => void;
+  handleSelectToothToRemove: (careplan: Tooth, care_plan_id: string) => void;
   hideModal: () => void;
 }
 
 export const useDeleteConfirmationModalStore = create<DeleteConfirmationModalStore>((set) => ({
   showModal: false,
 
-  selectedProcedure: null,
+  selectedTooth: null,
 
-  handleSelectProcedureToRemove(careplan) {
-    set({ selectedProcedure: careplan, showModal: true });
+  handleSelectToothToRemove(careplan) {
+    set({ selectedTooth: careplan, showModal: true });
   },
 
   hideModal() {
-    set({ showModal: false, selectedProcedure: null });
+    set({ showModal: false, selectedTooth: null });
   },
 }));

@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Badge, Button, Card, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
 import * as Icon from 'react-bootstrap-icons';
 import ModalNewProcedure from './modals/ModalNewProcedure';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import useCarePlanStore from './hooks/CarePlanStore';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import StaticLoading from '../../components/loading/StaticLoading';
 import Empty from '../../components/Empty';
 import { useModalNewProcedureStore } from './hooks/ModalNewProcedureStore';
@@ -17,6 +17,11 @@ import { notify } from '../../components/toast/NotificationIcon';
 import { Professional } from '../MySettings/hooks/ProfessionalStore/types';
 import DeleteConfirmationModal from './modals/DeleteConfirmationModal';
 import { useDeleteConfirmationModalStore } from './hooks/DeleteConfirmationModalStore';
+import useCarePlanBudgetStore from '../PatientMenu/budget/hooks/CarePlanBudgetStore';
+import { CarePlanBudget } from '../PatientMenu/budget/hooks/CarePlanBudgetStore/types';
+import { appRoot } from '../../routes';
+import AsyncButton from '../../components/AsyncButton';
+import { parseToBrValue } from '../../helpers/StringHelpers';
 
 const getProfessionalName = (professionalId: string, professionals: Professional[]) => {
   return professionals.find((professional: any) => professional.professional_id === professionalId)?.professional_full_name;
@@ -27,10 +32,16 @@ export default function CarePlan() {
 
   const user = useAuth((state) => state.user);
 
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const [isCreatingBudget, setIsCreatingBudget] = useState(false);
+  const { addCarePlanBudget } = useCarePlanBudgetStore();
+
   const { getCarePlan } = useCarePlanStore();
   const { getProfessionals } = useProfessionalStore();
   const { handleShowModalNewProcedure, handleSelectProcedureToEdit } = useModalNewProcedureStore();
-  const { handleSelectProcedureToRemove } = useDeleteConfirmationModalStore();
+  const { handleSelectToothToRemove } = useDeleteConfirmationModalStore();
 
   const getProfessionals_ = async () => {
     try {
@@ -62,6 +73,30 @@ export default function CarePlan() {
     } catch (error) {
       console.error(error);
       throw error;
+    }
+  };
+
+  const handleCreateBudget = async () => {
+    setIsCreatingBudget(true);
+
+    try {
+      if (!result.data?.care_plan_patient_id) throw new Error('budget_care_plan_patient_id (id) is not defined');
+
+      const payload: Partial<CarePlanBudget> = {
+        budget_date_creation: new Date().toISOString(),
+        budget_name: result.data?.care_plan_identification ?? 'Sem identificação',
+        budget_value: parseToBrValue(totalValue).replace('R$', '').trim(),
+      };
+      const response = await addCarePlanBudget({ ...payload, budget_care_plan_patient_id: result.data?.care_plan_patient_id }, queryClient);
+
+      if (!response) throw new Error('Error adding budget');
+
+      navigate(`${appRoot}/orcamento/${response.budget_id}`);
+
+      setIsCreatingBudget(false);
+    } catch (error) {
+      setIsCreatingBudget(false);
+      console.error(error);
     }
   };
 
@@ -139,8 +174,8 @@ export default function CarePlan() {
                           <Icon.Pencil />
                         </Button>
                       </OverlayTrigger>{' '}
-                      <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Remover procedimento</Tooltip>}>
-                        <Button size="sm" className="me-1" variant="outline-primary" onClick={() => handleSelectProcedureToRemove(procedure)}>
+                      <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Remover dente</Tooltip>}>
+                        <Button size="sm" className="me-1" variant="outline-primary" onClick={() => id && handleSelectToothToRemove(tooth, id)}>
                           <Icon.TrashFill />
                         </Button>
                       </OverlayTrigger>{' '}
@@ -163,9 +198,11 @@ export default function CarePlan() {
           <strong>{procedureNumber}</strong> procedimento(s), em <strong>{teethNumber}</strong> dente(s), totalizando um valor de: 
           <strong>{totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
           <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Crie um prçamento para encaminhar para o paciente.</Tooltip>}>
-            <Button size="sm" className="ms-3 mb-3 mt-3" variant="primary">
-              Gerar orçamento
-            </Button>
+            <span>
+              <AsyncButton isSaving={isCreatingBudget} size="sm" className="ms-3 mb-3 mt-3" variant="primary" onClickHandler={handleCreateBudget}>
+                Gerar orçamento
+              </AsyncButton>
+            </span>
           </OverlayTrigger>{' '}
           <p>Volte ao menu do paciente, e vá até a guia "Orçamento" para verificar os detalhes e disponibilizar condições de pagamentos.</p>
         </h5>

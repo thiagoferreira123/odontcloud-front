@@ -12,7 +12,7 @@ interface createPatientMenuStore {
   query: string;
 
   setQuery: (query: string) => void;
-  getPatient: (patient_id: string, navigate: NavigateFunction) => Promise<Patient & { patient_id: string } | false>;
+  getPatient: (patient_id: string, navigate: NavigateFunction) => Promise<Patient & { patient_id: string, age: number } | false>;
   setPatientId: (patient_id: string) => void;
   updatePatient: (patient: Partial<Patient>) => void;
   persistUpdatePatient: (PatientData: Partial<Patient> & { patient_id: string }, hideNotification?: boolean) => Promise<boolean>;
@@ -37,11 +37,11 @@ const usePatientMenuStore = create<createPatientMenuStore>((set) => ({
 
   getPatient: async (patient_id, navigate) => {
     try {
-      const { data } = await api.get<Patient & { patient_id: string }>(`/clinic-patient/${patient_id}`);
+      const { data } = await api.get<Patient & { patient_id: string, age: number }>(`/clinic-patient/${patient_id}`);
 
-      // data.age = calculateYearsDiffByDateISO(data.dateOfBirth);
+      data.age = calculateYearsDiffByDateISO(data.patient_birth_date);
 
-      // data.photoLink = data.photoLink ? data.photoLink : getAvatarByGender(data.gender);
+      data.patient_photo = data.patient_photo ? data.patient_photo : getAvatarByGender(data.patient_sex);
 
       set((state) => {
         return { ...state, patient: data };
@@ -49,7 +49,7 @@ const usePatientMenuStore = create<createPatientMenuStore>((set) => ({
 
       return data;
     } catch (error) {
-      if(error instanceof AxiosError && error.response?.status === 404) {
+      if (error instanceof AxiosError && error.response?.status === 404) {
         notify('Paciente não encontrado', 'Erro', 'alert-circle', 'danger');
         navigate('/app/');
         return false;
@@ -66,14 +66,14 @@ const usePatientMenuStore = create<createPatientMenuStore>((set) => ({
 
   updatePatient: (patient) =>
     set((state) => {
-      if(!state.patient) return { patient: null };
+      if (!state.patient) return { patient: null };
 
       return { patient: { ...state.patient, ...patient } };
     }),
 
   persistUpdatePatient: async (PatientData, hideNotification) => {
     try {
-      await api.patch<Patient>(`/clinic-patient/${PatientData.patient_id}`, PatientData);
+      await api.put<Patient>(`/clinic-patient/${PatientData.patient_id}`, PatientData);
 
       !hideNotification && notify('Paciente atualizado com sucesso', 'Sucesso', 'check', 'success');
 

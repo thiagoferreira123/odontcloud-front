@@ -1,6 +1,6 @@
 import { notify } from "../../../../components/toast/NotificationIcon";
 import api from "../../../../services/useAxios";
-import { Tooth, ToothActions } from "./types";
+import { CarePlan, Tooth, ToothActions } from "./types";
 
 const useToothActions = (): ToothActions => ({
 
@@ -38,13 +38,21 @@ const useToothActions = (): ToothActions => ({
     }
   },
 
-  removeTooth: async (tooth, queryClient) => {
+  removeTooth: async (tooth, care_plan_id, queryClient) => {
     try {
       await api.delete(`/tooth/${tooth.tooth_id}`);
 
-      queryClient.setQueryData<Tooth[]>(['tooths', tooth.tooth_id], (oldData) =>
-        oldData ? oldData.filter(detail => detail.tooth_id !== tooth.tooth_id) : []
-      );
+      queryClient.setQueryData<CarePlan>(['careplan', care_plan_id ], (oldData) => {
+        if (!oldData) return oldData;
+
+        return {
+          ...oldData,
+          procedures: oldData.procedures.map(procedure => ({
+            ...procedure,
+            teeth: procedure.teeth.filter(detail => detail.tooth_id !== tooth.tooth_id),
+          })),
+        };
+      });
 
       notify('Dente removido com sucesso', 'Sucesso', 'check', 'success');
       return true;

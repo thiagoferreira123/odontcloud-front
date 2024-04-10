@@ -6,9 +6,14 @@ export interface CarePlanBudgetHistoryItem {
   payment_due_date: string;
   payment_installments_number: number;
   payment_installments_value: number;
-  payment_installments_value_date_received: Date | null;
-  payment_status: string;
+  payment_installments_value_date_received: string;
+  payment_status: 'pending' | 'received';
   payment_description: string;
+}
+
+export enum HistoryItemTranslatedStatus {
+  'pending' = 'Pendente',
+  'received' = 'Recebido'
 }
 
 interface CreateCarePlanBudgetHistoryItemPayload {
