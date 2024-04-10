@@ -133,11 +133,6 @@ const Login = () => {
                 Experimente grátis
               </Button>
             </div>
-            <div className='d-flex justify-content-center mt-3 '>
-              <Button size="sm" className="mb-1 btn btn-dark" type="button" onClick={() => window.location.href = 'https://OdontCloud.com.br/app'}>
-                Usar versão anterior
-              </Button>
-            </div>
           </form>
         </div>
       </div>
