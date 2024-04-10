@@ -3,11 +3,11 @@ import { Receipt, ReceiptActions } from "./types";
 import { notify } from "../../../../../components/toast/NotificationIcon";
 
 const useReceiptActions = (): ReceiptActions => ({
-  addReceipt: async (patientDetailData, queryClient) => {
+  addReceipt: async (payload, queryClient) => {
     try {
-      const { data } = await api.post<Receipt>('/recibo/', patientDetailData);
+      const { data } = await api.post<Receipt>('/patient-receipt/', payload);
 
-      queryClient.setQueryData<Receipt[]>(['receipts', patientDetailData.patient_id], (oldData) => [...(oldData || []), data]);
+      queryClient.setQueryData<Receipt[]>(['receipts', payload.receipt_patient_id], (oldData) => [...(oldData || []), data]);
 
       notify('Recibo adicionado com sucesso', 'Sucesso', 'check', 'success');
 
@@ -19,12 +19,12 @@ const useReceiptActions = (): ReceiptActions => ({
     }
   },
 
-  updateReceipt: async (patientDetailData, queryClient) => {
+  updateReceipt: async (payload, queryClient) => {
     try {
-      const { data } = await api.patch<Receipt>(`/recibo/${patientDetailData.id}`, patientDetailData);
+      const { data } = await api.patch<Receipt>(`/patient-receipt/${payload.receipt_id}`, payload);
 
-      queryClient.setQueryData<Receipt[]>(['receipts', patientDetailData.patient_id], (oldData) =>
-        oldData ? oldData.map(detail => detail.id === data.id ? data : detail) : []
+      queryClient.setQueryData<Receipt[]>(['receipts', payload.receipt_patient_id], (oldData) =>
+        oldData ? oldData.map(detail => detail.receipt_id === data.receipt_id ? data : detail) : []
       );
 
       notify('Recibo atualizado com sucesso', 'Sucesso', 'check', 'success');
@@ -39,10 +39,10 @@ const useReceiptActions = (): ReceiptActions => ({
 
   removeReceipt: async (certificate, queryClient) => {
     try {
-      await api.delete(`/recibo/${certificate.id}`);
+      await api.delete(`/patient-receipt/${certificate.receipt_id}`);
 
-      queryClient.setQueryData<Receipt[]>(['receipts', certificate.patient_id], (oldData) =>
-        oldData ? oldData.filter(detail => detail.id !== certificate.id) : []
+      queryClient.setQueryData<Receipt[]>(['receipts', certificate.receipt_patient_id], (oldData) =>
+        oldData ? oldData.filter(detail => detail.receipt_id !== certificate.receipt_id) : []
       );
 
       notify('Recibo removido com sucesso', 'Sucesso', 'check', 'success');

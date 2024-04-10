@@ -19,19 +19,19 @@ interface ModalCreateReceipt {
 }
 
 interface FormValues {
-  patient_id: number;
-  patient_name: string;
-  cpf_cnpj_do_patient: string;
-  receipt_value: string;
-  value_by_extension: string;
-  issue_date: string;
-  referent_to: string;
-  cep: string;
-  state: string;
-  city: string;
-  neighborhood: string;
-  street: string;
-  number: string;
+  receipt_patient_id: string;
+  receipt_patient_name: string;
+  receipt_cpf_or_cnpj: string;
+  receipt_receipt_value: string;
+  receipt_value_in_extension: string;
+  receipt_date_emission: string;
+  receipt_referent_a: string;
+  receipt_cep: string;
+  receipt_state: string;
+  receipt_city: string;
+  receipt_neighborhood: string;
+  receipt_street: string;
+  receipt_number: string;
 }
 
 const maskCPFOrCNPJ = (value: string) => {
@@ -57,71 +57,69 @@ const formatDate = (value: string): string => {
   return `${onlyNums.slice(0, 2)}/${onlyNums.slice(2, 4)}/${onlyNums.slice(4, 8)}`;
 };
 
-const ModalCreateReceipt  = () => {
-
+const ModalCreateReceipt = () => {
   const { id } = useParams();
 
   const queryClient = useQueryClient();
   const toastId = useRef<React.ReactText>();
-  
+
   const [isSaving, setIsSaving] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
 
-  const showModal = useCreateAndEditModalStore((state) => state.showModal);
-  const selectedReceipt = useCreateAndEditModalStore((state) => state.selectedReceipt);
+  const showModal = useCreateAndEditModalStore((receipt_state) => receipt_state.showModal);
+  const selectedReceipt = useCreateAndEditModalStore((receipt_state) => receipt_state.selectedReceipt);
 
-  
   const validationSchema = Yup.object().shape({
-    patient_name: Yup.string().nullable().required('Insira uma nome válido.'),
-    cpf_cnpj_do_patient: Yup.string().nullable().required('Insira um CPF ou CNPJ válido.'),
-    receipt_value: Yup.string().nullable().required('Insira um valor válido'),
-    value_by_extension: Yup.string().nullable().required('Insira um valor por extenso válido'),
-    issue_date: Yup.string().nullable().required('Insira uma data válida'),
-    referent_to: Yup.string().nullable().required('Insira uma referencia válida'),
-    cep: Yup.string().nullable().required('Insira um cep válido'),
-    state: Yup.string().nullable().required('Insira um estado válido'),
-    city: Yup.string().nullable().required('Insira uma cidade válida'),
-    neighborhood: Yup.string().nullable().required('Insira um bairro válido'),
-    street: Yup.string().nullable().required('Insira uma rua válida'),
-    number: Yup.string().nullable().required('Insira um número válido'),
+    receipt_patient_name: Yup.string().nullable().required('Insira uma nome válido.'),
+    receipt_cpf_or_cnpj: Yup.string().nullable().required('Insira um CPF ou CNPJ válido.'),
+    receipt_receipt_value: Yup.string().nullable().required('Insira um valor válido'),
+    receipt_value_in_extension: Yup.string().nullable().required('Insira um valor por extenso válido'),
+    receipt_date_emission: Yup.string().nullable().required('Insira uma data válida'),
+    receipt_referent_a: Yup.string().nullable().required('Insira uma referencia válida'),
+    receipt_cep: Yup.string().nullable().required('Insira um receipt_cep válido'),
+    receipt_state: Yup.string().nullable().required('Insira um estado válido'),
+    receipt_city: Yup.string().nullable().required('Insira uma cidade válida'),
+    receipt_neighborhood: Yup.string().nullable().required('Insira um bairro válido'),
+    receipt_street: Yup.string().nullable().required('Insira uma rua válida'),
+    receipt_number: Yup.string().nullable().required('Insira um número válido'),
   });
 
   const initialValues = {
-  patient_id: 0, 
-  patient_name: '', 
-  cpf_cnpj_do_patient: '', 
-  receipt_value: '', 
-  value_by_extension: '', 
-  issue_date: '', 
-  referent_to: '', 
-  cep: '', 
-  state: '', 
-  city: '', 
-  neighborhood: '', 
-  street: '', 
-  number: '', 
-};
+    receipt_patient_id: '',
+    receipt_patient_name: '',
+    receipt_cpf_or_cnpj: '',
+    receipt_receipt_value: '',
+    receipt_value_in_extension: '',
+    receipt_date_emission: '',
+    receipt_referent_a: '',
+    receipt_cep: '',
+    receipt_state: '',
+    receipt_city: '',
+    receipt_neighborhood: '',
+    receipt_street: '',
+    receipt_number: '',
+  };
 
   const onSubmit = async (values: FormValues) => {
     try {
       let certificateId = '';
       setIsSaving(true);
 
-      if (!id) throw new Error('patient_id (id) is not defined');
+      if (!id) throw new Error('receipt_patient_id (id) is not defined');
 
-      if (selectedReceipt?.id) {
+      if (selectedReceipt?.receipt_id) {
         const result = await updateReceipt({ ...selectedReceipt, ...values }, queryClient);
 
         if (result === false) throw new Error('Error updating assessment');
 
-        certificateId = selectedReceipt.id;
+        certificateId = selectedReceipt.receipt_id;
       } else {
-        const result = await addReceipt({ ...values, patient_id: +id }, queryClient);
+        const result = await addReceipt({ ...values, receipt_patient_id: id }, queryClient);
 
         if (!result) throw new Error('Error adding assessment');
 
-        certificateId = result.id;
+        certificateId = result.receipt_id;
       }
 
       hideModal();
@@ -153,18 +151,18 @@ const ModalCreateReceipt  = () => {
   const handleZipCodeChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const rawZipCode = event.target.value;
     const maskedZipCode = applyZipCodeMask(rawZipCode);
-    formik.setFieldValue('cep', maskedZipCode); // Access setFieldValue through formik object
+    formik.setFieldValue('receipt_cep', maskedZipCode); // Access setFieldValue through formik object
 
     if (maskedZipCode.length === 9) {
       try {
         const numericZipCode = maskedZipCode.replace('-', '');
-        const response = await axios.get(`https://viacep.com.br/ws/${numericZipCode}/json/`);
+        const response = await axios.get(`https://viareceipt_cep.com.br/ws/${numericZipCode}/json/`);
         const { uf, localidade, bairro, logradouro } = response.data;
 
-        formik.setFieldValue('state', uf);
-        formik.setFieldValue('city', localidade);
-        formik.setFieldValue('neighborhood', bairro);
-        formik.setFieldValue('street', logradouro);
+        formik.setFieldValue('receipt_state', uf);
+        formik.setFieldValue('receipt_city', localidade);
+        formik.setFieldValue('receipt_neighborhood', bairro);
+        formik.setFieldValue('receipt_street', logradouro);
       } catch (error) {
         console.error('Error fetching zip code', error);
       }
@@ -181,55 +179,52 @@ const ModalCreateReceipt  = () => {
     let inputVal = event.target.value;
     inputVal = inputVal.replace(/\D/g, '').replace(/^0+/, '');
     if (inputVal) {
-      inputVal = (inputVal.length > 2 ? inputVal.slice(0, inputVal.length - 2) + ',' + inputVal.slice(inputVal.length - 2) : inputVal);
+      inputVal = inputVal.length > 2 ? inputVal.slice(0, inputVal.length - 2) + ',' + inputVal.slice(inputVal.length - 2) : inputVal;
       inputVal = inputVal.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
-    formik.setFieldValue('receipt_value', inputVal);
+    formik.setFieldValue('receipt_receipt_value', inputVal);
   };
 
   const handleDownloadPdf = async () => {
     setIsGeneratingPdf(true);
     const certificateId = await onSubmit(values);
-    
-      toastId.current = notify('Gerando pdf do recibo, por favor aguarde...', 'Sucesso', 'check', 'success', true);
 
-      try {
-        console.log('certificateId', certificateId);
-        if(!certificateId) throw new Error('certificateId is not defined');
-        
-        const { data } = await api.get(
-          '/recibo-pdf/' + certificateId,
-          {
-            responseType: 'arraybuffer',
-            headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/pdf',
-            },
-          }
-        );
-  
-        downloadPDF(data, 'recibo-' + certificateId);
-  
-        updateNotify(toastId.current, 'Pdf gerado com sucesso!', 'Sucesso', 'check', 'success');
-  
-        setIsGeneratingPdf(false);
-      } catch (error) {
-        setIsGeneratingPdf(false);
-        updateNotify(toastId.current, 'Erro ao gerar pdf!', 'Erro', 'close', 'danger');
-        console.error(error);
-      }
+    toastId.current = notify('Gerando pdf do recibo, por favor aguarde...', 'Sucesso', 'check', 'success', true);
+
+    try {
+      console.log('certificateId', certificateId);
+      if (!certificateId) throw new Error('certificateId is not defined');
+
+      const { data } = await api.get('/receipt-pdf/' + certificateId, {
+        responseType: 'arraybuffer',
+        headers: {
+          'Content-Type': 'application/json',
+          Acreceipt_cept: 'application/pdf',
+        },
+      });
+
+      downloadPDF(data, 'recibo-' + certificateId);
+
+      updateNotify(toastId.current, 'Pdf gerado com sucesso!', 'Sucesso', 'check', 'success');
+
+      setIsGeneratingPdf(false);
+    } catch (error) {
+      setIsGeneratingPdf(false);
+      updateNotify(toastId.current, 'Erro ao gerar pdf!', 'Erro', 'close', 'danger');
+      console.error(error);
+    }
   };
 
   const handleSendToEmail = async () => {
     setIsSendingEmail(true);
     const certificateId = await onSubmit(values);
 
-    toastId.current = notify("Gerando pdf do recibo, por favor aguarde...", 'Sucesso', 'check', 'success', true);
+    toastId.current = notify('Gerando pdf do recibo, por favor aguarde...', 'Sucesso', 'check', 'success', true);
 
     try {
-      if(!certificateId) return;
+      if (!certificateId) return;
 
-      await api.post('/recibo-email/' + certificateId);
+      await api.post('/receipt-email/' + certificateId);
 
       updateNotify(toastId.current, 'E-mail enviado com sucesso!', 'Sucesso', 'check', 'success');
 
@@ -243,28 +238,67 @@ const ModalCreateReceipt  = () => {
 
   useEffect(() => {
     if (selectedReceipt) {
-      const { patient_id, patient_name, cpf_cnpj_do_patient, receipt_value, value_by_extension,issue_date, referent_to, cep, state, city, neighborhood, street , number } = selectedReceipt;
-      setValues({ patient_id, patient_name, cpf_cnpj_do_patient, receipt_value, value_by_extension,issue_date, referent_to, cep, state, city, neighborhood, street , number  });
+      const {
+        receipt_patient_id,
+        receipt_patient_name,
+        receipt_cpf_or_cnpj,
+        receipt_receipt_value,
+        receipt_value_in_extension,
+        receipt_date_emission,
+        receipt_referent_a,
+        receipt_cep,
+        receipt_state,
+        receipt_city,
+        receipt_neighborhood,
+        receipt_street,
+        receipt_number,
+      } = selectedReceipt;
+      setValues({
+        receipt_patient_id,
+        receipt_patient_name,
+        receipt_cpf_or_cnpj,
+        receipt_receipt_value,
+        receipt_value_in_extension,
+        receipt_date_emission,
+        receipt_referent_a,
+        receipt_cep,
+        receipt_state,
+        receipt_city,
+        receipt_neighborhood,
+        receipt_street,
+        receipt_number,
+      });
     } else {
       setValues(initialValues);
     }
   }, [selectedReceipt]);
-  
+
   return (
     <Modal size="lg" className="modal-close-out" backdrop="static" show={showModal} onHide={hideModal}>
-      <Modal.Header closeButton> <Modal.Title>Emita um recibo para o paciente</Modal.Title></Modal.Header>
+      <Modal.Header closeButton>
+        {' '}
+        <Modal.Title>Emita um recibo para o paciente</Modal.Title>
+      </Modal.Header>
       <Modal.Body>
-        <div className='mb-2 text-end' >
+        <div className="mb-2 text-end">
           <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-chart">Envie o PDF do recibo para o e-mail do paciente</Tooltip>}>
             <span>
-              <AsyncButton isSaving={isSendingEmail} loadingText=' ' onClickHandler={handleSendToEmail} type="button" variant="outline-primary" size="sm" className='me-1'>
+              <AsyncButton
+                isSaving={isSendingEmail}
+                loadingText=" "
+                onClickHandler={handleSendToEmail}
+                type="button"
+                variant="outline-primary"
+                size="sm"
+                className="me-1"
+              >
                 <Icon.Send />
               </AsyncButton>
             </span>
           </OverlayTrigger>
           <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-chart">Crie um PDF do recibo do paciente</Tooltip>}>
             <span>
-              <AsyncButton isSaving={isGeneratingPdf} loadingText=' ' onClickHandler={handleDownloadPdf} type="button" variant="outline-primary" size="sm">
+              <AsyncButton isSaving={isGeneratingPdf} loadingText=" " onClickHandler={handleDownloadPdf} type="button" variant="outline-primary" size="sm">
                 <Icon.Printer />
               </AsyncButton>
             </span>
@@ -272,149 +306,87 @@ const ModalCreateReceipt  = () => {
         </div>
 
         <Form onSubmit={handleSubmit} className="tooltip-end-top">
-          <div className='d-flex'>
+          <div className="d-flex">
             <Col md={6} className="mb-3 top-label me-2">
-              <Form.Control type="text"
-                name="patient_name"
-                value={values.patient_name}
-                onChange={handleChange} />
+              <Form.Control type="text" name="receipt_patient_name" value={values.receipt_patient_name} onChange={handleChange} />
               <Form.Label>NOME DO PACIENTE</Form.Label>
-              {errors.patient_name && touched.patient_name && <div className="error">{errors.patient_name}</div>}
+              {errors.receipt_patient_name && touched.receipt_patient_name && <div className="error">{errors.receipt_patient_name}</div>}
             </Col>
 
             <Col md={6} className="mb-3 top-label">
-              <Form.Control
-                type="text"
-                name="cpf_cnpj_do_patient"
-                value={values.cpf_cnpj_do_patient}
-                onChange={handleCPFOrCNPJChange}
-              />
+              <Form.Control type="text" name="receipt_cpf_or_cnpj" value={values.receipt_cpf_or_cnpj} onChange={handleCPFOrCNPJChange} />
               <Form.Label>CPF OU CNPJ DO PACIENTE</Form.Label>
-              {errors.cpf_cnpj_do_patient && touched.cpf_cnpj_do_patient && (
-                <div className="error">{errors.cpf_cnpj_do_patient}</div>
-              )}
+              {errors.receipt_cpf_or_cnpj && touched.receipt_cpf_or_cnpj && <div className="error">{errors.receipt_cpf_or_cnpj}</div>}
             </Col>
           </div>
 
-          <div className='d-flex'>
+          <div className="d-flex">
             <Col md={6} className="mb-3 top-label me-2">
-              <Form.Control
-                type="text"
-                name="receipt_value"
-                value={formik.values.receipt_value}
-                onChange={handleCurrencyChange}
-              />
+              <Form.Control type="text" name="receipt_receipt_value" value={formik.values.receipt_receipt_value} onChange={handleCurrencyChange} />
               <Form.Label>VALOR R$</Form.Label>
-              {formik.errors.receipt_value && formik.touched.receipt_value && <div className="error">
-                {formik.errors.receipt_value}</div>}
+              {formik.errors.receipt_receipt_value && formik.touched.receipt_receipt_value && <div className="error">{formik.errors.receipt_receipt_value}</div>}
             </Col>
 
             <Col md={6} className="mb-3 top-label">
-              <Form.Control
-                type="text"
-                name="value_by_extension"
-                value={values.value_by_extension}
-                onChange={handleChange} />
+              <Form.Control type="text" name="receipt_value_in_extension" value={values.receipt_value_in_extension} onChange={handleChange} />
               <Form.Label>VALOR POR EXTENSO</Form.Label>
-              {errors.value_by_extension && touched.value_by_extension && <div className="error">
-                {errors.value_by_extension}</div>}
+              {errors.receipt_value_in_extension && touched.receipt_value_in_extension && <div className="error">{errors.receipt_value_in_extension}</div>}
             </Col>
           </div>
 
-          <div className='d-flex'>
+          <div className="d-flex">
             <Col md={6} className="mb-3 top-label me-2">
-              <Form.Control
-                type="text"
-                name="issue_date"
-                value={formik.values.issue_date}
-                onChange={handleDateChange}
-              />
+              <Form.Control type="text" name="receipt_date_emission" value={formik.values.receipt_date_emission} onChange={handleDateChange} />
               <Form.Label>DATA DA EMISSÃO</Form.Label>
-              {formik.errors.issue_date && formik.touched.issue_date && <div className="error">
-                {formik.errors.issue_date}</div>}
+              {formik.errors.receipt_date_emission && formik.touched.receipt_date_emission && <div className="error">{formik.errors.receipt_date_emission}</div>}
             </Col>
 
             <Col md={6} className="mb-3 top-label">
-              <Form.Control
-                type="text"
-                name="referent_to"
-                value={values.referent_to}
-                onChange={handleChange} />
+              <Form.Control type="text" name="receipt_referent_a" value={values.receipt_referent_a} onChange={handleChange} />
               <Form.Label>REFERENTE A</Form.Label>
-              {errors.referent_to && touched.issue_date && <div className="error">
-                {errors.referent_to}</div>}
+              {errors.receipt_referent_a && touched.receipt_date_emission && <div className="error">{errors.receipt_referent_a}</div>}
             </Col>
           </div>
 
-          <div className='d-flex'>
+          <div className="d-flex">
             <Col md={6} className="mb-3 top-label">
-              <Form.Control
-                type="text"
-                name="cep"
-                value={values.cep}
-                onChange={handleZipCodeChange} />
+              <Form.Control type="text" name="receipt_cep" value={values.receipt_cep} onChange={handleZipCodeChange} />
               <Form.Label>CEP</Form.Label>
-              {errors.cep && touched.cep && <div className="error">
-                {errors.cep}</div>}
+              {errors.receipt_cep && touched.receipt_cep && <div className="error">{errors.receipt_cep}</div>}
             </Col>
           </div>
 
-          <div className='d-flex'>
+          <div className="d-flex">
             <Col md={6} className="mb-3 top-label me-2">
-              <Form.Control
-                type="text"
-                name="state"
-                value={values.state}
-                onChange={handleChange} />
+              <Form.Control type="text" name="receipt_state" value={values.receipt_state} onChange={handleChange} />
               <Form.Label>ESTADO</Form.Label>
-              {errors.state && touched.state && <div className="error">
-                {errors.state}</div>}
+              {errors.receipt_state && touched.receipt_state && <div className="error">{errors.receipt_state}</div>}
             </Col>
 
             <Col md={6} className="mb-3 top-label">
-              <Form.Control
-                type="text"
-                name="city"
-                value={values.city}
-                onChange={handleChange} />
+              <Form.Control type="text" name="receipt_city" value={values.receipt_city} onChange={handleChange} />
               <Form.Label>CIDADE</Form.Label>
-              {errors.city && touched.city && <div className="error">{
-                errors.city}</div>}
+              {errors.receipt_city && touched.receipt_city && <div className="error">{errors.receipt_city}</div>}
             </Col>
           </div>
 
-          <div className='d-flex'>
+          <div className="d-flex">
             <Col md={5} className="mb-3 top-label me-2">
-              <Form.Control
-                type="text"
-                name="neighborhood"
-                value={values.neighborhood}
-                onChange={handleChange} />
+              <Form.Control type="text" name="receipt_neighborhood" value={values.receipt_neighborhood} onChange={handleChange} />
               <Form.Label>BAIRRO</Form.Label>
-              {errors.neighborhood && touched.neighborhood && <div className="error">
-                {errors.neighborhood}</div>}
+              {errors.receipt_neighborhood && touched.receipt_neighborhood && <div className="error">{errors.receipt_neighborhood}</div>}
             </Col>
 
             <Col md={5} className="mb-3 top-label me-1">
-              <Form.Control
-                type="text"
-                name="street"
-                value={values.street}
-                onChange={handleChange} />
+              <Form.Control type="text" name="receipt_street" value={values.receipt_street} onChange={handleChange} />
               <Form.Label>RUA</Form.Label>
-              {errors.street && touched.street && <div className="error">
-                {errors.street}</div>}
+              {errors.receipt_street && touched.receipt_street && <div className="error">{errors.receipt_street}</div>}
             </Col>
 
             <Col md={2} className="mb-3 top-label">
-              <Form.Control
-                type="text"
-                name="number"
-                value={values.number}
-                onChange={handleChange} />
+              <Form.Control type="text" name="receipt_number" value={values.receipt_number} onChange={handleChange} />
               <Form.Label>Nº</Form.Label>
-              {errors.number && touched.number && <div className="error">
-                {errors.number}</div>}
+              {errors.receipt_number && touched.receipt_number && <div className="error">{errors.receipt_number}</div>}
             </Col>
           </div>
 
@@ -424,7 +396,6 @@ const ModalCreateReceipt  = () => {
             </AsyncButton>
           </div>
         </Form>
-
       </Modal.Body>
     </Modal>
   );

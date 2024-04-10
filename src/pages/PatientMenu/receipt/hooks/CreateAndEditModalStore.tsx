@@ -1,12 +1,12 @@
 import { create } from "zustand";
-import { ReceiptDetails } from "./ReceiptStore/types";
+import { Receipt } from "./ReceiptStore/types";
 
 interface CreateAndEditModalStore {
   showModal: boolean;
 
-  selectedReceipt: ReceiptDetails | null;
+  selectedReceipt: Receipt | null;
 
-  handleSelectReceiptToEdit: (expenditure: ReceiptDetails) => void;
+  handleSelectReceiptToEdit: (expenditure: Receipt) => void;
   openModal: () => void;
   hideModal: () => void;
 }

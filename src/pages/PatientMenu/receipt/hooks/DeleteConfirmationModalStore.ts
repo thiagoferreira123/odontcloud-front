@@ -1,13 +1,12 @@
 import { create } from "zustand";
-import { ReceiptDetails } from "./ReceiptStore/types";
+import { Receipt } from "./ReceiptStore/types";
 
 interface DeleteConfirmationModalStore {
   showModal: boolean;
 
-  selectedReceipt: ReceiptDetails | null;
+  selectedReceipt: Receipt | null;
 
-  // eslint-disable-next-line no-unused-vars
-  handleSelectReceiptToRemove: (expenditure: ReceiptDetails) => void;
+  handleSelectReceiptToRemove: (expenditure: Receipt) => void;
   hideModal: () => void;
 }
 

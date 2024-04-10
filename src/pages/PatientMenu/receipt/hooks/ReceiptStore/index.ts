@@ -7,7 +7,7 @@ import useReceiptActions from './ReceiptActions';
 const useReceiptStore = create<ReceiptStore>((set) => ({
   getReceipts: async (patient_id) => {
     try {
-      const response = await api.get(`/recibo/paciente/${patient_id}`);
+      const response = await api.get(`/patient-receipt/by-patient/${patient_id}`);
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status !== 404) {

@@ -25,9 +25,9 @@ export default function AttendanceReceipt() {
 
   const getReceipts_ = async () => {
     try {
-      if (!id) throw new AppException('Id is required');
+      if (!id) throw new AppException('receipt_patient_id is required');
 
-      const response = await getReceipts(+id);
+      const response = await getReceipts(id);
 
       if (response === false) throw new Error('Erro ao buscar recibos');
 
@@ -60,7 +60,7 @@ export default function AttendanceReceipt() {
     return pagesArray;
   }, [selectedPage]);
 
-  const result = useQuery({ queryKey: ['receipts', Number(id)], queryFn: getReceipts_, enabled: !!id});
+  const result = useQuery({ queryKey: ['receipts', id], queryFn: getReceipts_, enabled: !!id});
 
   const slicedResult = result.data ? (result.data.length > 7 ? result.data.slice(actualPage[0], actualPage[1]) : result.data) : [];
 
@@ -84,12 +84,12 @@ export default function AttendanceReceipt() {
             </div>
           ) : (
             slicedResult.map((attendance) => (
-              <div className="border-bottom border-separator-light mb-2 pb-2" key={attendance.id}>
+              <div className="border-bottom border-separator-light mb-2 pb-2" key={attendance.receipt_id}>
                 <Row className="g-0 sh-6">
                   <Col>
                     <div className="d-flex flex-row pt-0 pb-0 ps-3 pe-0 h-100 align-items-center justify-content-between">
                       <div className="d-flex flex-column">
-                        <div>Emitido em: {attendance.issue_date}</div>
+                        <div>Emitido em: {attendance.receipt_date_emission}</div>
                       </div>
                       <div className="d-flex">
                         <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-3">Excluir</Tooltip>}>
