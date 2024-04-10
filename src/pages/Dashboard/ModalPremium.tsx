@@ -129,13 +129,13 @@ const ModalPremium = ({ showModal, setShowModal }) => {
                     <CsLineIcons icon="check" className='me-1 text-primary' /> <span>Suporte de especialistas</span>
                   </p>
                   <p className='text-medium mb-0'>
-                    <CsLineIcons icon="check" className='me-1 text-primary' /> <span>Download de lâminas nutricionais</span>
+                    <CsLineIcons icon="check" className='me-1 text-primary' /> <span>Lembrete de agendamentos</span>
                   </p>
                   <p className='text-medium mb-0'>
-                    <CsLineIcons icon="check" className='me-1 text-primary' /> <span>Vídeos chamadas sem restrições</span>
+                    <CsLineIcons icon="check" className='me-1 text-primary' /> <span>Orçamentos</span>
                   </p>
                   <p className='text-medium mb-0'>
-                    <CsLineIcons icon="check" className='me-1 text-primary' /> <span>Cursos online</span>
+                    <CsLineIcons icon="check" className='me-1 text-primary' /> <span>Ficha de tratamento</span>
                   </p>
                 </div>
                 <div className='text-end mt-2'>
@@ -200,17 +200,6 @@ const ModalPremium = ({ showModal, setShowModal }) => {
                     />
                     <span className="text-alternate" style={{ marginBottom: "1px" }}>47.9 R$ /mês - Mensal</span>
                   </div>
-                  <div className="d-flex align-items-center">
-                    <Form.Check
-                      type="radio"
-                      id="stackedRadio6"
-                      name="stackedRadio"
-                      className="mr-3 me-2 mb-2"
-                      onChange={handleCheckboxChange}
-                      checked={selectedOption === "stackedRadio6"}
-                    />
-                    <span className="text-alternate" style={{ marginBottom: "1px" }}>27.9 R$ /mês - Estudante</span>
-                  </div>
                 </div>
               </Alert>
               <div className='text-medium text-center'>
@@ -219,7 +208,7 @@ const ModalPremium = ({ showModal, setShowModal }) => {
               <div className='mt-3 mb-3'>
                 Dúvidas frequentes:
                 <p className='text-medium mb-2 mt-3'>
-                  a) Os planos semestral e anual podem ser parcelados no cartão de crédito, sem juros.
+                  a) Os planos semestral e anual podem ser parcelados no cartão de crédito
                 </p>
                 <p className='text-medium mb-2'>
                   b) Cancelamento a qualquer momento, sem multas ou fidelidade.
