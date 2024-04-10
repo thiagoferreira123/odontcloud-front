@@ -82,7 +82,7 @@ const Register = () => {
     <div className="sw-lg-70 min-h-100 bg-foreground d-flex justify-content-center align-items-center shadow-deep py-5 full-page-content-right-border">
       <div className="sw-lg-50 px-5">
         <Col xs="12" sm={25} className="text-center">
-          <img src="/img/logo/logo.webp" className="img-fluid rounded-md" alt="Fluid image" />
+          <img src="/img/logo/logo.webp" className="img-fluid sh-30" alt="Fluid image" />
         </Col>
         <div className="mb-2 mt-3">
           <h4 className="cta-1 mb-3 text-alternate">Boas-vindas ao OdontCloud!</h4>

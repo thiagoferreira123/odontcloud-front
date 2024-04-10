@@ -11,7 +11,7 @@ const NavLogo = () => {
   return (
     <div className="logo position-relative">
       <Link to={DEFAULT_PATHS.APP}>
-          <img src="/img/logo/logo-light.webp" alt="logo" />
+          <img src="/img/logo/logo-light.webp" alt="logo"/>
       </Link>
     </div>
   );
