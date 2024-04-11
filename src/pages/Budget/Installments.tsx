@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { Badge, ButtonGroup, Card, Dropdown, DropdownButton, Table } from 'react-bootstrap';
 import { CarePlanBudgetHistoryItem, HistoryItemTranslatedStatus } from './hooks/CarePlanBudgetHistoryItem/types';
 import { convertIsoToBrDate } from '../../helpers/DateHelper';
@@ -6,10 +6,9 @@ import useCarePlanBudgetHistoryItemStore from './hooks/CarePlanBudgetHistoryItem
 import { useQueryClient } from '@tanstack/react-query';
 import { AppException } from '../../helpers/ErrorHelpers';
 import { notify } from '../../components/toast/NotificationIcon';
-import useTransactionStore from '../FinancialControl/hooks/TransactionStore';
-import { Transaction } from '../FinancialControl/hooks/TransactionStore/types';
-import { parseToBrValue } from '../../helpers/StringHelpers';
 import { CarePlanBudget } from './hooks/CarePlanBudgetStore/types';
+import TransactionConfirmationModal from './modals/TransactionConfirmationModal';
+import { useModalTransactionConfirmationModalStore } from './hooks/ModalTransactionConfirmationModalStore';
 
 type InstallmentsProps = {
   carePlanBudget: CarePlanBudget;
@@ -19,12 +18,12 @@ export default function Installments({ carePlanBudget }: InstallmentsProps) {
   const queryClient = useQueryClient();
 
   const { removeCarePlanBudgetHistoryItem, updateCarePlanBudgetHistoryItem } = useCarePlanBudgetHistoryItemStore();
-  const { addTransaction } = useTransactionStore();
+  const { openModalDayOffModal } = useModalTransactionConfirmationModalStore();
 
   const handleRemovePayment = async (payment: CarePlanBudgetHistoryItem) => {
     try {
       if (!payment.payment_id) throw new Error('Id do pagamento é obrigatório');
-      const response = await removeCarePlanBudgetHistoryItem(payment, queryClient);
+      await removeCarePlanBudgetHistoryItem(payment, queryClient);
     } catch (error) {
       console.error(error);
     }
@@ -45,32 +44,7 @@ export default function Installments({ carePlanBudget }: InstallmentsProps) {
 
       if (response === false) throw new Error('Erro ao atualizar pagamento');
 
-      if(payment.payment_status === 'pending') {
-        const payload: Partial<Transaction> = {
-          financial_control_description: `Recebimento da parcela ${payment.payment_description}`,
-          financial_control_value: payment.payment_installments_value.toString().replace('.', ','),
-          financial_control_entry_or_exit: 'entrance',
-          financial_control_date: new Date().toISOString(),
-          financial_control_category: `Recebimento de parcela de plano de tratamento - ${carePlanBudget.budget_name}`,
-          financial_control_payment_method: carePlanBudget.budget_payment_method,
-          financial_control_observation: null
-        };
-        const response = await addTransaction(payload, queryClient);
-
-        if (response === false) throw new Error('Erro ao adicionar transação');
-      } else {
-        const response = await addTransaction({
-          financial_control_description: `Estorno do recebimento da parcela ${payment.payment_description}`,
-          financial_control_value: payment.payment_installments_value.toString().replace('.', ','),
-          financial_control_entry_or_exit: 'output',
-          financial_control_date: new Date().toISOString(),
-          financial_control_category: 'Estorno de recebimento de parcela de plano de tratamento',
-          financial_control_payment_method: carePlanBudget.budget_payment_method,
-          financial_control_observation: null
-        }, queryClient);
-
-        if (response === false) throw new Error('Erro ao adicionar transação');
-      }
+      openModalDayOffModal(payment);
     } catch (error) {
       console.error(error);
       error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
@@ -104,7 +78,7 @@ export default function Installments({ carePlanBudget }: InstallmentsProps) {
                 </td>
                 <td>
                   <DropdownButton title="" as={ButtonGroup} variant="outline-primary" className="mb-1">
-                    <Dropdown.Item href="#/action-1" onClick={() => handleTogglePaymentStatus(payment)}>
+                    <Dropdown.Item href="#/action-1" onClick={() => handleTogglePaymentStatus(payment)} disabled={payment.payment_status === 'received'}>
                       Confirmar pagamento
                     </Dropdown.Item>
                     <Dropdown.Item href="#/action-2" onClick={() => handleRemovePayment(payment)}>
@@ -116,6 +90,8 @@ export default function Installments({ carePlanBudget }: InstallmentsProps) {
             ))}
         </tbody>
       </Table>
+
+      <TransactionConfirmationModal carePlanBudget={carePlanBudget} />
     </Card>
   );
 }

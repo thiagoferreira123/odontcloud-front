@@ -20,6 +20,7 @@ import PatientMenuRow from '../../components/PatientMenuRow';
 import usePatientMenuStore from '../PatientMenu/hooks/patientMenuStore';
 import { getTotalValueWithDiscount } from './helpers';
 import ResponsiveNav from '../../components/ResponsiveNav';
+import TransactionConfirmationModal from './modals/TransactionConfirmationModal';
 
 export default function Budget() {
   const [showModal, setShowModal] = useState(false);
