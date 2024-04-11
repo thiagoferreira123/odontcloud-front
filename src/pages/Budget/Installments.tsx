@@ -6,15 +6,20 @@ import useCarePlanBudgetHistoryItemStore from './hooks/CarePlanBudgetHistoryItem
 import { useQueryClient } from '@tanstack/react-query';
 import { AppException } from '../../helpers/ErrorHelpers';
 import { notify } from '../../components/toast/NotificationIcon';
+import useTransactionStore from '../FinancialControl/hooks/TransactionStore';
+import { Transaction } from '../FinancialControl/hooks/TransactionStore/types';
+import { parseToBrValue } from '../../helpers/StringHelpers';
+import { CarePlanBudget } from './hooks/CarePlanBudgetStore/types';
 
 type InstallmentsProps = {
-  carePlanBudgetHistoryItems: CarePlanBudgetHistoryItem[];
+  carePlanBudget: CarePlanBudget;
 };
 
-export default function Installments({ carePlanBudgetHistoryItems }: InstallmentsProps) {
+export default function Installments({ carePlanBudget }: InstallmentsProps) {
   const queryClient = useQueryClient();
 
   const { removeCarePlanBudgetHistoryItem, updateCarePlanBudgetHistoryItem } = useCarePlanBudgetHistoryItemStore();
+  const { addTransaction } = useTransactionStore();
 
   const handleRemovePayment = async (payment: CarePlanBudgetHistoryItem) => {
     try {
@@ -39,6 +44,33 @@ export default function Installments({ carePlanBudgetHistoryItems }: Installment
       );
 
       if (response === false) throw new Error('Erro ao atualizar pagamento');
+
+      if(payment.payment_status === 'pending') {
+        const payload: Partial<Transaction> = {
+          financial_control_description: `Recebimento da parcela ${payment.payment_description}`,
+          financial_control_value: payment.payment_installments_value.toString().replace('.', ','),
+          financial_control_entry_or_exit: 'entrance',
+          financial_control_date: new Date().toISOString(),
+          financial_control_category: `Recebimento de parcela de plano de tratamento - ${carePlanBudget.budget_name}`,
+          financial_control_payment_method: carePlanBudget.budget_payment_method,
+          financial_control_observation: null
+        };
+        const response = await addTransaction(payload, queryClient);
+
+        if (response === false) throw new Error('Erro ao adicionar transação');
+      } else {
+        const response = await addTransaction({
+          financial_control_description: `Estorno do recebimento da parcela ${payment.payment_description}`,
+          financial_control_value: payment.payment_installments_value.toString().replace('.', ','),
+          financial_control_entry_or_exit: 'output',
+          financial_control_date: new Date().toISOString(),
+          financial_control_category: 'Estorno de recebimento de parcela de plano de tratamento',
+          financial_control_payment_method: carePlanBudget.budget_payment_method,
+          financial_control_observation: null
+        }, queryClient);
+
+        if (response === false) throw new Error('Erro ao adicionar transação');
+      }
     } catch (error) {
       console.error(error);
       error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
@@ -59,7 +91,7 @@ export default function Installments({ carePlanBudgetHistoryItems }: Installment
           </tr>
         </thead>
         <tbody>
-          {carePlanBudgetHistoryItems
+          {carePlanBudget.paymentHistorics
             .sort((a, b) => new Date(a.payment_due_date).getTime() - new Date(b.payment_due_date).getTime())
             .map((payment) => (
               <tr key={payment.payment_id}>

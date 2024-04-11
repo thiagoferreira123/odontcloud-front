@@ -204,7 +204,7 @@ export default function Budget() {
           <Tab.Pane eventKey="paymentHistory">
             {result.data && <PaymentHistory carePlanBudget={result.data} />}
 
-            {result.data && <Installments carePlanBudgetHistoryItems={result.data.paymentHistorics} />}
+            {result.data && <Installments carePlanBudget={result.data} />}
           </Tab.Pane>
         </Tab.Content>
       </Tab.Container>
