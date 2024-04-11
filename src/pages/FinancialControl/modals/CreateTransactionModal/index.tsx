@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { Col, Form, Modal, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import * as Yup from 'yup';
-import { PaymentMethod, Transaction, TransactionCategory, TransactionType } from '../../hooks/TransactionStore/types';
+import { Transaction, TransactionType } from '../../hooks/TransactionStore/types';
 import useTransactionStore from '../../hooks/TransactionStore';
 import { useCreateTransactionModalStore } from '../../hooks/EditModalStore';
 import { useQueryClient } from '@tanstack/react-query';
@@ -13,16 +13,17 @@ import { useFiltersStore } from '../../hooks/FiltersStore';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ptBR } from 'date-fns/locale/pt-BR';
+import { parseToBrValue } from '../../../../helpers/StringHelpers';
 registerLocale('pt-BR', ptBR);
 
 export interface CreateTransactionModalFormValues {
-  description: string;
-  value: string;
-  observation: string;
-  date: string;
-  transaction_type: TransactionType | '';
-  paymentMethod: PaymentMethod | null;
-  category: TransactionCategory | null;
+  financial_control_description: string;
+  financial_control_value: string;
+  financial_control_observation: string;
+  financial_control_date: string;
+  financial_control_entry_or_exit: TransactionType | '';
+  financial_control_payment_method: string;
+  financial_control_category: string;
 }
 
 const CreateTransactionModal = () => {
@@ -38,42 +39,34 @@ const CreateTransactionModal = () => {
   const [startDate, setStartDate] = useState<Date | null>(null);
 
   const validationSchema = Yup.object().shape({
-    description: Yup.string().required('Insira uma descrição válida.'),
-    value: Yup.string().required('Insira um valor válido.'),
-    transaction_type: Yup.string().required('Selecione uma categoria válida.'),
-    observation: Yup.string(),
-    date: Yup.string().required('Insira uma data válida.'),
-    paymentMethod: Yup.object()
-      .shape({
-        payment_form: Yup.string().required('Insira uma forma de pagamento válida.'),
-      })
-      .required('Insira uma forma de pagamento válida.'),
-    category: Yup.object()
-      .shape({
-        category: Yup.string().required('Insira uma categoria válida.'),
-      })
-      .required('Insira uma categoria válida.'),
+    financial_control_description: Yup.string().required('Insira uma descrição válida.'),
+    financial_control_value: Yup.string().required('Insira um valor válido.'),
+    financial_control_entry_or_exit: Yup.string().required('Selecione uma categoria válida.'),
+    financial_control_observation: Yup.string(),
+    financial_control_date: Yup.string().required('Insira uma data válida.'),
+    financial_control_payment_method: Yup.string().required('Insira um método de pagamento válido.'),
+    financial_control_category: Yup.string().required('Insira uma categoria válida.'),
   });
 
   const initialValues: CreateTransactionModalFormValues = {
-    description: '',
-    value: '',
-    transaction_type: '',
-    observation: '',
-    date: '',
-    category: null,
-    paymentMethod: null,
+    financial_control_description: '',
+    financial_control_value: '',
+    financial_control_observation: '',
+    financial_control_date: '',
+    financial_control_entry_or_exit: '',
+    financial_control_payment_method: '',
+    financial_control_category: '',
   };
 
   const onSubmit = async (values: CreateTransactionModalFormValues) => {
     try {
-      if (!values.category) return console.error('Categoria inválida');
+      if (!values.financial_control_category) return console.error('Categoria inválida');
 
       setIsSaving(true);
 
-      if (selectedTransaction?.id) {
+      if (selectedTransaction?.financial_control_id) {
         const response = await updateTransaction(
-          { ...(values as Partial<Transaction>), id: selectedTransaction.id },
+          { ...(values as Partial<Transaction>), financial_control_id: selectedTransaction.financial_control_id },
           selectedMonth?.value ?? '',
           selectedYear?.value ?? '',
           queryClient
@@ -81,7 +74,7 @@ const CreateTransactionModal = () => {
 
         if (response === false) throw new Error('Erro ao atualizar transação');
       } else {
-        const response = await addTransaction(values as Partial<Transaction>, selectedMonth?.value ?? '', selectedYear?.value ?? '', queryClient);
+        const response = await addTransaction(values as Partial<Transaction>, queryClient);
 
         if (response === false) throw new Error('Erro ao adicionar transação');
       }
@@ -107,20 +100,20 @@ const CreateTransactionModal = () => {
       inputVal = inputVal.length > 2 ? inputVal.slice(0, inputVal.length - 2) + ',' + inputVal.slice(inputVal.length - 2) : inputVal;
       inputVal = inputVal.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
-    formik.setFieldValue('value', inputVal);
+    formik.setFieldValue('financial_control_value', inputVal);
   };
 
   useEffect(() => {
     if (selectedTransaction) {
-      setStartDate(new Date(selectedTransaction.date));
+      setStartDate(new Date(selectedTransaction.financial_control_date));
       formik.setValues({
-        description: selectedTransaction.description,
-        value: Number(selectedTransaction.value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }).replace('R$ ', ''),
-        transaction_type: selectedTransaction.transaction_type,
-        observation: selectedTransaction.observation,
-        date: selectedTransaction.date,
-        category: selectedTransaction.category,
-        paymentMethod: selectedTransaction.paymentMethod,
+        financial_control_description: selectedTransaction.financial_control_description,
+        financial_control_value: parseToBrValue(selectedTransaction.financial_control_value).replace('R$', ''),
+        financial_control_entry_or_exit: selectedTransaction.financial_control_entry_or_exit,
+        financial_control_observation: selectedTransaction.financial_control_observation ?? '',
+        financial_control_date: selectedTransaction.financial_control_date,
+        financial_control_category: selectedTransaction.financial_control_category,
+        financial_control_payment_method: selectedTransaction.financial_control_payment_method,
       });
     } else {
       resetForm();
@@ -138,35 +131,47 @@ const CreateTransactionModal = () => {
         <Form onSubmit={handleSubmit} className="tooltip-end-top">
           <div className="d-flex">
             <Col md={6} className="mb-3 top-label me-2">
-              <Form.Control type="text" name="description" value={formik.values.description} onChange={handleChange} />
+              <Form.Control type="text" name="financial_control_description" value={formik.values.financial_control_description} onChange={handleChange} />
               <Form.Label>DESCRIÇÃO DA TRANSAÇÃO</Form.Label>
-              {formik.errors.description && formik.touched.description && <div className="error">{formik.errors.description}</div>}
+              {formik.errors.financial_control_description && formik.touched.financial_control_description && (
+                <div className="error">{formik.errors.financial_control_description}</div>
+              )}
             </Col>
 
             <Col md={3} className="mb-3 top-label me-2">
-              <Form.Control type="text" name="value" value={formik.values.value} onChange={handleCurrencyChange} onBlur={formik.handleBlur} />
+              <Form.Control
+                type="text"
+                name="financial_control_value"
+                value={formik.values.financial_control_value}
+                onChange={handleCurrencyChange}
+                onBlur={formik.handleBlur}
+              />
               <Form.Label>VALOR</Form.Label>
-              {formik.errors.value && formik.touched.value && <div className="error">{formik.errors.value}</div>}
+              {formik.errors.financial_control_value && formik.touched.financial_control_value && (
+                <div className="error">{formik.errors.financial_control_value}</div>
+              )}
             </Col>
 
             <Col md={3} className="mb-3 me-2">
               <div className="top-label transform-up-3">
-                {formik.errors.transaction_type && formik.touched.transaction_type && <div className="error">{formik.errors.transaction_type}</div>}
+                {formik.errors.financial_control_entry_or_exit && formik.touched.financial_control_entry_or_exit && (
+                  <div className="error">{formik.errors.financial_control_entry_or_exit}</div>
+                )}
               </div>
-              <ToggleButtonGroup type="radio" className="d-block" name="buttonOptions2" value={values.transaction_type}>
+              <ToggleButtonGroup type="radio" className="d-block" name="buttonOptions2" value={values.financial_control_entry_or_exit}>
                 <ToggleButton
                   id="tbg-radio-3"
-                  value={'entrada'}
+                  value={'entrance'}
                   variant="outline-primary"
-                  onChange={() => setFieldValue('transaction_type', 'entrada')}
+                  onChange={() => setFieldValue('financial_control_entry_or_exit', 'entrance')}
                 >
                   Entrada
                 </ToggleButton>
                 <ToggleButton
                   id="tbg-radio-4"
-                  value={'saida'}
+                  value={'output'}
                   variant="outline-secondary"
-                  onChange={() => setFieldValue('transaction_type', 'saida')}
+                  onChange={() => setFieldValue('financial_control_entry_or_exit', 'output')}
                 >
                   Saída
                 </ToggleButton>
@@ -181,33 +186,48 @@ const CreateTransactionModal = () => {
                 selected={startDate}
                 onChange={(date) => {
                   setStartDate(date);
-                  setFieldValue('date', date ? date.toISOString() : '');
+                  setFieldValue('financial_control_date', date ? date.toISOString() : '');
                 }}
                 locale="pt-BR"
                 dateFormat="dd/MM/yyyy"
               />
               <Form.Label>DATA DA TRANSAÇÃO</Form.Label>
-              {formik.errors.date && formik.touched.date && <div className="error">{formik.errors.date}</div>}
+              {formik.errors.financial_control_date && formik.touched.financial_control_date && (
+                <div className="error">{formik.errors.financial_control_date}</div>
+              )}
             </Col>
 
             <Col md={4} className="mb-3 top-label me-2">
               <CategorySelect formik={formik} />
               <Form.Label>CATEGORIA</Form.Label>
-              {formik.errors.category && formik.touched.category && <div className="error">{formik.errors.category}</div>}
+              {formik.errors.financial_control_category && formik.touched.financial_control_category && (
+                <div className="error">{formik.errors.financial_control_category}</div>
+              )}
             </Col>
 
             <Col md={4} className="mb-3 top-label me-2">
               <PaymentMethodSelect formik={formik} />
               <Form.Label>FORMA DE PAGAMENTO</Form.Label>
-              {formik.errors.paymentMethod && formik.touched.paymentMethod && <div className="error">{formik.errors.paymentMethod}</div>}
+              {formik.errors.financial_control_payment_method && formik.touched.financial_control_payment_method && (
+                <div className="error">{formik.errors.financial_control_payment_method}</div>
+              )}
             </Col>
           </div>
 
           <div>
             <Col className="mb-3 top-label">
-              <Form.Control type="text" as="textarea" rows={3} name="observation" value={formik.values.observation} onChange={handleChange} />
+              <Form.Control
+                type="text"
+                as="textarea"
+                rows={3}
+                name="financial_control_observation"
+                value={formik.values.financial_control_observation}
+                onChange={handleChange}
+              />
               <Form.Label>OBSERVAÇÃO</Form.Label>
-              {formik.errors.observation && formik.touched.observation && <div className="error">{formik.errors.observation}</div>}
+              {formik.errors.financial_control_observation && formik.touched.financial_control_observation && (
+                <div className="error">{formik.errors.financial_control_observation}</div>
+              )}
             </Col>
           </div>
 

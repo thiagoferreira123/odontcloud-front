@@ -4,8 +4,8 @@ import Autosuggest from 'react-autosuggest';
 import { CreateTransactionModalFormValues } from '.';
 import { escapeRegexCharacters } from '../../../../helpers/SearchFoodHelper';
 import { useQuery } from '@tanstack/react-query';
-import { PaymentMethod } from '../../hooks/TransactionStore/types';
-import usePaymentMethodStore from '../../hooks/PaymentMethodStore';
+import { PaymentMethod, Transaction } from '../../hooks/TransactionStore/types';
+import useTransactionStore from '../../hooks/TransactionStore';
 
 interface PaymentMethodSelectProps {
   formik: {
@@ -14,7 +14,7 @@ interface PaymentMethodSelectProps {
       <T_1 = string | React.ChangeEvent<unknown>>(field: T_1): T_1 extends React.ChangeEvent<unknown> ? void : (e: string | React.ChangeEvent<unknown>) => void;
     };
 
-    setFieldValue: (field: string, value: PaymentMethod, shouldValidate?: boolean | undefined) => void;
+    setFieldValue: (field: string, value: string, shouldValidate?: boolean | undefined) => void;
     values: CreateTransactionModalFormValues;
     errors: FormikErrors<CreateTransactionModalFormValues>;
     touched: FormikTouched<CreateTransactionModalFormValues>;
@@ -24,14 +24,14 @@ interface PaymentMethodSelectProps {
 const PaymentMethodSelect = ({ formik }: PaymentMethodSelectProps) => {
   const { setFieldValue, touched, errors, values } = formik;
 
-  const [valueState, setValueState] = useState(values.paymentMethod?.payment_form || '');
+  const [valueState, setValueState] = useState(values.financial_control_payment_method || '');
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
-  const { getTransactionPaymentMethods } = usePaymentMethodStore();
+  const { getTransactions } = useTransactionStore();
 
-  const getTransactionPaymentMethods_ = async () => {
+  const getTransactions_ = async () => {
     try {
-      const response = await getTransactionPaymentMethods();
+      const response = await getTransactions();
 
       if(response === false) throw new Error('Erro ao buscar metodos de pagamento');
 
@@ -50,12 +50,12 @@ const PaymentMethodSelect = ({ formik }: PaymentMethodSelectProps) => {
     setSuggestions([]);
   };
 
-  const getSuggestions = (paymentMethods: PaymentMethod[], value: string) => {
+  const getSuggestions = (financial_control_payment_methods: Transaction[], value: string) => {
     const escapedValue = escapeRegexCharacters(value.trim());
 
-    const items = Array.from(new Set(paymentMethods.map((exam) => exam.payment_form)))
-      .filter((exam) => escapeRegexCharacters(exam.trim()).includes(escapedValue))
-      .map((exam) => exam);
+    const items = Array.from(new Set(financial_control_payment_methods.map((transaction) => transaction.financial_control_payment_method)))
+      .filter((transaction) => escapeRegexCharacters(transaction.trim()).includes(escapedValue))
+      .map((transaction) => transaction);
 
     return items;
   };
@@ -63,20 +63,14 @@ const PaymentMethodSelect = ({ formik }: PaymentMethodSelectProps) => {
   const changeInput = (_event: unknown, { newValue }: { newValue: string }) => {
     if (typeof newValue !== 'string') return;
 
-    const existingCategory = result.data?.find((paymentMethod) => paymentMethod.payment_form === newValue);
-
-    if(existingCategory) {
-      setFieldValue('paymentMethod', existingCategory);
-    } else {
-      setFieldValue('paymentMethod', { payment_form: newValue });
-    }
+    setFieldValue('financial_control_payment_method', newValue ?? '');
   };
 
   useEffect(() => {
-    setValueState(values.paymentMethod?.payment_form || '');
-  }, [values.paymentMethod]);
+    setValueState(values.financial_control_payment_method || '');
+  }, [values.financial_control_payment_method]);
 
-  const result = useQuery({ queryKey: ['transaction-payment-menthods'], queryFn: getTransactionPaymentMethods_ });
+  const result = useQuery({ queryKey: ['my-transactions'], queryFn: getTransactions_ });
 
   return (
     <>
@@ -95,7 +89,7 @@ const PaymentMethodSelect = ({ formik }: PaymentMethodSelectProps) => {
           className: 'form-control',
         }}
       />
-      {errors.paymentMethod && touched.paymentMethod && <div className="error">{errors.paymentMethod}</div>}
+      {errors.financial_control_payment_method && touched.financial_control_payment_method && <div className="error">{errors.financial_control_payment_method}</div>}
     </>
   );
 };

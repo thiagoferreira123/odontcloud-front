@@ -5,7 +5,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { months, useFiltersStore } from './hooks/FiltersStore';
 import useTransactionStore from './hooks/TransactionStore';
 import { AppException } from '../../helpers/ErrorHelpers';
-import { Transaction } from './hooks/TransactionStore/types';
+import { Transaction, TransactionTypeOptions } from './hooks/TransactionStore/types';
+import { parseBrValueToNumber, parseToBrValue } from '../../helpers/StringHelpers';
 
 interface MonthValues {
   month: string;
@@ -22,13 +23,13 @@ export default function YearlyPane() {
 
   const defaultMonthValues: MonthValues[] = months.map((month) => ({ month: month.label, value: 0 }));
 
-  const { getTransactions } = useTransactionStore();
+  const { getTransactionsByPeriod } = useTransactionStore();
 
-  const getTransactions_ = async () => {
+  const getTransactionsByPeriod_ = async () => {
     try {
       if (!selectedYear) throw new AppException('Selecione um ano para visualizar as transações');
 
-      const response = await getTransactions('', selectedYear.value);
+      const response = await getTransactionsByPeriod('', selectedYear.value);
 
       if (response === false) throw new Error('Error');
 
@@ -41,36 +42,36 @@ export default function YearlyPane() {
 
   const result = useQuery({
     queryKey: ['my-transactions', selectedYear?.value],
-    queryFn: getTransactions_,
+    queryFn: getTransactionsByPeriod_,
     enabled: !!selectedYear,
   });
 
   const entranceCategories = result.data?.reduce((acc: TransactionCategoryGroup[], transaction: Transaction) => {
-    const category = acc.find((group) => group.category === transaction.category.category);
+    const category = acc.find((group) => group.category === transaction.financial_control_category);
 
-    if (transaction.transaction_type !== 'entrada') return acc;
+    if (transaction.financial_control_entry_or_exit !== TransactionTypeOptions.ENTRANCE) return acc;
 
     if (category) {
-      const transactionMonth = new Date(transaction.date).getMonth();
+      const transactionMonth = new Date(transaction.financial_control_date).getMonth();
 
       const month = category.months.find((month) => month.month === months[transactionMonth].label);
 
       if (month) {
-        month.value += +transaction.value;
+        month.value += parseBrValueToNumber(transaction.financial_control_value);
       } else {
         category.months.push({
           month: months[transactionMonth].label,
-          value: +transaction.value,
+          value: parseBrValueToNumber(transaction.financial_control_value),
         });
       }
     } else {
       acc.push({
-        category: transaction.category.category,
+        category: transaction.financial_control_category,
         months: defaultMonthValues.map((month) => {
-          if (month.month === months[new Date(transaction.date).getMonth()].label) {
+          if (month.month === months[new Date(transaction.financial_control_date).getMonth()].label) {
             return {
               month: month.month,
-              value: +transaction.value,
+              value: parseBrValueToNumber(transaction.financial_control_value),
             };
           }
 
@@ -83,35 +84,35 @@ export default function YearlyPane() {
   }, []);
 
   const expenseCategories = result.data?.reduce((acc: TransactionCategoryGroup[], transaction: Transaction) => {
-    const category = acc.find((group) => group.category === transaction.category.category);
+    const category = acc.find((group) => group.category === transaction.financial_control_category);
 
-    if (transaction.transaction_type !== 'saida') return acc;
+    if (transaction.financial_control_entry_or_exit !== TransactionTypeOptions.OUTPUT) return acc;
 
     if (category) {
-      const transactionMonth = new Date(transaction.date).getMonth();
+      const transactionMonth = new Date(transaction.financial_control_date).getMonth();
 
       const month = category.months.find((month) => month.month === months[transactionMonth].label);
 
       if (month) {
-        month.value += +transaction.value;
+        month.value += parseBrValueToNumber(transaction.financial_control_value);
       } else {
         category.months.push({
           month: months[transactionMonth].label,
-          value: +transaction.value,
+          value: parseBrValueToNumber(transaction.financial_control_value),
         });
       }
     } else {
       acc.push({
-        category: transaction.category.category,
+        category: transaction.financial_control_category,
         months: defaultMonthValues.map((month) => {
-          if (month.month === months[new Date(transaction.date).getMonth()].label) {
+          if (month.month === months[new Date(transaction.financial_control_date).getMonth()].label) {
             return {
               month: month.month,
-              value: +transaction.value,
+              value: parseBrValueToNumber(transaction.financial_control_value),
             };
           }
 
-          return month;
+          return {...month};
         }),
       });
     }
@@ -121,11 +122,11 @@ export default function YearlyPane() {
 
   const totalEntrance =
     result.data?.reduce((acc, transaction) => {
-      return transaction.transaction_type === 'entrada' ? acc + Number(transaction.value) : acc;
+      return transaction.financial_control_entry_or_exit === TransactionTypeOptions.ENTRANCE ? acc + parseBrValueToNumber(transaction.financial_control_value) : acc;
     }, 0) ?? 0;
   const totalExpense =
     result.data?.reduce((acc, transaction) => {
-      return transaction.transaction_type === 'saida' ? acc + Number(transaction.value) : acc;
+      return transaction.financial_control_entry_or_exit === TransactionTypeOptions.OUTPUT ? acc + parseBrValueToNumber(transaction.financial_control_value) : acc;
     }, 0) ?? 0;
   const balance = totalEntrance - totalExpense;
 
@@ -166,7 +167,7 @@ export default function YearlyPane() {
                         <th>{category.category}</th>
                         {category.months.map((month) => (
                           <td key={month.month}>
-                            + {month.value ? month.value.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' }).replace('R$ ', '') : 0}
+                            + {month.value ? parseToBrValue(month.value).replace('R$ ', '') : 0}
                           </td>
                         ))}
                       </tr>
@@ -210,7 +211,7 @@ export default function YearlyPane() {
                         <th>{category.category}</th>
                         {category.months.map((month) => (
                           <td key={month.month}>
-                            + {month.value ? month.value.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' }).replace('R$ ', '') : 0}
+                            + {month.value ? parseToBrValue(month.value).replace('R$ ', '') : 0}
                           </td>
                         ))}
                       </tr>
@@ -236,7 +237,7 @@ export default function YearlyPane() {
                   <div className="heading mb-0 sh-8 d-flex align-items-center lh-1-25 ps-3">Entrada</div>
                 </Col>
                 <Col xs="auto" className="ps-3">
-                  <div className="display-5 text-primary">{totalEntrance?.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}</div>
+                  <div className="display-5 text-primary">{parseToBrValue(totalEntrance)}</div>
                 </Col>
               </Row>
             </Card.Body>
@@ -255,7 +256,7 @@ export default function YearlyPane() {
                   <div className="heading mb-0 sh-8 d-flex align-items-center lh-1-25 ps-3">Saída</div>
                 </Col>
                 <Col xs="auto" className="ps-3">
-                  <div className="display-5 text-danger">{totalExpense?.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}</div>
+                  <div className="display-5 text-danger">{parseToBrValue(totalExpense)}</div>
                 </Col>
               </Row>
             </Card.Body>
@@ -274,7 +275,7 @@ export default function YearlyPane() {
                   <div className="heading mb-0 sh-8 d-flex align-items-center lh-1-25 ps-3">Balanço do ano</div>
                 </Col>
                 <Col xs="auto" className="ps-3">
-                  <div className="display-5 text-primary">{balance?.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}</div>
+                  <div className="display-5 text-primary">{parseToBrValue(balance)}</div>
                 </Col>
               </Row>
             </Card.Body>
