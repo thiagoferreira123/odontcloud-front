@@ -17,11 +17,11 @@ const useCarePlanBudgetHistoryItemActions = (): CarePlanBudgetHistoryItemActions
         }
       });
 
-      notify('Parcela criada com sucesso', 'Sucesso', 'check', 'success');
+      notify('Parcelas criadas com sucesso', 'Sucesso', 'check', 'success');
 
       return data ?? false;
     } catch (error) {
-      notify('Erro ao adicionar parcela', 'Erro', 'close', 'danger');
+      notify('Erro ao adicionar parcelas', 'Erro', 'close', 'danger');
       console.error(error);
       return false;
     }

@@ -11,10 +11,11 @@ import { useFiltersStore } from './hooks/FiltersStore';
 import useTransactionStore from './hooks/TransactionStore';
 import { useCreateTransactionModalStore } from './hooks/EditModalStore';
 import { AppException } from '../../helpers/ErrorHelpers';
-import { Transaction } from './hooks/TransactionStore/types';
+import { Transaction, TransactionTypeOptions } from './hooks/TransactionStore/types';
 import { notify } from '../../components/toast/NotificationIcon';
 import { downloadExcel } from '../../helpers/PdfHelpers';
 import api from '../../services/useAxios';
+import { parseBrValueToNumber, parseToBrValue } from '../../helpers/StringHelpers';
 
 export default function MonthlyPane() {
   const queryClient = useQueryClient();
@@ -22,17 +23,17 @@ export default function MonthlyPane() {
   const selectedMonth = useFiltersStore((state) => state.selectedMonth);
   const selectedYear = useFiltersStore((state) => state.selectedYear);
 
-  const [removingTransactionIds, setRemovingTransactionIds] = useState<number[]>([]);
+  const [removingTransactionIds, setRemovingTransactionIds] = useState<string[]>([]);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const { getTransactions, removeTransaction } = useTransactionStore();
+  const { getTransactionsByPeriod, removeTransaction } = useTransactionStore();
   const { handleShowCreateTransactionModal, handleSelectTransactionToEdit } = useCreateTransactionModalStore();
 
-  const getTransactions_ = async () => {
+  const getTransactionsByPeriod_ = async () => {
     try {
       if (!selectedMonth || !selectedYear) throw new AppException('Selecione um mês e um ano para visualizar as transações');
 
-      const response = await getTransactions(selectedMonth.value, selectedYear.value);
+      const response = await getTransactionsByPeriod(selectedMonth.value, selectedYear.value);
 
       if (response === false) throw new Error('Error');
 
@@ -48,17 +49,17 @@ export default function MonthlyPane() {
     try {
       if (!selectedMonth || !selectedYear) throw new AppException('Selecione um mês e um ano para visualizar as transações');
 
-      setRemovingTransactionIds((old) => [...old, transaction.id]);
+      setRemovingTransactionIds((old) => [...old, transaction.financial_control_id]);
 
-      const response = await removeTransaction(transaction.id, selectedMonth.value, selectedYear.value, queryClient);
+      const response = await removeTransaction(transaction.financial_control_id, selectedMonth.value, selectedYear.value, queryClient);
 
       if (response === false) throw new Error('Error');
 
-      setRemovingTransactionIds((old) => old.filter((id) => id !== transaction.id));
+      setRemovingTransactionIds((old) => old.filter((id) => id !== transaction.financial_control_id));
 
       return response;
     } catch (error) {
-      setRemovingTransactionIds((old) => old.filter((id) => id !== transaction.id));
+      setRemovingTransactionIds((old) => old.filter((id) => id !== transaction.financial_control_id));
       console.error(error);
 
       error instanceof AppException && notify('Erro ao remover transação', 'Erro', 'close', 'danger');
@@ -73,7 +74,7 @@ export default function MonthlyPane() {
 
       setIsDownloading(true);
 
-      const { data } = await api.get(`/controle-financeiro/download/${selectedYear.value}/${selectedMonth.value}/`, {
+      const { data } = await api.get(`/clinic-financial-control/download/${selectedYear.value}/${selectedMonth.value}/`, {
         responseType: 'arraybuffer',
         headers: {
           'Content-Type': 'application/json',
@@ -93,17 +94,21 @@ export default function MonthlyPane() {
 
   const result = useQuery({
     queryKey: ['my-transactions', selectedMonth?.value, selectedYear?.value],
-    queryFn: getTransactions_,
+    queryFn: getTransactionsByPeriod_,
     enabled: !!selectedMonth && !!selectedYear,
   });
 
   const totalEntrance =
     result.data?.reduce((acc, transaction) => {
-      return transaction.transaction_type === 'entrada' ? acc + Number(transaction.value) : acc;
+      return transaction.financial_control_entry_or_exit === TransactionTypeOptions.ENTRANCE
+        ? acc + parseBrValueToNumber(transaction.financial_control_value)
+        : acc;
     }, 0) ?? 0;
   const totalExpense =
     result.data?.reduce((acc, transaction) => {
-      return transaction.transaction_type === 'saida' ? acc + Number(transaction.value) : acc;
+      return transaction.financial_control_entry_or_exit === TransactionTypeOptions.OUTPUT
+        ? acc + parseBrValueToNumber(transaction.financial_control_value)
+        : acc;
     }, 0) ?? 0;
   const balance = totalEntrance - totalExpense;
 
@@ -156,17 +161,17 @@ export default function MonthlyPane() {
                     </thead>
                     <tbody>
                       {result.data?.map((transaction) => (
-                        <tr key={transaction.id}>
-                          <th>{new Date(transaction.date).toLocaleDateString()}</th>
-                          <td>{transaction.description}</td>
-                          <td className={transaction.transaction_type === 'saida' ? 'text-danger' : ''}>
-                            {Number(transaction.value).toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
+                        <tr key={transaction.financial_control_id}>
+                          <th>{new Date(transaction.financial_control_date).toLocaleDateString()}</th>
+                          <td>{transaction.financial_control_description}</td>
+                          <td className={transaction.financial_control_entry_or_exit === TransactionTypeOptions.OUTPUT ? 'text-danger' : ''}>
+                            {parseToBrValue(transaction.financial_control_value)}
                           </td>
-                          <td>{transaction.paymentMethod.payment_form}</td>
-                          <td>{transaction.category.category}</td>
+                          <td>{transaction.financial_control_payment_method}</td>
+                          <td>{transaction.financial_control_category}</td>
                           <td>
                             <AsyncButton
-                              isSaving={removingTransactionIds.includes(transaction.id)}
+                              isSaving={removingTransactionIds.includes(transaction.financial_control_id)}
                               variant="outline-primary"
                               size="sm"
                               className="me-2"
@@ -209,7 +214,7 @@ export default function MonthlyPane() {
                   <div className="heading mb-0 sh-8 d-flex align-items-center lh-1-25 ps-3">Entrada</div>
                 </Col>
                 <Col xs="auto" className="ps-3">
-                  <div className="display-5 text-primary">{totalEntrance?.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}</div>
+                  <div className="display-5 text-primary">{parseToBrValue(totalEntrance)}</div>
                 </Col>
               </Row>
             </Card.Body>
@@ -228,7 +233,7 @@ export default function MonthlyPane() {
                   <div className="heading mb-0 sh-8 d-flex align-items-center lh-1-25 ps-3">Saída</div>
                 </Col>
                 <Col xs="auto" className="ps-3">
-                  <div className="display-5 text-danger">{totalExpense?.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}</div>
+                  <div className="display-5 text-danger">{parseToBrValue(totalExpense)}</div>
                 </Col>
               </Row>
             </Card.Body>
@@ -247,7 +252,7 @@ export default function MonthlyPane() {
                   <div className="heading mb-0 sh-8 d-flex align-items-center lh-1-25 ps-3">Balanço do mês</div>
                 </Col>
                 <Col xs="auto" className="ps-3">
-                  <div className="display-5 text-primary">{balance?.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}</div>
+                  <div className="display-5 text-primary">{parseToBrValue(balance)}</div>
                 </Col>
               </Row>
             </Card.Body>

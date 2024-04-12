@@ -2,10 +2,10 @@ import { FormikErrors, FormikTouched } from 'formik';
 import React, { useEffect, useState } from 'react';
 import Autosuggest from 'react-autosuggest';
 import { CreateTransactionModalFormValues } from '.';
-import { TransactionCategory } from '../../hooks/TransactionStore/types';
-import useTransactionCategoryStore from '../../hooks/TransactionCategoryStore';
+import useTransactionStore from '../../hooks/TransactionStore';
 import { escapeRegexCharacters } from '../../../../helpers/SearchFoodHelper';
 import { useQuery } from '@tanstack/react-query';
+import { Transaction } from '../../hooks/TransactionStore/types';
 
 interface CategorySelectProps {
   formik: {
@@ -14,7 +14,7 @@ interface CategorySelectProps {
       <T_1 = string | React.ChangeEvent<unknown>>(field: T_1): T_1 extends React.ChangeEvent<unknown> ? void : (e: string | React.ChangeEvent<unknown>) => void;
     };
 
-    setFieldValue: (field: string, value: TransactionCategory, shouldValidate?: boolean | undefined) => void;
+    setFieldValue: (field: string, value: string, shouldValidate?: boolean | undefined) => void;
     values: CreateTransactionModalFormValues;
     errors: FormikErrors<CreateTransactionModalFormValues>;
     touched: FormikTouched<CreateTransactionModalFormValues>;
@@ -24,14 +24,14 @@ interface CategorySelectProps {
 const CategorySelect = ({ formik }: CategorySelectProps) => {
   const { setFieldValue, touched, errors, values } = formik;
 
-  const [valueState, setValueState] = useState(values.category?.category || '');
+  const [valueState, setValueState] = useState(values.financial_control_category || '');
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
-  const { getTransactionCategories } = useTransactionCategoryStore();
+  const { getTransactions } = useTransactionStore();
 
-  const getTransactionCategories_ = async () => {
+  const getTransactions_ = async () => {
     try {
-      const response = await getTransactionCategories();
+      const response = await getTransactions();
 
       if(response === false) throw new Error('Erro ao buscar categorias');
 
@@ -50,12 +50,12 @@ const CategorySelect = ({ formik }: CategorySelectProps) => {
     setSuggestions([]);
   };
 
-  const getSuggestions = (exams: TransactionCategory[], value: string) => {
+  const getSuggestions = (transactions: Transaction[], value: string) => {
     const escapedValue = escapeRegexCharacters(value.trim());
 
-    const items = Array.from(new Set(exams.map((exam) => exam.category)))
-      .filter((exam) => escapeRegexCharacters(exam.trim()).includes(escapedValue))
-      .map((exam) => exam);
+    const items = Array.from(new Set(transactions.map((transaction) => transaction.financial_control_category)))
+      .filter((transaction) => escapeRegexCharacters(transaction.trim()).includes(escapedValue))
+      .map((transaction) => transaction);
 
     return items;
   };
@@ -63,20 +63,16 @@ const CategorySelect = ({ formik }: CategorySelectProps) => {
   const changeInput = (_event: unknown, { newValue }: { newValue: string }) => {
     if (typeof newValue !== 'string') return;
 
-    const existingCategory = result.data?.find((category) => category.category === newValue);
+    // setValueState(newValue);
 
-    if(existingCategory) {
-      setFieldValue('category', existingCategory);
-    } else {
-      setFieldValue('category', { category: newValue, category_type: 'entrada' });
-    }
+    setFieldValue('financial_control_category', newValue ?? '');
   };
 
   useEffect(() => {
-    setValueState(values.category?.category || '');
-  }, [values.category]);
+    setValueState(values.financial_control_category || '');
+  }, [values.financial_control_category]);
 
-  const result = useQuery({ queryKey: ['transactionCategories'], queryFn: getTransactionCategories_ });
+  const result = useQuery({ queryKey: ['my-transactions'], queryFn: getTransactions_ });
 
   return (
     <>
@@ -95,7 +91,7 @@ const CategorySelect = ({ formik }: CategorySelectProps) => {
           className: 'form-control',
         }}
       />
-      {errors.category && touched.category && <div className="error">{errors.category}</div>}
+      {errors.financial_control_category && touched.financial_control_category && <div className="error">{errors.financial_control_category}</div>}
     </>
   );
 };

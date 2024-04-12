@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { Badge, ButtonGroup, Card, Dropdown, DropdownButton, Table } from 'react-bootstrap';
 import { CarePlanBudgetHistoryItem, HistoryItemTranslatedStatus } from './hooks/CarePlanBudgetHistoryItem/types';
 import { convertIsoToBrDate } from '../../helpers/DateHelper';
@@ -6,20 +6,24 @@ import useCarePlanBudgetHistoryItemStore from './hooks/CarePlanBudgetHistoryItem
 import { useQueryClient } from '@tanstack/react-query';
 import { AppException } from '../../helpers/ErrorHelpers';
 import { notify } from '../../components/toast/NotificationIcon';
+import { CarePlanBudget } from './hooks/CarePlanBudgetStore/types';
+import TransactionConfirmationModal from './modals/TransactionConfirmationModal';
+import { useModalTransactionConfirmationModalStore } from './hooks/ModalTransactionConfirmationModalStore';
 
 type InstallmentsProps = {
-  carePlanBudgetHistoryItems: CarePlanBudgetHistoryItem[];
+  carePlanBudget: CarePlanBudget;
 };
 
-export default function Installments({ carePlanBudgetHistoryItems }: InstallmentsProps) {
+export default function Installments({ carePlanBudget }: InstallmentsProps) {
   const queryClient = useQueryClient();
 
   const { removeCarePlanBudgetHistoryItem, updateCarePlanBudgetHistoryItem } = useCarePlanBudgetHistoryItemStore();
+  const { openModalDayOffModal } = useModalTransactionConfirmationModalStore();
 
   const handleRemovePayment = async (payment: CarePlanBudgetHistoryItem) => {
     try {
       if (!payment.payment_id) throw new Error('Id do pagamento é obrigatório');
-      const response = await removeCarePlanBudgetHistoryItem(payment, queryClient);
+      await removeCarePlanBudgetHistoryItem(payment, queryClient);
     } catch (error) {
       console.error(error);
     }
@@ -39,6 +43,8 @@ export default function Installments({ carePlanBudgetHistoryItems }: Installment
       );
 
       if (response === false) throw new Error('Erro ao atualizar pagamento');
+
+      openModalDayOffModal(payment);
     } catch (error) {
       console.error(error);
       error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
@@ -59,7 +65,7 @@ export default function Installments({ carePlanBudgetHistoryItems }: Installment
           </tr>
         </thead>
         <tbody>
-          {carePlanBudgetHistoryItems
+          {carePlanBudget.paymentHistorics
             .sort((a, b) => new Date(a.payment_due_date).getTime() - new Date(b.payment_due_date).getTime())
             .map((payment) => (
               <tr key={payment.payment_id}>
@@ -72,7 +78,7 @@ export default function Installments({ carePlanBudgetHistoryItems }: Installment
                 </td>
                 <td>
                   <DropdownButton title="" as={ButtonGroup} variant="outline-primary" className="mb-1">
-                    <Dropdown.Item href="#/action-1" onClick={() => handleTogglePaymentStatus(payment)}>
+                    <Dropdown.Item href="#/action-1" onClick={() => handleTogglePaymentStatus(payment)} disabled={payment.payment_status === 'received'}>
                       Confirmar pagamento
                     </Dropdown.Item>
                     <Dropdown.Item href="#/action-2" onClick={() => handleRemovePayment(payment)}>
@@ -84,6 +90,8 @@ export default function Installments({ carePlanBudgetHistoryItems }: Installment
             ))}
         </tbody>
       </Table>
+
+      <TransactionConfirmationModal carePlanBudget={carePlanBudget} />
     </Card>
   );
 }

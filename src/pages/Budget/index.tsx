@@ -20,6 +20,7 @@ import PatientMenuRow from '../../components/PatientMenuRow';
 import usePatientMenuStore from '../PatientMenu/hooks/patientMenuStore';
 import { getTotalValueWithDiscount } from './helpers';
 import ResponsiveNav from '../../components/ResponsiveNav';
+import TransactionConfirmationModal from './modals/TransactionConfirmationModal';
 
 export default function Budget() {
   const [showModal, setShowModal] = useState(false);
@@ -204,7 +205,7 @@ export default function Budget() {
           <Tab.Pane eventKey="paymentHistory">
             {result.data && <PaymentHistory carePlanBudget={result.data} />}
 
-            {result.data && <Installments carePlanBudgetHistoryItems={result.data.paymentHistorics} />}
+            {result.data && <Installments carePlanBudget={result.data} />}
           </Tab.Pane>
         </Tab.Content>
       </Tab.Container>
