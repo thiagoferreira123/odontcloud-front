@@ -156,7 +156,7 @@ const ModalCreateReceipt = () => {
     if (maskedZipCode.length === 9) {
       try {
         const numericZipCode = maskedZipCode.replace('-', '');
-        const response = await axios.get(`https://viareceipt_cep.com.br/ws/${numericZipCode}/json/`);
+        const response = await axios.get(`https://viacep.com.br/ws/${numericZipCode}/json/`);
         const { uf, localidade, bairro, logradouro } = response.data;
 
         formik.setFieldValue('receipt_state', uf);

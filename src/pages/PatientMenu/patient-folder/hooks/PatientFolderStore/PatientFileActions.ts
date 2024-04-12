@@ -28,7 +28,7 @@ const usePatientFileActions = (set: (partial: (state: PatientFolderStore) => Par
 
   updatePatientFile: async (payload, queryClient) => {
     try {
-      const { data } = await api.put<PatientFile>(`/patient-documents/${payload.documents_id}`, payload);
+      const { data } = await api.patch<PatientFile>(`/patient-documents/${payload.documents_id}`, payload);
 
       queryClient.setQueryData<PatientFile[]>(['patientFolders', payload.documents_patient_id?.toString()], (oldData) =>
         oldData ? oldData.map(record => record.documents_id === data.documents_id ? data : record) : []

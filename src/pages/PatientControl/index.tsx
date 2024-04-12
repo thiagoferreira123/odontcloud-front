@@ -110,7 +110,7 @@ export default function PatientControl() {
       if (!selectedMonth || !selectedYear) throw new AppException('Selecione um mês e um ano para filtrar os pacientes');
 
       return (
-        (!query || patient.patient_full_name.toLowerCase().includes(query.toLowerCase()))
+        !query || patient.patient_full_name.toLowerCase().includes(query.toLowerCase())
         // (!status || (status === 1 && patient.patientActiveOrInactive === 1) || (status === 2 && patient.patientActiveOrInactive === 0))
       );
     })
@@ -130,9 +130,11 @@ export default function PatientControl() {
             <Filters />
             <div className="text-end">
               <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-1">Download do PDF com o registro dos pacientes</Tooltip>}>
-                <AsyncButton isSaving={isDownloading} onClickHandler={handleDownloadPatients} loadingText=" " variant="outline-primary" size="sm">
-                  <Icon.Printer />
-                </AsyncButton>
+                <span>
+                  <AsyncButton isSaving={isDownloading} onClickHandler={handleDownloadPatients} loadingText=" " variant="outline-primary" size="sm">
+                    <Icon.Printer />
+                  </AsyncButton>
+                </span>
               </OverlayTrigger>
             </div>
             <div className="scroll-out">
@@ -140,16 +142,16 @@ export default function PatientControl() {
                 <section className="scroll-section" id="stripedRows">
                   {result.isLoading ? (
                     <div className="sh-50 d-flex align-items-center justify-content-center">
-                        <StaticLoading />
-                      </div>
+                      <StaticLoading />
+                    </div>
                   ) : result.isError ? (
                     <div className="sh-50 d-flex align-items-center justify-content-center">
                       <h5 className="mb-3">Erro ao buscar pacientes</h5>
                     </div>
                   ) : !filteredPatients.length ? (
                     <div className="sh-50 d-flex align-items-center justify-content-center">
-                        <Empty message="Nenhum paciente encontrado" classNames="mt-0 py-5" />
-                      </div>
+                      <Empty message="Nenhum paciente encontrado" classNames="mt-0 py-5" />
+                    </div>
                   ) : (
                     <Table striped>
                       <thead>
