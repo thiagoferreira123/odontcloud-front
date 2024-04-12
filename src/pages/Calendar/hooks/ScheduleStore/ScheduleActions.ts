@@ -48,7 +48,7 @@ const useScheduleActions = (): ScheduleActions => ({
 
   updateSchedule: async (payload, queryClient) => {
     try {
-      const { data } = await api.put<Schedule>(`/calendar/${payload.calendar_id}`, payload);
+      const { data } = await api.put<Schedule>(`/calendar/${payload.calendar_id}`, {...payload, professionals: undefined, alerts: undefined});
 
       queryClient.setQueryData<Schedule[]>(['schedules'], (oldData) =>
         oldData ? oldData.map(schedule => schedule.calendar_id === data.calendar_id ? data : schedule) : []
