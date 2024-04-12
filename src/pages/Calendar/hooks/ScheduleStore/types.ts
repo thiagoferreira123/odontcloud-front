@@ -27,12 +27,12 @@ export type Schedule = {
   calendar_phone?: string;
   calendar_email?: string;
   calendar_agreement?: string;
-  calendar_date?: string;
+  calendar_date: string;
   calendar_start_time: string;
   calendar_end_time: string;
   calendar_medical_insurance: string;
   calendar_observation: string;
-  calendar_status?: ScheduleStatus;
+  calendar_status: ScheduleStatus;
   calendar_recurrence?: string;
   calendar_recurrence_type?: string;
   calendar_recurrence_quantity?: string;

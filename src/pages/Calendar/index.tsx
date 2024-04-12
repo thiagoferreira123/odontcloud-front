@@ -35,6 +35,7 @@ import { useModalAppointmentDetailsStore } from './hooks/modals/ModalAppointment
 import DeleteScheduleConfirmationModal from './modals/DeleteScheduleConfirmationModal';
 import StaticLoading from '../../components/loading/StaticLoading';
 import { useAuth } from '../Auth/Login/hook';
+import useCalendarConfigStore from './hooks/CalendarConfigStore';
 
 const CustomToggle = React.forwardRef<HTMLButtonElement | null, { onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void }>(
   ({ onClick }, ref) => (
@@ -71,6 +72,7 @@ const CalendarApp = () => {
   const { openModalConfigCalendar } = useModalConfigCalendarStore();
   const { openModalAppointmentDetails } = useModalAppointmentDetailsStore();
   const { getSchedules, updateSchedule } = useScheduleStore();
+  const { getCalendarConfigs } = useCalendarConfigStore();
 
   const getSchedules_ = async () => {
     try {
@@ -89,6 +91,24 @@ const CalendarApp = () => {
   };
 
   const result = useQuery({ queryKey: ['schedules'], queryFn: getSchedules_ });
+
+  const getCalendarConfigs_ = async () => {
+    try {
+      const result = await getCalendarConfigs();
+
+      if (result === false) throw new Error('Could not get calendar config');
+
+      return result;
+    } catch (error) {
+      console.error(error);
+
+      error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
+
+      throw error;
+    }
+  };
+
+  const calendarConfigResult = useQuery({ queryKey: ['calendar-config'], queryFn: getCalendarConfigs_ });
 
   const events = useMemo(() => {
     return (
@@ -388,29 +408,29 @@ const CalendarApp = () => {
               minute: '2-digit',
               meridiem: false,
             }}
-            // slotMinTime={selectedLocal?.hora_inicio ?? '08:00:00'}
-            // slotMaxTime={selectedLocal?.hora_final ?? '18:00:00'}
+            slotMinTime={calendarConfigResult.data?.calendar_config_time_start || '08:00:00'}
+            slotMaxTime={calendarConfigResult.data?.calendar_config_time_end || '18:00:00'}
             allDaySlot={false}
-            // businessHours={
-            //   selectedLocal?.hora_inicio
-            //     ? [
-            //         {
-            //           daysOfWeek: selectedLocal?.dias_semana?.split(',').map((day) => +day - 1) ?? [],
-            //           startTime: selectedLocal?.hora_inicio ?? '08:00:00',
-            //           endTime: selectedLocal?.almoco_inicio ?? '12:00:00',
-            //         },
-            //         {
-            //           daysOfWeek: selectedLocal?.dias_semana?.split(',').map((day) => +day - 1) ?? [],
-            //           startTime: selectedLocal?.almoco_final ?? '13:00:00',
-            //           endTime: selectedLocal?.hora_final ?? '18:00:00',
-            //         },
-            //       ]
-            //     : {
-            //         daysOfWeek: selectedLocal?.dias_semana?.split(',').map((day) => +day - 1) ?? [],
-            //         startTime: selectedLocal?.hora_inicio ?? '08:00:00',
-            //         endTime: selectedLocal?.hora_final ?? '18:00:00',
-            //       }
-            // }
+            businessHours={
+              calendarConfigResult.data?.calendar_config_time_start
+                ? [
+                    {
+                      daysOfWeek: calendarConfigResult.data?.calendar_config_service_days?.split(',').map((day) => +day - 1) ?? [],
+                      startTime: calendarConfigResult.data?.calendar_config_time_start ?? '08:00:00',
+                      endTime: calendarConfigResult.data?.calendar_config_interval_start ?? '12:00:00',
+                    },
+                    {
+                      daysOfWeek: calendarConfigResult.data?.calendar_config_service_days?.split(',').map((day) => +day - 1) ?? [],
+                      startTime: calendarConfigResult.data?.calendar_config_interval_end ?? '13:00:00',
+                      endTime: calendarConfigResult.data?.calendar_config_time_end ?? '18:00:00',
+                    },
+                  ]
+                : {
+                    daysOfWeek: calendarConfigResult.data?.calendar_config_service_days?.split(',').map((day) => +day - 1) ?? [],
+                    startTime: calendarConfigResult.data?.calendar_config_time_start ?? '08:00:00',
+                    endTime: calendarConfigResult.data?.calendar_config_time_end ?? '18:00:00',
+                  }
+            }
           />
           <Row>
             <Col md={6} className="mt-5">

@@ -9,7 +9,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAfter, isBefore, parse } from 'date-fns';
 import { useAuth } from '../../../Auth/Login/hook';
 import CsLineIcons from '../../../../cs-line-icons/CsLineIcons';
-import { formatDateToApi, getTimeZones, getWeekDay, isObjectNotEmpty } from '../../../../helpers/Utils';
+import { formatDateToApi, getWeekDay, isObjectNotEmpty } from '../../../../helpers/Utils';
 
 import { FormEventModel, useCalendarStore } from '../../hooks';
 import { RecurrenceType, appointmentOptions, recurrenceOptions } from '../../../../types/Events';
@@ -27,6 +27,7 @@ import { useModalDayOffModalStore } from '../../hooks/modals/ModalDayOffModalSto
 import DayOffModal from '../DayOffModal';
 import usePatientStore from '../../../Dashboard/patients/hooks/PatientStore';
 import ProfessionalSelect from './ProfessionalSelect';
+import useCalendarConfigStore from '../../hooks/CalendarConfigStore';
 
 const validationSchema = yup.object({
   calendar_name: yup
@@ -121,6 +122,7 @@ const ModalAddEdit = () => {
   const { openModalDayOffModal, hideModal: hideModalModalDayOffModal } = useModalDayOffModalStore();
   const { getPatients } = usePatientStore();
   const { hideModal } = useModalAddEditStore();
+  const { getCalendarConfigs } = useCalendarConfigStore();
 
   const getPatients_ = async () => {
     try {
@@ -137,6 +139,24 @@ const ModalAddEdit = () => {
   };
 
   const patientsResult = useQuery({ queryKey: ['patients'], queryFn: getPatients_ });
+
+  const getCalendarConfigs_ = async () => {
+    try {
+      const result = await getCalendarConfigs();
+
+      if (result === false) throw new Error('Could not get calendar config');
+
+      return result;
+    } catch (error) {
+      console.error(error);
+
+      error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
+
+      throw error;
+    }
+  };
+
+  const calendarConfigResult = useQuery({ queryKey: ['calendar-config'], queryFn: getCalendarConfigs_ });
 
   const onSubmit = async (values: FormEventModel) => {
     try {
@@ -237,24 +257,23 @@ const ModalAddEdit = () => {
 
   const checkAvailability = async () => {
     const errors = await validateForm(values);
-    // if (!selectedLocal || isObjectNotEmpty(errors)) return false;
+    if (!calendarConfigResult.data || isObjectNotEmpty(errors)) return false;
 
     const { calendar_date, calendar_start_time, calendar_end_time } = values;
 
-    // const parsedHoraInicio = parse(calendar_start_time || '', 'HH:mm', new Date());
-    // const parsedHoraFinal = parse(calendar_end_time || '', 'HH:mm', new Date());
-    // const parsedWorkHoraInicio = parse(selectedLocal.hora_inicio || '', 'HH:mm', new Date());
-    // const parsedWorkHoraFinal = parse(selectedLocal.hora_final || '', 'HH:mm', new Date());
+    const parsedHoraInicio = parse(calendar_start_time || '', 'HH:mm', new Date());
+    const parsedHoraFinal = parse(calendar_end_time || '', 'HH:mm', new Date());
+    const parsedWorkHoraInicio = parse(calendarConfigResult.data.calendar_config_time_start || '', 'HH:mm', new Date());
+    const parsedWorkHoraFinal = parse(calendarConfigResult.data.calendar_config_time_end || '', 'HH:mm', new Date());
 
-    // const workWeekDays = selectedLocal.dias_semana?.split(',').map((day) => +day);
+    const workWeekDays = calendarConfigResult.data.calendar_config_service_days?.split(',').map((day) => +day);
     const weekDay = getWeekDay(new Date(`${calendar_date}, 00:00:00`));
 
-    // const isDayOff = !workWeekDays || !workWeekDays.includes(weekDay + 1);
-    // const isBeforeWorkHours = isBefore(parsedHoraInicio, parsedWorkHoraInicio);
-    // const isAfterWorkHours = isAfter(parsedHoraFinal, parsedWorkHoraFinal);
+    const isDayOff = !workWeekDays || !workWeekDays.includes(weekDay + 1);
+    const isBeforeWorkHours = isBefore(parsedHoraInicio, parsedWorkHoraInicio);
+    const isAfterWorkHours = isAfter(parsedHoraFinal, parsedWorkHoraFinal);
 
-    // return isDayOff || isBeforeWorkHours || isAfterWorkHours;
-    return false;
+    return isDayOff || isBeforeWorkHours || isAfterWorkHours;
   };
 
   const handleSelectChange = (value: any, field: string) => {

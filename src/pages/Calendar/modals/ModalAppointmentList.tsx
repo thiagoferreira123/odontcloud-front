@@ -9,15 +9,13 @@ import useScheduleStore from '../hooks/ScheduleStore';
 import { AppException } from '../../../helpers/ErrorHelpers';
 import { notify } from '../../../components/toast/NotificationIcon';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { EventType, Schedule } from '../hooks/ScheduleStore/types';
+import { Schedule, ScheduleType } from '../hooks/ScheduleStore/types';
 import { Patient } from '../../../types/Patient';
-import { HealthInsurance } from '../hooks/HealthInsuranceStore/types';
-import { getTimeZones } from '../../../helpers/Utils';
 import { SingleValue } from 'react-select';
 import { Option } from '../../../types/inputs';
 import { useModalAppointmentListStore } from '../hooks/modals/ModalAppointmentListStore';
 import { useModalAddEditStore } from '../hooks/modals/ModalAddEditStore';
-import { useAuth } from '../../Auth/Login/hook';
+import Empty from '../../../components/Empty';
 
 const formatDateTime = (event: Schedule) => {
   const parsedDate = parseISO(event.calendar_date);
@@ -28,17 +26,13 @@ const formatDateTime = (event: Schedule) => {
 };
 
 const ModalAppointmentList = () => {
-
-  const user = useAuth((state) => state.user);
-
   const queryClient = useQueryClient();
   const showModal = useModalAppointmentListStore((state) => state.showModal);
 
-  const { selectedLocal, setEvent } = useCalendarStore((state) => state);
+  const { setEvent } = useCalendarStore((state) => state);
 
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { setLocal } = useCalendarStore((state) => state);
   const { getSchedules } = useScheduleStore();
   const { hideModal } = useModalAppointmentListStore();
   const { openModalAddEdit } = useModalAddEditStore();
@@ -80,45 +74,43 @@ const ModalAppointmentList = () => {
     const {
       calendar_patient_id,
       calendar_type,
+      calendar_clinic_id,
+      calendar_medical_insurance,
+      calendar_recurrence_type,
+      calendar_recurrence_date_end,
       calendar_recurrence_quantity,
       calendar_recurrency_type_qnt,
       calendar_start_time,
       calendar_end_time,
       calendar_date,
-      calendar_medical_insurance,
-      calendar_recurrence,
-      calendar_recurrence_date_end,
-      calendar_timezone,
       ...rest
     } = event;
 
     const patients = queryClient.getQueryData<Patient[]>(['patients']);
-    const insurancies = queryClient.getQueryData<HealthInsurance[]>(['insurancies']);
-    const timezones = getTimeZones();
 
-    const foundPatient = patients?.find((patient) => patient.id === calendar_patient_id);
+    const foundPatient = patients?.find((patient) => patient.patient_id === calendar_patient_id);
     const foundTipoConsulta = appointmentOptions.find((appointment) => appointment.value === calendar_type);
-    const foundInsurancie = insurancies?.find((insurancie) => insurancie.calendar_medical_insurance === calendar_medical_insurance);
-    const foundRecurrence = recurrenceOptions.find((option) => option?.value === calendar_recurrence);
-    const foundTimezone = timezones.find(({ value }) => value === calendar_timezone);
+    const foundRecurrence = recurrenceOptions.find((option) => option?.value === calendar_recurrence_type);
 
     const formModel: FormEventModel = {
       ...rest,
-      calendar_name: foundPatient ? ({ label: foundPatient.name, value: foundPatient.id?.toString() } as SingleValue<Option>) : { label: rest.calendar_name, value: '0' },
+      calendar_name: foundPatient
+        ? ({ label: foundPatient.patient_full_name, value: foundPatient.patient_id?.toString() } as SingleValue<Option>)
+        : { label: rest.calendar_name, value: '0' },
       calendar_type: foundTipoConsulta
-        ? ({ label: foundTipoConsulta.label, value: foundTipoConsulta.value } as unknown as SingleValue<{ value: EventType; label: string }>)
+        ? ({ label: foundTipoConsulta.label, value: foundTipoConsulta.value } as unknown as SingleValue<{ value: ScheduleType; label: string }>)
         : null,
-      calendar_observation: '',
-      calendar_medical_insurance: (foundInsurancie as unknown as SingleValue<HealthInsurance>) || null,
-      calendar_recurrence: foundRecurrence || null,
-      calendar_timezone: foundTimezone || null,
-      calendar_video_conference: rest.calendar_video_conference as number ?? 0,
+      calendar_medical_insurance: calendar_medical_insurance || '',
+      calendar_recurrence: foundRecurrence,
       calendar_recurrence_date_end: calendar_recurrence_date_end || '',
       calendar_recurrence_quantity: calendar_recurrence_quantity?.toString(),
       calendar_recurrency_type_qnt: calendar_recurrency_type_qnt?.toString(),
       calendar_start_time: `${calendar_start_time.split(':')[0]}:${calendar_start_time.split(':')[1]}`,
       calendar_end_time: `${calendar_end_time.split(':')[0]}:${calendar_end_time.split(':')[1]}`,
       calendar_date: new Date(`${calendar_date}, 00:00:00`).toDateString(),
+      calendar_status: rest.calendar_status || '',
+      calendar_email: rest.calendar_email || '',
+      calendar_phone: rest.calendar_phone || '',
     };
 
     return formModel;
@@ -129,20 +121,13 @@ const ModalAppointmentList = () => {
   const filteredEvents = useMemo(() => {
     const eventsByQuery = result.data?.filter((event) => event.calendar_name.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    return eventsByQuery?.sort((a, b) => new Date(b.calendar_date).getTime() - new Date(a.calendar_date).getTime());
+    return eventsByQuery?.sort((a, b) => new Date(b.calendar_date).getTime() - new Date(a.calendar_date).getTime()) ?? [];
   }, [result.data, searchQuery]);
 
-  if(!showModal) return null;
+  if (!showModal) return null;
 
   return (
-    <Modal
-      className="modal-close-out"
-      size="xl"
-      show={showModal}
-      onHide={hideModal}
-      backdrop="static"
-      keyboard={false}
-    >
+    <Modal className="modal-close-out" size="xl" show={showModal} onHide={hideModal} backdrop="static" keyboard={false}>
       <div
         className={classNames('mb-5', {
           'overlay-spinner': result.isLoading,
@@ -162,60 +147,71 @@ const ModalAppointmentList = () => {
                   </span>
                 </div>
               </Col>
-              <Table striped>
-                <thead>
-                  <tr>
-                    <th scope="col">Status | Nome do agendamento</th>
-                    <th scope="col">Categorias do agendamento</th>
-                    <th scope="col">Data | Horário</th>
-                    <th scope="col">Contato</th>
-                    <th scope="col">Editar</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredEvents.map((event) => (
-                    <tr key={event.id}>
-                      <th>
-                        <CsLineIcons
-                          fill={EventStatusColor[event.calendar_status]}
-                          stroke={EventStatusColor[event.calendar_status]}
-                          icon="circle"
-                          className="text-primary align-top me-1"
-                        />
-                        {event.calendar_name}
-                      </th>
-                      <td>{event.calendar_type}</td>
-                      <td>{formatDateTime(event)}</td>
-                      <td>
-                        {event.calendar_phone ? (
-                          <>
-                            {event.calendar_phone}
-                            <OverlayTrigger
-                              placement="top"
-                              overlay={
-                                <Tooltip id="tooltip-phone">Entre em contato por WhatsApp Web. O WhatsApp Web precisa estar aberto no navegador.</Tooltip>
-                              }
-                            >
-                              <Button onClick={() => openWhatsApp(event.calendar_phone)} variant="outline-primary" className="btn-icon btn-icon-only ms-2" size="sm">
-                                <CsLineIcons icon="phone" />
-                              </Button>
-                            </OverlayTrigger>
-                          </>
-                        ) : (
-                          '--'
-                        )}
-                      </td>
-                      <td>
-                        <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-edit">Editar o agendamento.</Tooltip>}>
-                          <Button onClick={() => handleEditEvent(event)} variant="outline-primary" className="btn-icon btn-icon-only" size="sm">
-                            <CsLineIcons icon="edit" />
-                          </Button>
-                        </OverlayTrigger>
-                      </td>
+              {!filteredEvents.length ? (
+                <div className='w-100 sh-20 d-flex justify-content-center align-items-center'>
+                  <Empty message="Nenhum agendamento encontrado." />
+                </div>
+              ) : (
+                <Table striped>
+                  <thead>
+                    <tr>
+                      <th scope="col">Status | Nome do agendamento</th>
+                      <th scope="col">Categorias do agendamento</th>
+                      <th scope="col">Data | Horário</th>
+                      <th scope="col">Contato</th>
+                      <th scope="col">Editar</th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
+                  </thead>
+                  <tbody>
+                    {filteredEvents.map((event) => (
+                      <tr key={event.calendar_id}>
+                        <th>
+                          <CsLineIcons
+                            fill={EventStatusColor[event.calendar_status]}
+                            stroke={EventStatusColor[event.calendar_status]}
+                            icon="circle"
+                            className="text-primary align-top me-1"
+                          />
+                          {event.calendar_name}
+                        </th>
+                        <td>{event.calendar_type}</td>
+                        <td>{formatDateTime(event)}</td>
+                        <td>
+                          {event.calendar_phone ? (
+                            <>
+                              {event.calendar_phone}
+                              <OverlayTrigger
+                                placement="top"
+                                overlay={
+                                  <Tooltip id="tooltip-phone">Entre em contato por WhatsApp Web. O WhatsApp Web precisa estar aberto no navegador.</Tooltip>
+                                }
+                              >
+                                <Button
+                                  onClick={() => event.calendar_phone && openWhatsApp(event.calendar_phone)}
+                                  variant="outline-primary"
+                                  className="btn-icon btn-icon-only ms-2"
+                                  size="sm"
+                                >
+                                  <CsLineIcons icon="phone" />
+                                </Button>
+                              </OverlayTrigger>
+                            </>
+                          ) : (
+                            '--'
+                          )}
+                        </td>
+                        <td>
+                          <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-edit">Editar o agendamento.</Tooltip>}>
+                            <Button onClick={() => handleEditEvent(event)} variant="outline-primary" className="btn-icon btn-icon-only" size="sm">
+                              <CsLineIcons icon="edit" />
+                            </Button>
+                          </OverlayTrigger>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              )}
             </div>
           </div>
         </Modal.Body>

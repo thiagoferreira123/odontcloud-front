@@ -16,7 +16,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AppException } from '../../../../helpers/ErrorHelpers';
 import { notify } from '../../../../components/toast/NotificationIcon';
 import { WaitingList } from '../../hooks/WaitingListStore/types';
-import { HealthInsurance } from '../../hooks/HealthInsuranceStore/types';
+import { HealthInsurance } from '../../hooks/CalendarConfigStore/types';
 import { useModalWaitingListStore } from '../../hooks/modals/ModalWaitingListStore';
 import { useModalAddEditStore } from '../../hooks/modals/ModalAddEditStore';
 import usePatientStore from '../../../Dashboard/patients/hooks/PatientStore';

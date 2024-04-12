@@ -9,23 +9,25 @@ import DatepickerTime from '../../../views/interface/forms/controls/datepicker/D
 import CsLineIcons from '../../../cs-line-icons/CsLineIcons';
 import { useModalConfigCalendarStore } from '../hooks/modals/ModalConfigCalendarStore';
 import { useServiceLocationStore } from '../../../hooks/professional/ServiceLocationStore';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { notify } from '../../../components/toast/NotificationIcon';
+import useCalendarConfigStore from '../hooks/CalendarConfigStore';
+import { AppException } from '../../../helpers/ErrorHelpers';
 
 const daysOptions = [1, 2, 3, 4, 5, 6, 7, 8];
 
 const validationSchema = yup.object({
-  hora_inicio: yup.string().required('Informe a hora de início'),
-  hora_final: yup
+  calendar_config_time_start: yup.string().required('Informe a hora de início'),
+  calendar_config_time_end: yup
     .string()
     .nullable()
     .required('Escolha a hora final')
     .test('is-greater', 'A hora final deve ser maior que a hora inicial', function (this: any, value: string | null | undefined) {
-      const { hora_inicio } = this.parent;
-      if (!hora_inicio || !value) {
+      const { calendar_config_time_start } = this.parent;
+      if (!calendar_config_time_start || !value) {
         return true;
       }
-      const [hours1, minutes1] = hora_inicio.split(':').map(Number);
+      const [hours1, minutes1] = calendar_config_time_start.split(':').map(Number);
       const [hours2, minutes2] = value.split(':').map(Number);
 
       const date1 = new Date(0, 0, 0, hours1, minutes1);
@@ -33,16 +35,16 @@ const validationSchema = yup.object({
 
       return date1 < date2;
     }),
-  almoco_inicio: yup.string(),
-  almoco_final: yup
+  calendar_config_interval_start: yup.string(),
+  calendar_config_interval_end: yup
     .string()
     .nullable()
     .test('is-greater', 'A hora final deve ser maior que a hora inicial', function (this: any, value: string | null | undefined) {
-      const { almoco_inicio } = this.parent;
-      if (!almoco_inicio || !value) {
+      const { calendar_config_interval_start } = this.parent;
+      if (!calendar_config_interval_start || !value) {
         return true;
       }
-      const [hours1, minutes1] = almoco_inicio.split(':').map(Number);
+      const [hours1, minutes1] = calendar_config_interval_start.split(':').map(Number);
       const [hours2, minutes2] = value.split(':').map(Number);
 
       const date1 = new Date(0, 0, 0, hours1, minutes1);
@@ -50,73 +52,86 @@ const validationSchema = yup.object({
 
       return date1 < date2;
     }),
-  dias_semana: yup.array().required('Informe os dias da semana'),
-  exibir_agenda: yup.number().required('Escolha uma opção'),
-  duracao_consulta: yup
-    .string()
-    .required('Informe a duração da consulta')
-    .test('is-valid', 'Insira uma hora válida', function (this: any, value: string | undefined) {
-      if (!value) return false;
-      return isValidHour(value);
-    }),
-  duracao_retorno: yup
-    .string()
-    .required('Informe a duração do retorno')
-    .test('is-valid', 'Insira uma hora válida', function (this: any, value: string | undefined) {
-      if (!value) return false;
-      return isValidHour(value);
-    }),
-  valor_consulta: yup.string().required('Informe o valor da consulta'),
-  valor_retorno: yup.string().required('Informe o valor do retorno'),
+  calendar_config_service_days: yup.array().required('Informe os dias da semana'),
+  // duracao_consulta: yup
+  //   .string()
+  //   .required('Informe a duração da consulta')
+  //   .test('is-valid', 'Insira uma hora válida', function (this: any, value: string | undefined) {
+  //     if (!value) return false;
+  //     return isValidHour(value);
+  //   }),
+  // duracao_retorno: yup
+  //   .string()
+  //   .required('Informe a duração do retorno')
+  //   .test('is-valid', 'Insira uma hora válida', function (this: any, value: string | undefined) {
+  //     if (!value) return false;
+  //     return isValidHour(value);
+  //   }),
+  // valor_consulta: yup.string().required('Informe o valor da consulta'),
+  // valor_retorno: yup.string().required('Informe o valor do retorno'),
 });
 
 interface FormValues {
-  hora_inicio: string;
-  hora_final: string;
-  almoco_inicio: string;
-  almoco_final: string;
-  dias_semana: number[];
-  exibir_agenda: number;
-  duracao_consulta: string;
-  duracao_retorno: string;
-  valor_consulta: string;
-  valor_retorno: string;
+  calendar_config_time_start: string;
+  calendar_config_time_end: string;
+  calendar_config_interval_start: string;
+  calendar_config_interval_end: string;
+  calendar_config_service_days: number[];
+  // duracao_consulta: string;
+  // duracao_retorno: string;
+  // valor_consulta: string;
+  // valor_retorno: string;
 }
 
 const ModalConfigCalendar = () => {
   const queryClient = useQueryClient();
-  const selectedLocal = useCalendarStore((state) => state.selectedLocal);
   const [isSaving, setIsSaving] = useState(false);
 
   const showModal = useModalConfigCalendarStore((state) => state.showModal);
 
-  const onSubmit = async (values: FormValues) => {
+  const getCalendarConfigs_ = async () => {
     try {
-      setIsSaving(true);
-      if (!selectedLocal || !values.dias_semana) return;
+      const result = await getCalendarConfigs();
 
-      const model = { ...values, id: selectedLocal.id, dias_semana: values.dias_semana.join(',') };
+      if (result === false) throw new Error('Could not get calendar config');
 
-      const response = await updateServiceLocation(model, queryClient);
-
-      setLocal({ ...selectedLocal, ...model });
-
-      if (!response) throw new Error('Erro ao atualizar local de atendimento');
-
-      notify('Local de atendimento atualizado com sucesso', 'Sucesso', 'check', 'success');
-      setIsSaving(false);
-      hideModal();
+      return result;
     } catch (error) {
       console.error(error);
 
-      notify('Erro ao atualizar local de atendimento', 'Erro', 'close', 'danger');
+      error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
+
+      throw error;
+    }
+  };
+
+  const result = useQuery({ queryKey: ['calendar-config'], queryFn: getCalendarConfigs_ });
+
+  const onSubmit = async (values: FormValues) => {
+    try {
+      setIsSaving(true);
+      if (!values.calendar_config_service_days) throw new AppException('Informe os dias da semana');
+
+      const model = { ...values, calendar_config_service_days: values.calendar_config_service_days.join(',') };
+
+      const response =
+        result.data && result.data.calendar_config_id
+          ? await updateCalendarConfig({ ...model, calendar_config_id: result.data.calendar_config_id }, queryClient)
+          : await addCalendarConfig(model, queryClient);
+
+      if (!response) throw new Error('Erro ao atualizar configurações da agenda');
+
+      setIsSaving(false);
+      hideModal();
+    } catch (error) {
+      error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
+      console.error(error);
       setIsSaving(false);
     }
   };
 
-  const { setLocal } = useCalendarStore();
   const { hideModal } = useModalConfigCalendarStore();
-  const { updateServiceLocation } = useServiceLocationStore();
+  const { getCalendarConfigs, updateCalendarConfig, addCalendarConfig } = useCalendarConfigStore();
 
   const handleTimeChange = (value: Date | undefined | null, field: string) => {
     if (!value) return setFieldValue(field, value);
@@ -129,30 +144,43 @@ const ModalConfigCalendar = () => {
   };
 
   const handleAllDaysChange = () => {
-    const currentValue = values.dias_semana;
+    const currentValue = values.calendar_config_service_days;
     if (currentValue?.length === daysOptions.length) {
-      return setFieldValue('dias_semana', []);
+      return setFieldValue('calendar_config_service_days', []);
     }
-    setFieldValue('dias_semana', daysOptions);
+    setFieldValue('calendar_config_service_days', daysOptions);
   };
 
   const { values, errors, touched, resetForm, handleChange, setFieldValue, handleSubmit } = useFormik({
     enableReinitialize: true,
     initialValues: {
-      hora_inicio: selectedLocal?.hora_inicio || '',
-      hora_final: selectedLocal?.hora_final || '',
-      almoco_inicio: selectedLocal?.almoco_inicio || '',
-      almoco_final: selectedLocal?.almoco_final || '',
-      dias_semana: selectedLocal?.dias_semana?.split(',').map((value) => +value) ?? [],
-      exibir_agenda: +(selectedLocal?.exibir_agenda ?? 0),
-      duracao_consulta: selectedLocal?.duracao_consulta || '',
-      duracao_retorno: selectedLocal?.duracao_retorno || '',
-      valor_consulta: String(selectedLocal?.valor_consulta) || '',
-      valor_retorno: String(selectedLocal?.valor_retorno) || '',
+      calendar_config_time_start: (result.data?.calendar_config_time_start) || '',
+      calendar_config_time_end: (result.data?.calendar_config_time_end) || '',
+      calendar_config_interval_start: (result.data?.calendar_config_interval_start) || '',
+      calendar_config_interval_end: (result.data?.calendar_config_interval_end) || '',
+      calendar_config_service_days: (result.data?.calendar_config_service_days?.split(',').map((value) => +value)) || [],
+      // duracao_consulta: selectedLocal?.duracao_consulta || '',
+      // duracao_retorno: selectedLocal?.duracao_retorno || '',
+      // valor_consulta: String(selectedLocal?.valor_consulta) || '',
+      // valor_retorno: String(selectedLocal?.valor_retorno) || '',
     },
     validationSchema,
     onSubmit,
   });
+
+  useEffect(() => {
+    if (result.data && showModal) {
+      setFieldValue('calendar_config_time_start', result.data.calendar_config_time_start);
+      setFieldValue('calendar_config_time_end', result.data.calendar_config_time_end);
+      setFieldValue('calendar_config_interval_start', result.data.calendar_config_interval_start);
+      setFieldValue('calendar_config_interval_end', result.data.calendar_config_interval_end);
+      result.data.calendar_config_service_days &&
+        setFieldValue(
+          'calendar_config_service_days',
+          result.data.calendar_config_service_days.split(',').map((value) => +value)
+        );
+    }
+  }, [result.data, setFieldValue, showModal]);
 
   useEffect(() => {
     if (!showModal) {
@@ -173,40 +201,54 @@ const ModalConfigCalendar = () => {
             <label className="mb-3">Horário de atendimento</label>
             <Col md={2} className="pe-2">
               <div className="mb-3 top-label">
-                <DatepickerTime id="hora_inicio" name="hora_inicio" value={values.hora_inicio} onChange={(value) => handleTimeChange(value, 'hora_inicio')} />
+                <DatepickerTime
+                  id="calendar_config_time_start"
+                  name="calendar_config_time_start"
+                  value={values.calendar_config_time_start}
+                  onChange={(value) => handleTimeChange(value, 'calendar_config_time_start')}
+                />
                 <span>HORA INÍCIO</span>
-                {errors.hora_inicio && touched.hora_inicio && <div className="error">{errors.hora_inicio}</div>}
-              </div>
-            </Col>
-            <Col md={2} className="pe-2">
-              <div className="mb-3 top-label">
-                <DatepickerTime id="hora_final" name="hora_final" value={values.hora_final} onChange={(value) => handleTimeChange(value, 'hora_final')} />
-                <span>HORA FIM</span>
-                {errors.hora_final && touched.hora_final && <div className="error">{errors.hora_final}</div>}
+                {errors.calendar_config_time_start && touched.calendar_config_time_start && <div className="error">{errors.calendar_config_time_start}</div>}
               </div>
             </Col>
             <Col md={2} className="pe-2">
               <div className="mb-3 top-label">
                 <DatepickerTime
-                  id="almoco_inicio"
-                  name="almoco_inicio"
-                  value={values.almoco_inicio}
-                  onChange={(value) => handleTimeChange(value, 'almoco_inicio')}
+                  id="calendar_config_time_end"
+                  name="calendar_config_time_end"
+                  value={values.calendar_config_time_end}
+                  onChange={(value) => handleTimeChange(value, 'calendar_config_time_end')}
+                />
+                <span>HORA FIM</span>
+                {errors.calendar_config_time_end && touched.calendar_config_time_end && <div className="error">{errors.calendar_config_time_end}</div>}
+              </div>
+            </Col>
+            <Col md={2} className="pe-2">
+              <div className="mb-3 top-label">
+                <DatepickerTime
+                  id="calendar_config_interval_start"
+                  name="calendar_config_interval_start"
+                  value={values.calendar_config_interval_start}
+                  onChange={(value) => handleTimeChange(value, 'calendar_config_interval_start')}
                 />
                 <span>INTERVALO INÍCIO</span>
-                {errors.almoco_inicio && touched.almoco_inicio && <div className="error">{errors.almoco_inicio}</div>}
+                {errors.calendar_config_interval_start && touched.calendar_config_interval_start && (
+                  <div className="error">{errors.calendar_config_interval_start}</div>
+                )}
               </div>
             </Col>
             <Col md={2} className="pe-2">
               <div className="mb-3 top-label">
                 <DatepickerTime
-                  id="almoco_final"
-                  name="almoco_final"
-                  value={values.almoco_final}
-                  onChange={(value) => handleTimeChange(value, 'almoco_final')}
+                  id="calendar_config_interval_end"
+                  name="calendar_config_interval_end"
+                  value={values.calendar_config_interval_end}
+                  onChange={(value) => handleTimeChange(value, 'calendar_config_interval_end')}
                 />
                 <span>INTERVALO FIM</span>
-                {errors.almoco_final && touched.almoco_final && <div className="error">{errors.almoco_final}</div>}
+                {errors.calendar_config_interval_end && touched.calendar_config_interval_end && (
+                  <div className="error">{errors.calendar_config_interval_end}</div>
+                )}
               </div>
             </Col>
           </Row>
@@ -217,18 +259,18 @@ const ModalConfigCalendar = () => {
                 id="tbg-check-8"
                 type="checkbox"
                 variant="outline-primary mb-3"
-                checked={values.dias_semana?.length === daysOptions.length}
+                checked={values.calendar_config_service_days?.length === daysOptions.length}
                 value={8}
                 onChange={handleAllDaysChange}
               >
                 Todos os dias
               </ToggleButton>
               <ToggleButtonGroup
-                id="dias_semana"
-                name="dias_semana"
-                value={values.dias_semana}
+                id="calendar_config_service_days"
+                name="calendar_config_service_days"
+                value={values.calendar_config_service_days}
                 onChange={(value) => {
-                  setFieldValue('dias_semana', value);
+                  setFieldValue('calendar_config_service_days', value);
                 }}
                 type="checkbox"
                 className="mb-3 d-block"
@@ -254,31 +296,16 @@ const ModalConfigCalendar = () => {
                 <ToggleButton id="tbg-check-1" value={1} variant="outline-secondary">
                   Dom
                 </ToggleButton>
-                {errors.dias_semana && touched.dias_semana && <div className="error">{errors.dias_semana}</div>}
+                {errors.calendar_config_service_days && touched.calendar_config_service_days && (
+                  <div className="error">{errors.calendar_config_service_days}</div>
+                )}
               </ToggleButtonGroup>
             </div>
           </Row>
           <Row>
             <label className="mb-3">Visibilidade da agenda no site pessoal</label>
 
-            <ToggleButtonGroup
-              id="exibir_agenda"
-              name="exibir_agenda"
-              value={values.exibir_agenda}
-              onChange={(value) => setFieldValue('exibir_agenda', value)}
-              type="radio"
-              className="d-block"
-            >
-              <ToggleButton id="tbg-radio-3" value={1} variant="outline-primary">
-                Exibir no site
-              </ToggleButton>
-              <ToggleButton id="tbg-radio-4" value={0} variant="outline-secondary">
-                Ocultar no site
-              </ToggleButton>
-              {errors.exibir_agenda && touched.exibir_agenda && <div className="error">{errors.exibir_agenda}</div>}
-            </ToggleButtonGroup>
-
-            <Col md={3} className="pe-2 mt-3">
+            {/* <Col md={3} className="pe-2 mt-3">
               <div className="mb-3 top-label">
                 <PatternFormat
                   id="duracao_consulta"
@@ -291,9 +318,9 @@ const ModalConfigCalendar = () => {
                 <span>DURAÇÃO DA CONSULTA</span>
                 {errors.duracao_consulta && touched.duracao_consulta && <div className="error">{errors.duracao_consulta}</div>}
               </div>
-            </Col>
+            </Col> */}
 
-            <Col md={3} className="pe-2 mt-3">
+            {/* <Col md={3} className="pe-2 mt-3">
               <div className="mb-3 top-label">
                 <PatternFormat
                   id="duracao_retorno"
@@ -322,9 +349,9 @@ const ModalConfigCalendar = () => {
                 <Form.Label>VALOR DA CONSULTA $</Form.Label>
                 {errors.valor_consulta && touched.valor_consulta && <div className="error">{errors.valor_consulta}</div>}
               </div>
-            </Col>
+            </Col> */}
 
-            <Col md={3} className="pe-2 mt-3">
+            {/* <Col md={3} className="pe-2 mt-3">
               <div className="mb-3 top-label">
                 <NumericFormat
                   id="valor_retorno"
@@ -339,7 +366,7 @@ const ModalConfigCalendar = () => {
                 <Form.Label>VALO DO RETORNO $</Form.Label>
                 {errors.valor_retorno && touched.valor_retorno && <div className="error">{errors.valor_retorno}</div>}
               </div>
-            </Col>
+            </Col> */}
           </Row>
         </Modal.Body>
 
