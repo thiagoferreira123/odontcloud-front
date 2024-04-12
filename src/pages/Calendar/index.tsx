@@ -9,8 +9,8 @@ import { SingleValue } from 'react-select';
 import * as Icon from 'react-bootstrap-icons';
 import CsLineIcons from '../../cs-line-icons/CsLineIcons';
 import { FormEventModel, useCalendarStore } from './hooks';
-import { EventColor, EventStatusColor, Local, appointmentOptions, recurrenceOptions } from '../../types/Events';
-import { formatDateToApi, formatHourToApi, getTimeZones, isBeforeThanToday } from '../../helpers/Utils';
+import { EventStatusColor, appointmentOptions, eventColorMap, recurrenceOptions } from '../../types/Events';
+import { formatDateToApi, formatHourToApi, isBeforeThanToday } from '../../helpers/Utils';
 import { notify } from '../../components/toast/NotificationIcon';
 import HtmlHead from '../../components/html-head/HtmlHead';
 import FullCalendar from '@fullcalendar/react';
@@ -18,28 +18,23 @@ import { DateSelectArg, EventChangeArg, EventClickArg } from '@fullcalendar/core
 
 import ModalAddEdit from './modals/ModalAddEdit';
 import ModalWaitingList from './modals/ModalWaitingList';
-import ModalHistoric from './modals/ModalHistoric';
 import ModalAppointmentList from './modals/ModalAppointmentList';
 import ModalConfigCalendar from './modals/ModalConfigCalendar';
-import LocalsSelect from './LocalsSelect';
 import ModalAppointmentDetails from './modals/ModalAppointmentDetails';
 import { useModalWaitingListStore } from './hooks/modals/ModalWaitingListStore';
 import { useModalAddEditStore } from './hooks/modals/ModalAddEditStore';
 import { useModalAppointmentListStore } from './hooks/modals/ModalAppointmentListStore';
-import { useModalHistoricStore } from './hooks/modals/ModalHistoricStore';
 import { useModalConfigCalendarStore } from './hooks/modals/ModalConfigCalendarStore';
 import useScheduleStore from './hooks/ScheduleStore';
 import { AppException } from '../../helpers/ErrorHelpers';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { EventType, Schedule } from './hooks/ScheduleStore/types';
+import { Schedule, ScheduleType } from './hooks/ScheduleStore/types';
 import { Patient } from '../../types/Patient';
-import { HealthInsurance } from './hooks/HealthInsuranceStore/types';
 import { Option } from '../../types/inputs';
 import { useModalAppointmentDetailsStore } from './hooks/modals/ModalAppointmentDetailsStore';
 import DeleteScheduleConfirmationModal from './modals/DeleteScheduleConfirmationModal';
 import StaticLoading from '../../components/loading/StaticLoading';
 import { useAuth } from '../Auth/Login/hook';
-import { Role } from '../Auth/Login/hook/types';
 
 const CustomToggle = React.forwardRef<HTMLButtonElement | null, { onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void }>(
   ({ onClick }, ref) => (
@@ -61,7 +56,7 @@ const CustomToggle = React.forwardRef<HTMLButtonElement | null, { onClick: (e: R
 const CalendarApp = () => {
   const user = useAuth((state) => state.user);
   const queryClient = useQueryClient();
-  const { selectedLocal, setLocal, setEvent } = useCalendarStore((state) => state);
+  const { setEvent } = useCalendarStore((state) => state);
 
   const htmlTitle = 'Calendar';
   const htmlDescription = 'Implementation for a basic events and schedule application that built on top of Full Calendar plugin.';
@@ -73,18 +68,13 @@ const CalendarApp = () => {
   const { openModalWaitingList } = useModalWaitingListStore();
   const { openModalAddEdit } = useModalAddEditStore();
   const { openModalAppointmentList } = useModalAppointmentListStore();
-  const { openModalHistoric } = useModalHistoricStore();
   const { openModalConfigCalendar } = useModalConfigCalendarStore();
   const { openModalAppointmentDetails } = useModalAppointmentDetailsStore();
   const { getSchedules, updateSchedule } = useScheduleStore();
 
-  const location_id = (user && 'id_local' in user && user.id_local ? user.id_local : null) ?? selectedLocal?.id;
-
   const getSchedules_ = async () => {
     try {
-      if (!location_id) throw new AppException('Selecione um local para visualizar os agendamentos');
-
-      const result = await getSchedules(location_id);
+      const result = await getSchedules();
 
       if (result === false) throw new Error('Could not get schedules');
 
@@ -98,30 +88,21 @@ const CalendarApp = () => {
     }
   };
 
-  // Função para gerar eventos de bloqueio
-
-  const result = useQuery({ queryKey: ['schedules', location_id], queryFn: getSchedules_, enabled: !!location_id });
+  const result = useQuery({ queryKey: ['schedules'], queryFn: getSchedules_ });
 
   const events = useMemo(() => {
-    const colorEvents =
+    return (
       result.data?.map((event) => ({
-        id: event.id?.toString(),
+        id: event.calendar_id?.toString(),
         title: event.calendar_name,
         start: `${event.calendar_date} ${event.calendar_start_time}`,
         end: `${event.calendar_date} ${event.calendar_end_time}`,
         category: event.calendar_type,
-        color: EventColor[event.calendar_type],
+        color: eventColorMap[event.calendar_type],
         eventDisplay: 'block',
-      })) ?? [];
-
-    if (!selectedLocal) {
-      return colorEvents;
-    }
-
-    const foundOptions = result.data?.filter((event) => event.calendar_location_id === selectedLocal.id);
-
-    return colorEvents.filter((event) => foundOptions?.some((found) => found.id?.toString() == event.id));
-  }, [result.data, selectedLocal]);
+      })) ?? []
+    );
+  }, [result.data]);
 
   const onPrevButtonClick = () => {
     if (!calendarRef.current) return;
@@ -161,13 +142,12 @@ const CalendarApp = () => {
     const {
       calendar_patient_id,
       calendar_type,
-      calendar_location_id,
-      calendar_health_insurance_id,
-      calendar_recurrence,
+      calendar_clinic_id,
+      calendar_medical_insurance,
+      calendar_recurrence_type,
       calendar_recurrence_date_end,
       calendar_recurrence_quantity,
       calendar_recurrency_type_qnt,
-      calendar_timezone,
       calendar_start_time,
       calendar_end_time,
       calendar_date,
@@ -175,46 +155,38 @@ const CalendarApp = () => {
     } = event;
 
     const patients = queryClient.getQueryData<Patient[]>(['patients']);
-    const insurancies = queryClient.getQueryData<HealthInsurance[]>(['insurancies']);
-    const locals = queryClient.getQueryData<Local[]>(['locals']);
-    const timezones = getTimeZones();
 
-    const foundPatient = patients?.find((patient) => patient.id === calendar_patient_id);
+    const foundPatient = patients?.find((patient) => patient.patient_id === calendar_patient_id);
     const foundTipoConsulta = appointmentOptions.find((appointment) => appointment.value === calendar_type);
-    const foundInsurancie = insurancies?.find((insurancie) => insurancie.calendar_health_insurance_id === calendar_health_insurance_id);
-    const foundRecurrence = recurrenceOptions.find((option) => option?.value === calendar_recurrence);
-    const foundLocal = locals?.find((local) => local.id === calendar_location_id);
-    const foundTimezone = timezones.find(({ value }) => value === calendar_timezone);
+    const foundRecurrence = recurrenceOptions.find((option) => option?.value === calendar_recurrence_type);
 
     const formModel: FormEventModel = {
       ...rest,
       calendar_name: foundPatient
-        ? ({ label: foundPatient.name, value: foundPatient.id?.toString() } as SingleValue<Option>)
+        ? ({ label: foundPatient.patient_full_name, value: foundPatient.patient_id?.toString() } as SingleValue<Option>)
         : { label: rest.calendar_name, value: '0' },
       calendar_type: foundTipoConsulta
-        ? ({ label: foundTipoConsulta.label, value: foundTipoConsulta.value } as unknown as SingleValue<{ value: EventType; label: string }>)
+        ? ({ label: foundTipoConsulta.label, value: foundTipoConsulta.value } as unknown as SingleValue<{ value: ScheduleType; label: string }>)
         : null,
-      calendar_observation: '',
-      calendar_health_insurance_id: (foundInsurancie as unknown as SingleValue<HealthInsurance>) || null,
-      calendar_recurrence: foundRecurrence || null,
-      calendar_timezone: foundTimezone || null,
-      calendar_video_conference: (rest.calendar_video_conference as number) ?? 0,
+      calendar_medical_insurance: calendar_medical_insurance || '',
+      calendar_recurrence: foundRecurrence,
       calendar_recurrence_date_end: calendar_recurrence_date_end || '',
       calendar_recurrence_quantity: calendar_recurrence_quantity?.toString(),
       calendar_recurrency_type_qnt: calendar_recurrency_type_qnt?.toString(),
       calendar_start_time: `${calendar_start_time.split(':')[0]}:${calendar_start_time.split(':')[1]}`,
       calendar_end_time: `${calendar_end_time.split(':')[0]}:${calendar_end_time.split(':')[1]}`,
       calendar_date: new Date(`${calendar_date}, 00:00:00`).toDateString(),
+      calendar_status: rest.calendar_status || '',
+      calendar_email: rest.calendar_email || '',
+      calendar_phone: rest.calendar_phone || '',
     };
-
-    foundLocal && setLocal(foundLocal);
 
     return formModel;
   };
 
   const handleEventClick = (clickInfo: EventClickArg) => {
     const { id } = clickInfo.event;
-    const foundEvent = result.data?.find((event) => event.id === +id);
+    const foundEvent = result.data?.find((event) => event.calendar_id === id);
 
     if (!foundEvent) return;
 
@@ -224,17 +196,13 @@ const CalendarApp = () => {
     openModalAppointmentDetails();
   };
 
-  const handleLocalSelect = (value: SingleValue<Local>) => {
-    setLocal(value);
-  };
-
   // handlers that initiate reads/writes via the 'action' props
   // ------------------------------------------------------------------------------------------
   const handleEventChange = async (changeInfo: EventChangeArg) => {
     try {
       const { event } = changeInfo;
 
-      const foundEvent = result.data?.find(({ id }) => id === +event.id);
+      const foundEvent = result.data?.find(({ calendar_id }) => calendar_id === event.id);
       if (!event.start || !event.end || !foundEvent) return;
 
       if (isBeforeThanToday(event.start)) {
@@ -242,16 +210,15 @@ const CalendarApp = () => {
         return notify('Não é possível alterar a data para o passado!', 'Erro', 'close', 'danger');
       }
 
-      if (!foundEvent.id) throw new Error('Event id not found');
+      if (!foundEvent.calendar_id) throw new Error('Event id not found');
 
       const response = await updateSchedule(
         {
           ...foundEvent,
-          id: foundEvent.id,
+          calendar_id: foundEvent.calendar_id,
           calendar_date: formatDateToApi(new Date(event.start)),
           calendar_start_time: formatHourToApi(new Date(event.start)),
           calendar_end_time: formatHourToApi(new Date(event.end)),
-          alertas: undefined,
         },
         queryClient
       );
@@ -266,7 +233,7 @@ const CalendarApp = () => {
 
   const renderEventContent = (eventInfo: EventContentArg & { event: any }) => {
     const { title, id } = eventInfo.event;
-    const foundEvent = result.data?.find((event) => event.id?.toString() === id);
+    const foundEvent = result.data?.find((event) => event.calendar_id?.toString() === id);
     const getHour = (hourString: string) => {
       const [hour, minute] = hourString.split(':');
       return `${hour}: ${minute}`;
@@ -282,13 +249,12 @@ const CalendarApp = () => {
                 className="flex-shrink-0"
                 icon="circle"
                 size={9}
-                fill={EventStatusColor[foundEvent.calendar_status]}
-                stroke={EventStatusColor[foundEvent.calendar_status]}
+                fill={foundEvent.calendar_status && EventStatusColor[foundEvent.calendar_status]}
+                stroke={foundEvent.calendar_status && EventStatusColor[foundEvent.calendar_status]}
               />
               <div className="fc-event-title fc-sticky">{getHour(foundEvent.calendar_start_time)}</div>
               <div className="fc-event-title fc-sticky ml-1">{title}</div>
             </div>
-            {foundEvent.calendar_video_conference ? <CsLineIcons className="flex-shrink-0 justify-self-end" icon="video" size={12} /> : null}
           </div>
         </div>
       </div>
@@ -354,16 +320,13 @@ const CalendarApp = () => {
       {/* Calendar Title End */}
 
       <Row className="justify-content-between mb-3">
-        <Col md={4} className={user?.role === Role.SECRETARY ? 'd-none' : undefined}>
-          <LocalsSelect onChange={handleLocalSelect} />
-        </Col>
         <Col md={8} className="text-md-end gap-2 d-flex flex-wrap align-items-center">
-          <Button variant="primary" className="btn-icon btn-icon-start ms-1 w-100 w-md-auto" disabled={selectedLocal === null} onClick={openModalAddEdit}>
+          <Button variant="primary" className="btn-icon btn-icon-start ms-1 w-100 w-md-auto" onClick={openModalAddEdit}>
             <CsLineIcons icon="plus" /> <span>Cadastrar agendamento</span>
           </Button>
 
           <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-add">Lista de espera</Tooltip>}>
-            <Button variant="primary" disabled={selectedLocal === null} className="btn-icon btn-icon-start ms-1 w-100 w-md-auto" onClick={openModalWaitingList}>
+            <Button variant="primary" className="btn-icon btn-icon-start ms-1 w-100 w-md-auto" onClick={openModalWaitingList}>
               <Icon.Clock />
             </Button>
           </OverlayTrigger>
@@ -371,7 +334,6 @@ const CalendarApp = () => {
           <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-add">Lista de agendamentos realizados</Tooltip>}>
             <Button
               variant="primary"
-              disabled={selectedLocal === null}
               className="btn-icon btn-icon-start ms-1 w-100 w-md-auto"
               onClick={openModalAppointmentList}
             >
@@ -379,16 +341,9 @@ const CalendarApp = () => {
             </Button>
           </OverlayTrigger>
 
-          <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-add">Histórico de ações</Tooltip>}>
-            <Button disabled={selectedLocal === null} variant="primary" className="btn-icon btn-icon-start ms-1 w-100 w-md-auto" onClick={openModalHistoric}>
-              <Icon.ListCheck />
-            </Button>
-          </OverlayTrigger>
-
           <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-add">Configuração da agenda</Tooltip>}>
             <Button
               variant="primary"
-              disabled={selectedLocal === null}
               className="btn-icon btn-icon-start ms-1 w-100 w-md-auto"
               onClick={openModalConfigCalendar}
             >
@@ -404,7 +359,7 @@ const CalendarApp = () => {
       ) : result.isError ? (
         <div className="sh-60 d-flex align-items-center justify-content-center">Erro ao buscar agendamentos</div>
       ) : (
-        <Card body className='z-1'>
+        <Card body className="z-1">
           <FullCalendar
             ref={calendarRef}
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, bootstrapPlugin]}
@@ -433,31 +388,35 @@ const CalendarApp = () => {
               minute: '2-digit',
               meridiem: false,
             }}
-            slotMinTime={selectedLocal?.hora_inicio ?? '08:00:00'}
-            slotMaxTime={selectedLocal?.hora_final ?? '18:00:00'}
+            // slotMinTime={selectedLocal?.hora_inicio ?? '08:00:00'}
+            // slotMaxTime={selectedLocal?.hora_final ?? '18:00:00'}
             allDaySlot={false}
-            businessHours={selectedLocal?.hora_inicio ? [
-              {
-                daysOfWeek: selectedLocal?.dias_semana?.split(',').map((day) => +day - 1) ?? [],
-                startTime: selectedLocal?.hora_inicio ?? '08:00:00',
-                endTime: selectedLocal?.almoco_inicio ?? '12:00:00',
-              },
-              {
-                daysOfWeek: selectedLocal?.dias_semana?.split(',').map((day) => +day - 1) ?? [],
-                startTime: selectedLocal?.almoco_final ?? '13:00:00',
-                endTime: selectedLocal?.hora_final ?? '18:00:00',
-              },
-            ] : {
-              daysOfWeek: selectedLocal?.dias_semana?.split(',').map((day) => +day - 1) ?? [],
-              startTime: selectedLocal?.hora_inicio ?? '08:00:00',
-              endTime: selectedLocal?.hora_final ?? '18:00:00',
-            }}
+            // businessHours={
+            //   selectedLocal?.hora_inicio
+            //     ? [
+            //         {
+            //           daysOfWeek: selectedLocal?.dias_semana?.split(',').map((day) => +day - 1) ?? [],
+            //           startTime: selectedLocal?.hora_inicio ?? '08:00:00',
+            //           endTime: selectedLocal?.almoco_inicio ?? '12:00:00',
+            //         },
+            //         {
+            //           daysOfWeek: selectedLocal?.dias_semana?.split(',').map((day) => +day - 1) ?? [],
+            //           startTime: selectedLocal?.almoco_final ?? '13:00:00',
+            //           endTime: selectedLocal?.hora_final ?? '18:00:00',
+            //         },
+            //       ]
+            //     : {
+            //         daysOfWeek: selectedLocal?.dias_semana?.split(',').map((day) => +day - 1) ?? [],
+            //         startTime: selectedLocal?.hora_inicio ?? '08:00:00',
+            //         endTime: selectedLocal?.hora_final ?? '18:00:00',
+            //       }
+            // }
           />
           <Row>
             <Col md={6} className="mt-5">
               <label className="my-custom-link text-end">
                 Categorias de agendamentos:
-                <Badge pill className='bg-consulta'>
+                <Badge pill className="bg-consulta">
                   Consulta
                 </Badge>{' '}
                 <Badge pill bg="warning">
@@ -498,7 +457,6 @@ const CalendarApp = () => {
       <ModalAddEdit />
 
       <ModalWaitingList />
-      <ModalHistoric />
       <ModalAppointmentList />
       <ModalConfigCalendar />
       <ModalAppointmentDetails />

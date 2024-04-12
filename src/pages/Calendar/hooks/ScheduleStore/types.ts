@@ -1,63 +1,52 @@
 import { QueryClient } from "@tanstack/react-query";
-import { RecurrenceType } from "../../../../types/Events";
+import { Professional } from "../../../MySettings/hooks/ProfessionalStore/types";
 
-export enum EventType {
-  CONSULTA = 'CONSULTA',
-  RETORNO = 'RETORNO',
-  POSSIVEL_RETORNO = 'POSSIVEL_RETORNO',
-  OUTROS = 'OUTROS',
-  AGENDADO_SITE = 'AGENDADO_SITE',
+export enum ScheduleType {
+  CONSULTA = 'CONSULTATION',
+  RETORNO = 'RETURN',
+  POSSIVEL_RETORNO = 'POSSIBLE_RETURN',
+  OUTROS = 'OTHER',
+  AGENDADO_SITE = 'SCHEDULED_WEBSITE',
 }
 
-export enum EventStatus {
-  CONFIRMADO = 'CONFIRMADO',
-  PENDENTE = 'PENDENTE',
-  AGENDADO = 'AGENDADO',
-  CANCELADO = 'CANCELADO',
-  NAO_COMPARECEU = 'NAO_COMPARECEU',
+export enum ScheduleStatus {
+  CONFIRMADO = 'CONFIRMED',
+  PENDENTE = 'PENDING',
+  AGENDADO = 'SCHEDULED',
+  CANCELADO = 'CANCELLED',
+  NAO_COMPARECEU = 'NO_SHOW',
 }
 
 export type Schedule = {
-  id?: number;
+  calendar_id?: string;
+  calendar_clinic_id?: string;
   calendar_name: string;
-  calendar_phone: string;
-  calendar_email: string;
-  calendar_date: string;
+  calendar_type: ScheduleType;
+  calendar_professional_id: string;
+  calendar_patient_id?: string;
+  calendar_phone?: string;
+  calendar_email?: string;
+  calendar_agreement?: string;
+  calendar_date?: string;
   calendar_start_time: string;
   calendar_end_time: string;
-  calendar_type: EventType;
+  calendar_medical_insurance: string;
   calendar_observation: string;
-  calendar_status: EventStatus;
-  calendar_professional_id?: number;
-  calendar_patient_id?: number;
-  calendar_health_insurance_id?: number | null;
-  calendar_location_id: number;
-  calendar_timezone?: string | null;
-  calendar_video_conference: string | number | readonly string[] | undefined;
+  calendar_status?: ScheduleStatus;
   calendar_recurrence?: string;
-  calendar_recurrence_type?: RecurrenceType;
-  calendar_recurrence_quantity?: number;
-  calendar_recurrence_date_end?: string | null;
-  calendar_recurrency_type_qnt?: number;
-  calendar_secretary_id?: number;
-  // calendar_recurrency_type_start_date?: number;
-  calendar_secretary?: {
-    calendar_secretary_id: number;
-    calendar_secretary_name: string;
-    calendar_secretary_responsible: string;
-    calendar_secretary_date_insertion: string;
-    calendar_secretary_status: string;
-  };
-  alertas?: {}[];
+  calendar_recurrence_type?: string;
+  calendar_recurrence_quantity?: string;
+  calendar_recurrency_type_qnt?: string;
+  calendar_recurrence_date_end?: string;
 };
 
 export type ScheduleActions = {
-  addSchedule: (scheduleData: Partial<Schedule>, queryClient: QueryClient) => Promise<Schedule | false>;
-  buildRecurrencySchedules: (scheduleData: Partial<Schedule>) => Partial<Schedule>[] | false;
-  updateSchedule: (scheduleData: Partial<Schedule> & { id: number }, queryClient: QueryClient) => Promise<Schedule | false>;
-  removeSchedule: (scheduleId: number, calendar_location_id:number, queryClient: QueryClient) => Promise<boolean>;
+  addSchedule: (payload: Partial<Schedule>, queryClient: QueryClient) => Promise<Schedule | false>;
+  buildRecurrencySchedules: (payload: Partial<Schedule>) => Partial<Schedule>[] | false;
+  updateSchedule: (payload: Partial<Schedule> & { calendar_id: string }, queryClient: QueryClient) => Promise<Schedule | false>;
+  removeSchedule: (scheduleId: string, queryClient: QueryClient) => Promise<boolean>;
 };
 
 export type ScheduleStore = {
-  getSchedules: (calendar_location_id: number) => Promise<Schedule[] | false>;
+  getSchedules: () => Promise<Schedule[] | false>;
 } & ScheduleActions;

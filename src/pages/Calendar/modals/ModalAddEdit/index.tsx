@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button, Form, Modal, OverlayTrigger, Tooltip, Row, Col } from 'react-bootstrap';
 import { SingleValue } from 'react-select';
-import InsuranciesSelect from '../ModalWaitingList/InsuranciesSelect';
+import InsuranciesSelect from './InsuranciesSelect';
 import PacientSelect from './PacientSelect';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -12,22 +12,21 @@ import CsLineIcons from '../../../../cs-line-icons/CsLineIcons';
 import { formatDateToApi, getTimeZones, getWeekDay, isObjectNotEmpty } from '../../../../helpers/Utils';
 
 import { FormEventModel, useCalendarStore } from '../../hooks';
-import { EventStatus, RecurrenceType, appointmentOptions, recurrenceOptions } from '../../../../types/Events';
+import { RecurrenceType, appointmentOptions, recurrenceOptions } from '../../../../types/Events';
 import Select from '../../../../components/Select';
 import DatePicker from '../../../../components/DatePicker';
 import DatepickerTime from '../../../../views/interface/forms/controls/datepicker/DatepickerTime';
 import { Option } from '../../../../types/inputs';
 import useScheduleStore from '../../hooks/ScheduleStore';
-import { EventType, Schedule } from '../../hooks/ScheduleStore/types';
+import { ScheduleStatus, Schedule, ScheduleType } from '../../hooks/ScheduleStore/types';
 import { AppException } from '../../../../helpers/ErrorHelpers';
 import { notify } from '../../../../components/toast/NotificationIcon';
-import useScheduleHistoryStore from '../../hooks/ScheduleHistoryStore';
-import { ScheduleHistory, ScheduleHistoryOwnerType } from '../../hooks/ScheduleHistoryStore/types';
 import { useModalAddEditStore } from '../../hooks/modals/ModalAddEditStore';
 import { useDeleteScheduleConfirmationModalStore } from '../../hooks/modals/DeleteScheduleConfirmationModalStore';
 import { useModalDayOffModalStore } from '../../hooks/modals/ModalDayOffModalStore';
 import DayOffModal from '../DayOffModal';
 import usePatientStore from '../../../Dashboard/patients/hooks/PatientStore';
+import ProfessionalSelect from './ProfessionalSelect';
 
 const validationSchema = yup.object({
   calendar_name: yup
@@ -67,12 +66,7 @@ const validationSchema = yup.object({
 
       return date1 < date2;
     }),
-  calendar_health_insurance_id: yup
-    .object()
-    .shape({
-      id: yup.string(),
-    })
-    .nullable(),
+  calendar_medical_insurance: yup.string().nullable(),
   calendar_recurrence: yup
     .object()
     .shape({
@@ -115,7 +109,7 @@ const ModalAddEdit = () => {
 
   const showModal = useModalAddEditStore((state) => state.showModal);
 
-  const { event, selectedLocal, resetEvent } = useCalendarStore((state) => state);
+  const { event, resetEvent } = useCalendarStore((state) => state);
   const user = useAuth((state) => state.user);
 
   const formRef = useRef(null);
@@ -125,7 +119,6 @@ const ModalAddEdit = () => {
   const { addSchedule, buildRecurrencySchedules, updateSchedule } = useScheduleStore();
   const { handleSelectScheduleToRemove } = useDeleteScheduleConfirmationModalStore();
   const { openModalDayOffModal, hideModal: hideModalModalDayOffModal } = useModalDayOffModalStore();
-  const { addScheduleHistory } = useScheduleHistoryStore();
   const { getPatients } = usePatientStore();
   const { hideModal } = useModalAddEditStore();
 
@@ -152,8 +145,8 @@ const ModalAddEdit = () => {
       const {
         calendar_name,
         calendar_type,
-        calendar_health_insurance_id,
-        calendar_timezone,
+        calendar_medical_insurance,
+        calendar_professional_id,
         calendar_recurrence,
         calendar_date,
         calendar_recurrence_date_end,
@@ -161,51 +154,33 @@ const ModalAddEdit = () => {
         ...rest
       } = values;
 
-      if (!selectedLocal?.id) throw new Error('Local não selecionado');
       if (!values.calendar_start_time) throw new Error('Hora de início não selecionada');
       if (!values.calendar_end_time) throw new Error('Hora final não selecionada');
 
       const payload: Schedule = {
-        calendar_status: (calendar_status as EventStatus) || 'AGENDADO',
+        calendar_status: (calendar_status as ScheduleStatus) || ScheduleStatus.AGENDADO,
         calendar_name: calendar_name?.label ?? '',
-        calendar_type: calendar_type?.value as EventType,
-        calendar_health_insurance_id: calendar_health_insurance_id?.calendar_health_insurance_id,
-        calendar_timezone: calendar_timezone?.value,
+        calendar_type: calendar_type?.value as ScheduleType,
+        calendar_medical_insurance: calendar_medical_insurance,
+        calendar_professional_id: calendar_professional_id,
         calendar_recurrence: calendar_recurrence?.value,
-        calendar_recurrence_date_end: calendar_recurrence_date_end ? formatDateToApi(new Date(`${calendar_recurrence_date_end}, 00:00:00`)) : null,
+        calendar_recurrence_date_end: calendar_recurrence_date_end ? formatDateToApi(new Date(`${calendar_recurrence_date_end}, 00:00:00`)) : undefined,
         calendar_date: formatDateToApi(new Date(`${calendar_date}, 00:00:00`)),
-        calendar_patient_id: calendar_name?.value ? +calendar_name?.value : undefined,
-        calendar_location_id: selectedLocal?.id,
-        calendar_professional_id: selectedLocal?.profissional,
+        calendar_patient_id: calendar_name?.value ? calendar_name?.value : undefined,
         ...rest,
-        calendar_video_conference: values.calendar_video_conference ? 1 : 0,
         calendar_start_time: values.calendar_start_time,
         calendar_end_time: values.calendar_end_time,
         calendar_recurrence_type: values.calendar_recurrence_type ? (values.calendar_recurrence_type as RecurrenceType) : undefined,
-        calendar_recurrence_quantity: values.calendar_recurrence_quantity ? +values.calendar_recurrence_quantity : undefined,
-        calendar_recurrency_type_qnt: values.calendar_recurrency_type_qnt ? +values.calendar_recurrency_type_qnt : undefined,
+        calendar_recurrence_quantity: values.calendar_recurrence_quantity ? values.calendar_recurrence_quantity : undefined,
+        calendar_recurrency_type_qnt: values.calendar_recurrency_type_qnt ? values.calendar_recurrency_type_qnt : undefined,
       };
 
-      if (event.id) {
-        const response = await updateSchedule({ ...payload, id: event.id, alertas: undefined }, queryClient);
+      if (event.calendar_id) {
+        const response = await updateSchedule({ ...payload, calendar_id: event.calendar_id }, queryClient);
 
         if (response === false) throw new Error('Erro ao atualizar agendamento');
 
-        if (!user?.id) throw new Error('Profissional não encontrado');
-
-        if (!response.calendar_location_id) throw new Error('Local não encontrado');
-
-        const history: ScheduleHistory = {
-          calendar_history_description: `Alterou o agendamento do paciente ${payload.calendar_name}`,
-          calendar_history_date: new Date().toISOString(),
-          calendar_history_location_id: payload.calendar_location_id,
-          calendar_history_schedule_id: event.id as number,
-          calendar_history_owner_id: user.id,
-          calendar_history_owner_type:
-            'nome_completo' in user ? ScheduleHistoryOwnerType.PROFISSIONAL : ScheduleHistoryOwnerType.COLABORADOR ?? ScheduleHistoryOwnerType.COLABORADOR,
-        };
-
-        addScheduleHistory(history, queryClient);
+        if (!user?.clinic_id) throw new Error('Clinica não encontrada');
       } else if (calendar_recurrence?.value) {
         const schedules = buildRecurrencySchedules(payload);
 
@@ -216,42 +191,14 @@ const ModalAddEdit = () => {
 
           if (response === false) throw new Error('Erro ao adicionar agendamento');
 
-          if (!user?.id) throw new Error('Profissional não encontrado');
-
-          if (!response.calendar_location_id) throw new Error('Local não encontrado');
-
-          const history: ScheduleHistory = {
-            calendar_history_description: `Adicionou um novo agendamento para o paciente ${response.calendar_name}`,
-            calendar_history_date: new Date().toISOString(),
-            calendar_history_location_id: response.calendar_location_id,
-            calendar_history_schedule_id: response.id as number,
-            calendar_history_owner_id: user.id,
-            calendar_history_owner_type:
-            'nome_completo' in user ? ScheduleHistoryOwnerType.PROFISSIONAL : ScheduleHistoryOwnerType.COLABORADOR ?? ScheduleHistoryOwnerType.COLABORADOR,
-          };
-
-          addScheduleHistory(history, queryClient);
+          if (!user?.clinic_id) throw new Error('Clinica não encontrada');
         }
       } else {
         const response = await addSchedule(payload, queryClient);
 
         if (response === false) throw new Error('Erro ao adicionar agendamento');
 
-        if (!user?.id) throw new Error('Profissional não encontrado');
-
-        if (!response.calendar_location_id) throw new Error('Local não encontrado');
-
-        const history: ScheduleHistory = {
-          calendar_history_description: `Adicionou um novo agendamento para o paciente ${response.calendar_name}`,
-          calendar_history_date: new Date().toISOString(),
-          calendar_history_location_id: response.calendar_location_id,
-          calendar_history_schedule_id: response.id as number,
-          calendar_history_owner_id: user.id,
-          calendar_history_owner_type:
-            'nome_completo' in user ? ScheduleHistoryOwnerType.PROFISSIONAL : ScheduleHistoryOwnerType.COLABORADOR ?? ScheduleHistoryOwnerType.COLABORADOR,
-        };
-
-        addScheduleHistory(history, queryClient);
+        if (!user?.clinic_id) throw new Error('Clinica não encontrada');
       }
 
       hideModal();
@@ -277,14 +224,11 @@ const ModalAddEdit = () => {
       calendar_status: '',
       calendar_name: null,
       calendar_type: null,
-      calendar_video_conference: 0,
       calendar_email: '',
       calendar_phone: '',
       calendar_date: '',
       calendar_start_time: undefined,
       calendar_end_time: undefined,
-      calendar_timezone: null,
-      calendar_observation: '',
     },
     enableReinitialize: true,
     validationSchema,
@@ -293,23 +237,24 @@ const ModalAddEdit = () => {
 
   const checkAvailability = async () => {
     const errors = await validateForm(values);
-    if (!selectedLocal || isObjectNotEmpty(errors)) return false;
+    // if (!selectedLocal || isObjectNotEmpty(errors)) return false;
 
     const { calendar_date, calendar_start_time, calendar_end_time } = values;
 
-    const parsedHoraInicio = parse(calendar_start_time || '', 'HH:mm', new Date());
-    const parsedHoraFinal = parse(calendar_end_time || '', 'HH:mm', new Date());
-    const parsedWorkHoraInicio = parse(selectedLocal.hora_inicio || '', 'HH:mm', new Date());
-    const parsedWorkHoraFinal = parse(selectedLocal.hora_final || '', 'HH:mm', new Date());
+    // const parsedHoraInicio = parse(calendar_start_time || '', 'HH:mm', new Date());
+    // const parsedHoraFinal = parse(calendar_end_time || '', 'HH:mm', new Date());
+    // const parsedWorkHoraInicio = parse(selectedLocal.hora_inicio || '', 'HH:mm', new Date());
+    // const parsedWorkHoraFinal = parse(selectedLocal.hora_final || '', 'HH:mm', new Date());
 
-    const workWeekDays = selectedLocal.dias_semana?.split(',').map((day) => +day);
+    // const workWeekDays = selectedLocal.dias_semana?.split(',').map((day) => +day);
     const weekDay = getWeekDay(new Date(`${calendar_date}, 00:00:00`));
 
-    const isDayOff = !workWeekDays || !workWeekDays.includes(weekDay + 1);
-    const isBeforeWorkHours = isBefore(parsedHoraInicio, parsedWorkHoraInicio);
-    const isAfterWorkHours = isAfter(parsedHoraFinal, parsedWorkHoraFinal);
+    // const isDayOff = !workWeekDays || !workWeekDays.includes(weekDay + 1);
+    // const isBeforeWorkHours = isBefore(parsedHoraInicio, parsedWorkHoraInicio);
+    // const isAfterWorkHours = isAfter(parsedHoraFinal, parsedWorkHoraFinal);
 
-    return isDayOff || isBeforeWorkHours || isAfterWorkHours;
+    // return isDayOff || isBeforeWorkHours || isAfterWorkHours;
+    return false;
   };
 
   const handleSelectChange = (value: any, field: string) => {
@@ -320,10 +265,10 @@ const ModalAddEdit = () => {
     if (!option) {
       return handleSelectChange(option, 'calendar_name');
     }
-    const found = patientsResult.data?.find((patient) => patient.id && patient.id.toString() === option.value);
+    const found = patientsResult.data?.find((patient) => patient.patient_id && patient.patient_id.toString() === option.value);
     if (found) {
-      setFieldValue('calendar_email', found.email || '');
-      setFieldValue('calendar_phone', found.phone || '');
+      setFieldValue('calendar_email', found.patient_email || '');
+      setFieldValue('calendar_phone', found.patient_phone || '');
     }
     handleSelectChange(option, 'calendar_name');
   };
@@ -385,7 +330,7 @@ const ModalAddEdit = () => {
           }}
         >
           <Modal.Header closeButton>
-            <Modal.Title>{event.id ? 'Editar agendamento' : 'Cadastre um agendamento'}</Modal.Title>
+            <Modal.Title>{event.calendar_id ? 'Editar agendamento' : 'Cadastre um agendamento'}</Modal.Title>
           </Modal.Header>
           <Modal.Body className="d-flex flex-column">
             <Row>
@@ -406,17 +351,6 @@ const ModalAddEdit = () => {
                   {errors.calendar_type && touched.calendar_type && <div className="error">{errors.calendar_type}</div>}
                 </div>
               </Col>
-              <div className="mb-3 top-label">
-                <Form.Check
-                  name="calendar_video_conference"
-                  id="calendar_video_conference"
-                  value={1}
-                  onChange={handleChange}
-                  type="checkbox"
-                  defaultChecked={values.calendar_video_conference === 1}
-                  label="Videoconferência"
-                />
-              </div>
             </Row>
             <Row>
               <Col md={8}>
@@ -476,30 +410,17 @@ const ModalAddEdit = () => {
               </Col>
               <Col md={4}>
                 <div className="mb-3 top-label ms-3">
-                  <InsuranciesSelect
-                    value={values.calendar_health_insurance_id}
-                    onChange={(value) => handleSelectChange(value, 'calendar_health_insurance_id')}
-                  />
-                  {errors.calendar_health_insurance_id && touched.calendar_health_insurance_id && (
-                    <div className="error">{errors.calendar_health_insurance_id.toString()}</div>
-                  )}
+                  <InsuranciesSelect formik={{ values, errors, touched, setFieldValue }} />
                 </div>
               </Col>
             </Row>
             <Row>
               <Col md={8}>
                 <div className="mb-3 top-label">
-                  <Select
-                    id="calendar_timezone"
-                    name="calendar_timezone"
-                    value={values.calendar_timezone}
-                    onChange={(value) => handleSelectChange(value, 'calendar_timezone')}
-                    options={getTimeZones()}
-                  />
-                  <Form.Label>FUSO HORÁRIO</Form.Label>
+                  <ProfessionalSelect formik={{ values, errors, touched, setFieldValue }} />
                 </div>
               </Col>
-              {!event.id ? (
+              {!event.calendar_id ? (
                 <Col md={4}>
                   <div className="mb-3 top-label">
                     <Select
@@ -516,7 +437,7 @@ const ModalAddEdit = () => {
                 </Col>
               ) : null}
             </Row>
-            {values.calendar_recurrence && !event.id ? (
+            {values.calendar_recurrence && !event.calendar_id ? (
               <Row>
                 <Col md={2}>
                   <div className="mb-3 top-label position-relative">
@@ -653,7 +574,7 @@ const ModalAddEdit = () => {
             </Row>
           </Modal.Body>
           <Modal.Footer>
-            {event.id ? (
+            {event.calendar_id ? (
               <>
                 <OverlayTrigger delay={{ show: 500, hide: 0 }} overlay={<Tooltip>Excluir agendamento</Tooltip>} placement="top">
                   <Button variant="outline-primary" className="btn-icon btn-icon-only" onClick={() => handleSelectScheduleToRemove(event)}>

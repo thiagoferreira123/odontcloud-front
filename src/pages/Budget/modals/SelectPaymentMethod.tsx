@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Select, { MultiValue } from 'react-select';
+import Select from 'react-select';
 import { FormikErrors, FormikTouched } from 'formik';
 import { Option } from '../../../types/inputs';
 import { ModalPaymentConditionsFormValues } from './ModalPaymentConditions';
@@ -63,8 +63,6 @@ const SelectPaymentMethod = ({ formik }: SelectPaymentMethodProps) => {
       'budget_payment_method',
       option.value
     );
-
-    // setValue(option);
   };
 
   useEffect(() => {

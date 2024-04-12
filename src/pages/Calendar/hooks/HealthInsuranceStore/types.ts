@@ -1,7 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 
 export type HealthInsurance = {
-  calendar_health_insurance_id?: number;
+  calendar_medical_insurance?: number;
   calendar_health_insurance_name?: string;
   calendar_health_insurance_responsible?: string;
   calendar_health_insurance_insertion_date?: Date;

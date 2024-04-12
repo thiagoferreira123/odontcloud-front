@@ -36,8 +36,6 @@ const ModalAppointmentList = () => {
 
   const { selectedLocal, setEvent } = useCalendarStore((state) => state);
 
-  const location_id = (user && 'id_local' in user && user.id_local ? user.id_local : null) ?? selectedLocal?.id;
-
   const [searchQuery, setSearchQuery] = useState('');
 
   const { setLocal } = useCalendarStore((state) => state);
@@ -47,9 +45,7 @@ const ModalAppointmentList = () => {
 
   const getSchedules_ = async () => {
     try {
-      if(!location_id) throw new AppException('Selecione um local para visualizar os agendamentos');
-
-      const result = await getSchedules(location_id);
+      const result = await getSchedules();
 
       if (result === false) throw new Error('Could not get schedules');
 
@@ -84,29 +80,26 @@ const ModalAppointmentList = () => {
     const {
       calendar_patient_id,
       calendar_type,
-      calendar_location_id,
-      calendar_health_insurance_id,
-      calendar_recurrence,
-      calendar_recurrence_date_end,
       calendar_recurrence_quantity,
       calendar_recurrency_type_qnt,
-      calendar_timezone,
       calendar_start_time,
       calendar_end_time,
       calendar_date,
+      calendar_medical_insurance,
+      calendar_recurrence,
+      calendar_recurrence_date_end,
+      calendar_timezone,
       ...rest
     } = event;
 
     const patients = queryClient.getQueryData<Patient[]>(['patients']);
     const insurancies = queryClient.getQueryData<HealthInsurance[]>(['insurancies']);
-    const locals = queryClient.getQueryData<Local[]>(['locals']);
     const timezones = getTimeZones();
 
     const foundPatient = patients?.find((patient) => patient.id === calendar_patient_id);
     const foundTipoConsulta = appointmentOptions.find((appointment) => appointment.value === calendar_type);
-    const foundInsurancie = insurancies?.find((insurancie) => insurancie.calendar_health_insurance_id === calendar_health_insurance_id);
+    const foundInsurancie = insurancies?.find((insurancie) => insurancie.calendar_medical_insurance === calendar_medical_insurance);
     const foundRecurrence = recurrenceOptions.find((option) => option?.value === calendar_recurrence);
-    const foundLocal = locals?.find((local) => local.id === calendar_location_id);
     const foundTimezone = timezones.find(({ value }) => value === calendar_timezone);
 
     const formModel: FormEventModel = {
@@ -116,7 +109,7 @@ const ModalAppointmentList = () => {
         ? ({ label: foundTipoConsulta.label, value: foundTipoConsulta.value } as unknown as SingleValue<{ value: EventType; label: string }>)
         : null,
       calendar_observation: '',
-      calendar_health_insurance_id: (foundInsurancie as unknown as SingleValue<HealthInsurance>) || null,
+      calendar_medical_insurance: (foundInsurancie as unknown as SingleValue<HealthInsurance>) || null,
       calendar_recurrence: foundRecurrence || null,
       calendar_timezone: foundTimezone || null,
       calendar_video_conference: rest.calendar_video_conference as number ?? 0,
@@ -128,23 +121,16 @@ const ModalAppointmentList = () => {
       calendar_date: new Date(`${calendar_date}, 00:00:00`).toDateString(),
     };
 
-    foundLocal && setLocal(foundLocal);
-
     return formModel;
   };
 
-  const result = useQuery({ queryKey: ['schedules', location_id], queryFn: getSchedules_, enabled: !!location_id });
-
-  const eventsByLocal = useMemo(() => {
-    if (!selectedLocal) return result.data ?? [];
-    return result.data?.filter((event) => event.calendar_location_id === selectedLocal.id) ?? [];
-  }, [result.data, selectedLocal]);
+  const result = useQuery({ queryKey: ['schedules'], queryFn: getSchedules_ });
 
   const filteredEvents = useMemo(() => {
-    const eventsByQuery = eventsByLocal.filter((event) => event.calendar_name.toLowerCase().includes(searchQuery.toLowerCase()));
+    const eventsByQuery = result.data?.filter((event) => event.calendar_name.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    return eventsByQuery.sort((a, b) => new Date(b.calendar_date).getTime() - new Date(a.calendar_date).getTime());
-  }, [eventsByLocal, searchQuery]);
+    return eventsByQuery?.sort((a, b) => new Date(b.calendar_date).getTime() - new Date(a.calendar_date).getTime());
+  }, [result.data, searchQuery]);
 
   if(!showModal) return null;
 

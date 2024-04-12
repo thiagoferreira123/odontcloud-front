@@ -10,7 +10,7 @@ import { EventType, appointmentOptions } from '../../../../types/Events';
 import * as yup from 'yup';
 import { Option } from '../../../../types/inputs';
 import PacientSelect from '../ModalAddEdit/PacientSelect';
-import InsuranciesSelect from './InsuranciesSelect';
+import InsuranciesSelect from '../ModalAddEdit/InsuranciesSelect';
 import useWaitingListStore from '../../hooks/WaitingListStore';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AppException } from '../../../../helpers/ErrorHelpers';
@@ -90,7 +90,7 @@ const ModalWaitingList = () => {
         ...rest,
         calendar_waiting_list_name: calendar_waiting_list_name?.label,
         calendar_waiting_list_schedule_type: calendar_waiting_list_schedule_type?.value,
-        calendar_waiting_list_health_insurance_id: calendar_waiting_list_health_insurance_id?.calendar_health_insurance_id,
+        calendar_waiting_list_health_insurance_id: calendar_waiting_list_health_insurance_id?.calendar_medical_insurance,
         calendar_waiting_list_professional_id: selectedLocal?.profissional,
         calendar_waiting_list_location_id: selectedLocal?.id,
         calendar_waiting_list_secretary_id: 0,

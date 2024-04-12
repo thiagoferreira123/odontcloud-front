@@ -5,9 +5,9 @@ import useScheduleActions from './ScheduleActions';
 import api from '../../../../services/useAxios';
 
 const useScheduleStore = create<ScheduleStore>((set) => ({
-  getSchedules: async (calendar_location_id) => {
+  getSchedules: async () => {
     try {
-      const response = await api.get(`/agenda/location/${calendar_location_id}`);
+      const response = await api.get('/calendar/by-clinic/');
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 404) {

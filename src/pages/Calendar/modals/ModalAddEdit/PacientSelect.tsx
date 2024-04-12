@@ -30,8 +30,8 @@ const PacientSelect = ({ onChange, value }: Props) => {
 
   const options = useMemo(() => {
     return patientsResult.data?.map((patient) => ({
-      label: patient.name,
-      value: patient.id?.toString() ?? '',
+      label: patient.patient_full_name,
+      value: patient.patient_id?.toString() ?? '',
     })) ?? [];
   }, [patientsResult.data]);
 

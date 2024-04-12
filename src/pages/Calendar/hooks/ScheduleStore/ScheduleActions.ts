@@ -6,11 +6,11 @@ import { RecurrenceType } from "../../../../types/Events";
 import { Schedule, ScheduleActions } from "./types";
 
 const useScheduleActions = (): ScheduleActions => ({
-  addSchedule: async (scheduleData, queryClient) => {
+  addSchedule: async (payload, queryClient) => {
     try {
-      const { data } = await api.post<Schedule>('/agenda/', {...scheduleData});
+      const { data } = await api.post<Schedule>('/calendar/', {...payload});
 
-      queryClient.setQueryData<Schedule[]>(['schedules', scheduleData.calendar_location_id], (oldData) => [...(oldData || []), data]);
+      queryClient.setQueryData<Schedule[]>(['schedules'], (oldData) => [...(oldData || []), data]);
 
       notify('Agendamento adicionado com sucesso', 'Sucesso', 'check', 'success');
 
@@ -22,19 +22,19 @@ const useScheduleActions = (): ScheduleActions => ({
     }
   },
 
-  buildRecurrencySchedules: (scheduleData) => {
+  buildRecurrencySchedules: (payload) => {
     try {
-      if(!scheduleData.calendar_recurrence_quantity) throw new AppException('O campo calendar_recurrence_quantity é obrigatório');
-      if(!scheduleData.calendar_recurrency_type_qnt) throw new AppException('O campo recurrency_type_qnt é obrigatório');
-      if(!scheduleData.calendar_date) throw new AppException('O campo calendar_date é obrigatório');
+      if(!payload.calendar_recurrence_quantity) throw new AppException('O campo calendar_recurrence_quantity é obrigatório');
+      if(!payload.calendar_recurrency_type_qnt) throw new AppException('O campo recurrency_type_qnt é obrigatório');
+      if(!payload.calendar_date) throw new AppException('O campo calendar_date é obrigatório');
 
-      const recurrenceType = scheduleData.calendar_recurrence as RecurrenceType;
-      const recurrenceRepeatQuantity = +scheduleData.calendar_recurrence_quantity;
-      const argument = scheduleData.calendar_recurrence_date_end ? new Date(scheduleData.calendar_recurrence_date_end) : +scheduleData.calendar_recurrency_type_qnt;
-      const dates = generateRecurrenceDates(scheduleData.calendar_date, recurrenceType, recurrenceRepeatQuantity, argument);
+      const recurrenceType = payload.calendar_recurrence as RecurrenceType;
+      const recurrenceRepeatQuantity = +payload.calendar_recurrence_quantity;
+      const argument = payload.calendar_recurrence_date_end ? new Date(payload.calendar_recurrence_date_end) : +payload.calendar_recurrency_type_qnt;
+      const dates = generateRecurrenceDates(payload.calendar_date, recurrenceType, recurrenceRepeatQuantity, argument);
 
       const schedules = dates.map((date) => {
-        return { ...scheduleData, calendar_date: date };
+        return { ...payload, calendar_date: date };
       });
 
       return schedules;
@@ -46,12 +46,12 @@ const useScheduleActions = (): ScheduleActions => ({
     }
   },
 
-  updateSchedule: async (scheduleData, queryClient) => {
+  updateSchedule: async (payload, queryClient) => {
     try {
-      const { data } = await api.put<Schedule>(`/agenda/${scheduleData.id}`, scheduleData);
+      const { data } = await api.put<Schedule>(`/calendar/${payload.calendar_id}`, payload);
 
-      queryClient.setQueryData<Schedule[]>(['schedules', scheduleData.calendar_location_id], (oldData) =>
-        oldData ? oldData.map(schedule => schedule.id === data.id ? data : schedule) : []
+      queryClient.setQueryData<Schedule[]>(['schedules'], (oldData) =>
+        oldData ? oldData.map(schedule => schedule.calendar_id === data.calendar_id ? data : schedule) : []
       );
 
       notify('Agendamento atualizado com sucesso', 'Sucesso', 'check', 'success');
@@ -64,12 +64,12 @@ const useScheduleActions = (): ScheduleActions => ({
     }
   },
 
-  removeSchedule: async (scheduleId, calendar_location_id, queryClient) => {
+  removeSchedule: async (scheduleId, queryClient) => {
     try {
-      await api.delete(`/agenda/${scheduleId}`);
+      await api.delete(`/calendar/${scheduleId}`);
 
-      queryClient.setQueryData<Schedule[]>(['schedules', calendar_location_id], (oldData) =>
-        oldData ? oldData.filter(schedule => schedule.id !== scheduleId) : []
+      queryClient.setQueryData<Schedule[]>(['schedules'], (oldData) =>
+        oldData ? oldData.filter(schedule => schedule.calendar_id !== scheduleId) : []
       );
 
       notify('Agendamento removido com sucesso', 'Sucesso', 'check', 'success');

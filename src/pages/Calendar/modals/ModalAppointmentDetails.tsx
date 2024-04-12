@@ -4,7 +4,7 @@ import { Button, Col, Modal, OverlayTrigger, Row, Tooltip } from 'react-bootstra
 import { SingleValue } from 'react-select';
 import { useAuth } from '../../Auth/Login/hook';
 import { useCalendarStore } from '../hooks';
-import { EventPrint, eventStatusColorMap, statusOptions } from '../../../types/Events';
+import { eventStatusColorMap, statusOptions } from '../../../types/Events';
 import CsLineIcons from '../../../cs-line-icons/CsLineIcons';
 import Select from '../../../components/Select';
 import { useQueryClient } from '@tanstack/react-query';
@@ -12,11 +12,9 @@ import { useModalAppointmentDetailsStore } from '../hooks/modals/ModalAppointmen
 import { useModalAddEditStore } from '../hooks/modals/ModalAddEditStore';
 import useScheduleStore from '../hooks/ScheduleStore';
 import { AppException } from '../../../helpers/ErrorHelpers';
-import { EventStatus } from '../hooks/ScheduleStore/types';
-import useScheduleHistoryStore from '../hooks/ScheduleHistoryStore';
-import { ScheduleHistory, ScheduleHistoryOwnerType } from '../hooks/ScheduleHistoryStore/types';
 import { notify } from '../../../components/toast/NotificationIcon';
 import { useDeleteScheduleConfirmationModalStore } from '../hooks/modals/DeleteScheduleConfirmationModalStore';
+import { ScheduleStatus } from '../hooks/ScheduleStore/types';
 
 const ModalAppointmentDetails = () => {
   const queryClient = useQueryClient();
@@ -30,7 +28,6 @@ const ModalAppointmentDetails = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   const { updateSchedule } = useScheduleStore();
-  const { addScheduleHistory } = useScheduleHistoryStore();
   const { openModalAddEdit } = useModalAddEditStore();
   const { hideModal } = useModalAppointmentDetailsStore();
   const { handleSelectScheduleToRemove } = useDeleteScheduleConfirmationModalStore();
@@ -46,31 +43,16 @@ const ModalAppointmentDetails = () => {
       setIsSaving(true);
 
       if (!selectedStatus?.value) throw new AppException('Selecione um status para atualizar o agendamento');
-      if (!event.id) throw new AppException('Agendamento não encontrado');
+      if (!event.calendar_id) throw new AppException('Agendamento não encontrado');
 
-      const response = await updateSchedule({ calendar_status: selectedStatus.value as EventStatus, id: event.id }, queryClient);
+      const response = await updateSchedule({ calendar_status: selectedStatus.value as ScheduleStatus, calendar_id: event.calendar_id }, queryClient);
 
       if (!response) throw new Error('Erro ao atualizar o status do agendamento');
 
       if (!response.calendar_professional_id) throw new Error('Profissional não encontrado');
-      if (!response.calendar_location_id) throw new Error('Local não encontrado');
-      if(!user?.id) throw new Error('user is not defined');
+      if(!user?.clinic_id) throw new Error('user is not defined');
 
       hideModal();
-
-      const history: ScheduleHistory = {
-        calendar_history_description: `Alterou o status de ${eventStatus?.value} para ${EventPrint[response.calendar_status]} na consulta do paciente ${
-          event.calendar_name?.label
-        }`,
-        calendar_history_date: new Date().toISOString(),
-        calendar_history_location_id: response.calendar_location_id,
-        calendar_history_schedule_id: response.id as number,
-        calendar_history_owner_id: response.calendar_professional_id,
-        calendar_history_owner_type:
-            'nome_completo' in user ? ScheduleHistoryOwnerType.PROFISSIONAL : ScheduleHistoryOwnerType.COLABORADOR ?? ScheduleHistoryOwnerType.COLABORADOR,
-      };
-
-      addScheduleHistory(history, queryClient);
       setIsSaving(false);
     } catch (error) {
       setIsSaving(false);
@@ -124,8 +106,8 @@ const ModalAppointmentDetails = () => {
                 className="flex-shrink-0"
                 icon="circle"
                 size={9}
-                fill={eventStatusColorMap[eventStatus?.value ?? 'CONFIRMADO']}
-                stroke={eventStatusColorMap[eventStatus?.value ?? 'CONFIRMADO']}
+                fill={eventStatusColorMap[eventStatus?.value ?? ScheduleStatus.CONFIRMADO]}
+                stroke={eventStatusColorMap[eventStatus?.value ?? ScheduleStatus.CONFIRMADO]}
               />
               {eventStatus?.label}
             </div>

@@ -1,12 +1,4 @@
-/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
-/* eslint-disable no-unused-vars */
-export enum EventType {
-  CONSULTA = 'CONSULTA',
-  RETORNO = 'RETORNO',
-  POSSIVEL_RETORNO = 'POSSIVEL_RETORNO',
-  OUTROS = 'OUTROS',
-  AGENDADO_SITE = 'AGENDADO_SITE',
-}
+import { ScheduleStatus, ScheduleType } from "../pages/Calendar/hooks/ScheduleStore/types";
 
 export enum EventColor {
   CONSULTA = '#0eb0f2',
@@ -16,28 +8,24 @@ export enum EventColor {
   AGENDADO_SITE = '#5de3c8',
 }
 
-export enum EventStatus {
-  CONFIRMADO = 'CONFIRMADO',
-  PENDENTE = 'PENDENTE',
-  AGENDADO = 'AGENDADO',
-  CANCELADO = 'CANCELADO',
-  NAO_COMPARECEU = 'NAO_COMPARECEU',
+export interface EventColorMap {
+  [index: string]: string;
 }
 
-export enum EventPrint {
-  CONFIRMADO = 'CONFIRMADO',
-  PENDENTE = 'PENDENTE',
-  AGENDADO = 'AGENDADO',
-  CANCELADO = 'CANCELADO',
-  NAO_COMPARECEU = 'NÃO COMPARECEU',
-}
+export const eventColorMap: EventColorMap = {
+  [ScheduleType.CONSULTA]: EventColor.CONSULTA,
+  [ScheduleType.RETORNO]: EventColor.RETORNO,
+  [ScheduleType.POSSIVEL_RETORNO]: EventColor.POSSIVEL_RETORNO,
+  [ScheduleType.OUTROS]: EventColor.OUTROS,
+  [ScheduleType.AGENDADO_SITE]: EventColor.AGENDADO_SITE,
+};
 
 export enum EventStatusColor {
-  CONFIRMADO = '#0eb0f2',
-  PENDENTE = '#ebb71a',
-  AGENDADO = '#ebb71a',
-  CANCELADO = '#cf2637',
-  NAO_COMPARECEU = '#558df3',
+  CONFIRMED = '#0eb0f2',
+  PENDING = '#ebb71a',
+  SCHEDULED = '#ebb71a',
+  CANCELLED = '#cf2637',
+  NO_SHOW = '#558df3',
 }
 
 export interface EventStatusColorMap {
@@ -45,11 +33,11 @@ export interface EventStatusColorMap {
 }
 
 export const eventStatusColorMap: EventStatusColorMap = {
-  [EventStatus.CONFIRMADO]: EventStatusColor.CONFIRMADO,
-  [EventStatus.PENDENTE]: EventStatusColor.PENDENTE,
-  [EventStatus.AGENDADO]: EventStatusColor.AGENDADO,
-  [EventStatus.CANCELADO]: EventStatusColor.CANCELADO,
-  [EventStatus.NAO_COMPARECEU]: EventStatusColor.NAO_COMPARECEU,
+  [ScheduleStatus.CONFIRMADO]: EventStatusColor.CONFIRMED,
+  [ScheduleStatus.PENDENTE]: EventStatusColor.PENDING,
+  [ScheduleStatus.AGENDADO]: EventStatusColor.SCHEDULED,
+  [ScheduleStatus.CANCELADO]: EventStatusColor.CANCELLED,
+  [ScheduleStatus.NAO_COMPARECEU]: EventStatusColor.NO_SHOW,
 };
 
 export type CalendarEvent = {
@@ -62,9 +50,9 @@ export type CalendarEvent = {
   dataConsulta: string;
   horaInicio: string;
   horaFinal: string;
-  tipoConsulta: EventType;
+  tipoConsulta: ScheduleType;
   anotacao: string;
-  status: EventStatus;
+  status: ScheduleStatus;
   idProfissional: number;
   idPaciente: number;
   idColaborador: number | null;
@@ -155,11 +143,11 @@ export type EventHistory = {
 export type RecurrenceType = 'days' | 'weeks' | 'months';
 
 export const appointmentOptions = [
-  { label: 'Consulta', value: EventType.CONSULTA },
-  { label: 'Retorno', value: EventType.RETORNO },
-  { label: 'Possível Retorno', value: EventType.POSSIVEL_RETORNO },
-  { label: 'Outros', value: EventType.OUTROS },
-  { label: 'Agendado pelo site', value: EventType.AGENDADO_SITE },
+  { label: 'Consulta', value: ScheduleType.CONSULTA },
+  { label: 'Retorno', value: ScheduleType.RETORNO },
+  { label: 'Possível Retorno', value: ScheduleType.POSSIVEL_RETORNO },
+  { label: 'Outros', value: ScheduleType.OUTROS },
+  { label: 'Agendado pelo site', value: ScheduleType.AGENDADO_SITE },
 ];
 
 export const recurrenceOptions = [
@@ -169,8 +157,8 @@ export const recurrenceOptions = [
 ];
 
 export const statusOptions = [
-  { label: 'Pendente', value: 'AGENDADO' },
-  { label: 'Desmarcada', value: 'CANCELADO' },
-  { label: 'Confirmada', value: 'CONFIRMADO' },
-  { label: 'Não compareceu', value: 'NAO_COMPARECEU' },
+  { label: 'Pendente', value: ScheduleStatus.AGENDADO },
+  { label: 'Desmarcada', value: ScheduleStatus.CANCELADO },
+  { label: 'Confirmada', value: ScheduleStatus.CONFIRMADO },
+  { label: 'Não compareceu', value: ScheduleStatus.NAO_COMPARECEU },
 ];
