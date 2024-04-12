@@ -4,7 +4,6 @@ import * as Icon from 'react-bootstrap-icons';
 import HtmlHead from '../../components/html-head/HtmlHead';
 import Filters from './Filters';
 import { useFiltersStore } from './hooks/FiltersStore';
-import usePatientControlDetailsStore from './hooks/PatientControlDetailsStore';
 import { AppException } from '../../helpers/ErrorHelpers';
 import { notify } from '../../components/toast/NotificationIcon';
 import { useQuery } from '@tanstack/react-query';
@@ -18,9 +17,9 @@ import { useAuth } from '../Auth/Login/hook';
 import api from '../../services/useAxios';
 import { useState } from 'react';
 import ModalPremium from '../Dashboard/ModalPremium';
-import ModalImportPatient from '../Dashboard/patients/modals/ModalImportPatient';
 import { downloadExcel } from '../../helpers/PdfHelpers';
 import AsyncButton from '../../components/AsyncButton';
+import usePatientStore from '../Dashboard/patients/hooks/PatientStore';
 
 export default function PatientControl() {
   const title = 'Controle de pacientes';
@@ -31,12 +30,11 @@ export default function PatientControl() {
   const selectedYear = useFiltersStore((state) => state.selectedYear);
 
   const [showModalPremium, setShowModalPremium] = useState(false);
-  const [showModalImportPatient, setShowModalImportPatient] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
   const user = useAuth((state) => state.user);
 
-  const { getPatients } = usePatientControlDetailsStore();
+  const { getPatients } = usePatientStore();
   const { handleSelectPatient, handleOpenModal } = useModalAddPatientStore();
   const { handleDeletePatient } = useDeleteConfirmStore();
 
@@ -46,7 +44,7 @@ export default function PatientControl() {
 
       const patients = await getPatients();
 
-      if (patients === false) throw new Error('Erro ao buscar os pacientes');
+      // if (patients === false) throw new Error('Erro ao buscar os pacientes');
 
       return patients;
     } catch (error) {
@@ -57,12 +55,12 @@ export default function PatientControl() {
   };
 
   const handleClickOpenModalAddPatient = async () => {
-    if (!user?.subscriptionStatus?.status || user.subscriptionStatus.status !== 'approved') {
-      // return setShowModalPremium(true);
-      const { data } = await api.get('/paciente/search/');
+    // if (!user?.subscriptionStatus?.status || user.subscriptionStatus.status !== 'approved') {
+    //   // return setShowModalPremium(true);
+    //   const { data } = await api.get('/paciente/search/');
 
-      if (data.statusCode === 900) return setShowModalPremium(true);
-    }
+    //   if (data.statusCode === 900) return setShowModalPremium(true);
+    // }
 
     handleOpenModal();
   };
@@ -73,7 +71,7 @@ export default function PatientControl() {
 
       setIsDownloading(true);
 
-      const { data } = await api.get(`/paciente/download?year=${selectedYear.value}&month=${selectedMonth.value}`, {
+      const { data } = await api.get(`/clinic-patient/download?year=${selectedYear.value}&month=${selectedMonth.value}`, {
         responseType: 'arraybuffer',
         headers: {
           'Content-Type': 'application/json',
@@ -102,8 +100,8 @@ export default function PatientControl() {
       if (!selectedMonth || !selectedYear) throw new AppException('Selecione um mês e um ano para filtrar os pacientes');
 
       return (
-        (selectedMonth?.value === '0' || new Date(patient.dateOfFirstConsultation).getMonth() + 1 === +selectedMonth?.value) &&
-        (selectedYear?.value === '0' || new Date(patient.dateOfFirstConsultation).getFullYear() === +selectedYear?.value)
+        (selectedMonth?.value === '0' || new Date(patient.patient_register_date).getMonth() + 1 === +selectedMonth?.value) &&
+        (selectedYear?.value === '0' || new Date(patient.patient_register_date).getFullYear() === +selectedYear?.value)
       );
     }) ?? [];
 
@@ -112,11 +110,11 @@ export default function PatientControl() {
       if (!selectedMonth || !selectedYear) throw new AppException('Selecione um mês e um ano para filtrar os pacientes');
 
       return (
-        (!query || patient.name.toLowerCase().includes(query.toLowerCase())) &&
-        (!status || (status === 1 && patient.patientActiveOrInactive === 1) || (status === 2 && patient.patientActiveOrInactive === 0))
+        (!query || patient.patient_full_name.toLowerCase().includes(query.toLowerCase()))
+        // (!status || (status === 1 && patient.patientActiveOrInactive === 1) || (status === 2 && patient.patientActiveOrInactive === 0))
       );
     })
-    .sort((a, b) => new Date(a.dateOfFirstConsultation).getTime() - new Date(b.dateOfFirstConsultation).getTime());
+    .sort((a, b) => new Date(a.patient_register_date).getTime() - new Date(b.patient_register_date).getTime());
 
   return (
     <>
@@ -157,27 +155,27 @@ export default function PatientControl() {
                       <thead>
                         <tr>
                           <th scope="col">Nome do paciente</th>
-                          <th scope="col">Motivo da consulta</th>
+                          {/* <th scope="col">Motivo da consulta</th> */}
                           <th scope="col">Data do cadastro</th>
                           <th scope="col">Email</th>
                           <th scope="col">Celular</th>
-                          <th scope="col">Situação</th>
+                          {/* <th scope="col">Situação</th> */}
                           <th scope="col">Opções</th>
                         </tr>
                       </thead>
                       <tbody>
                         {filteredPatients.map((patient) => (
-                          <tr key={patient.id}>
-                            <th>{patient.name}</th>
-                            <td>{patient.reasonForConsultation}</td>
-                            <td>{new Date(patient.dateOfFirstConsultation).toLocaleDateString()}</td>
-                            <td>{patient.email}</td>
-                            <td>{patient.phone}</td>
-                            <td>
+                          <tr key={patient.patient_id}>
+                            <th>{patient.patient_full_name}</th>
+                            {/* <td>{patient.reasonForConsultation}</td> */}
+                            <td>{new Date(patient.patient_register_date).toLocaleDateString()}</td>
+                            <td>{patient.patient_email}</td>
+                            <td>{patient.patient_phone}</td>
+                            {/* <td>
                               <Badge pill bg={patient.patientActiveOrInactive ? 'secondary' : 'danger'}>
                                 {patient.patientActiveOrInactive ? 'Ativo' : 'Inativo'}
                               </Badge>
-                            </td>
+                            </td> */}
                             <td>
                               <Button variant="outline-primary me-2" size="sm" onClick={() => handleDeletePatient(patient)}>
                                 <Icon.Trash />
@@ -197,9 +195,6 @@ export default function PatientControl() {
             <div className="mt-3 text-center">
               <Button variant="primary" className="mb-1 hover-scale-up me-2" onClick={handleClickOpenModalAddPatient}>
                 Cadastrar uma paciente
-              </Button>{' '}
-              <Button variant="primary" className="mb-1 hover-scale-up" onClick={() => setShowModalImportPatient(true)}>
-                Importar de outro Software
               </Button>{' '}
             </div>
           </Card.Body>
@@ -250,7 +245,6 @@ export default function PatientControl() {
       <ModalAddPatient />
       <DeleteConfirm />
       <ModalPremium showModal={showModalPremium} setShowModal={setShowModalPremium} />
-      <ModalImportPatient showModal={showModalImportPatient} setShowModal={setShowModalImportPatient} />
     </>
   );
 }

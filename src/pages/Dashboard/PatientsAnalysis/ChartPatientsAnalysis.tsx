@@ -81,7 +81,7 @@ const ChartPatientsAnalysis = (props: ChartPatientsAnalysisProps) => {
 
   const data = useMemo(() => {
     return {
-      labels: props.data.meses.map((item) => item.mes),
+      labels: props.data.months.map((item) => item.month),
       datasets: [
         {
           label: 'Masculino',
@@ -92,7 +92,7 @@ const ChartPatientsAnalysis = (props: ChartPatientsAnalysisProps) => {
           borderSkipped: 'bottom',
           borderWidth: 1.5,
           borderRadius: parseInt(themeValues.borderRadiusMd, 10),
-          data: props.data.meses.map((item) => item.genero1),
+          data: props.data.months.map((item) => item.patient_sex1),
         },
         {
           label: 'Feminino',
@@ -103,11 +103,11 @@ const ChartPatientsAnalysis = (props: ChartPatientsAnalysisProps) => {
           borderSkipped: 'bottom',
           borderWidth: 1.5,
           borderRadius: parseInt(themeValues.borderRadiusMd, 10),
-          data: props.data.meses.map((item) => item.genero0),
+          data: props.data.months.map((item) => item.patient_sex0),
         },
       ],
     };
-  }, [props.data.meses, themeValues.borderRadiusMd, themeValues.primary, themeValues.primaryrgb, themeValues.secondary, themeValues.secondaryrgb]);
+  }, [props.data.months, themeValues.borderRadiusMd, themeValues.primary, themeValues.primaryrgb, themeValues.secondary, themeValues.secondaryrgb]);
 
   const config: ChartConfiguration<keyof ChartTypeRegistry, number[], string> = useMemo(() => {
     return {
@@ -135,8 +135,8 @@ const ChartPatientsAnalysis = (props: ChartPatientsAnalysisProps) => {
           y: {
             stacked: true,
             min: 0,
-            max: props.data.meses.reduce(
-              (acc, item) => (Number(item.genero0) + Number(item.genero1) > acc ? Number(item.genero0) + Number(item.genero1) : acc),
+            max: props.data.months.reduce(
+              (acc, item) => (Number(item.patient_sex0) + Number(item.patient_sex1) > acc ? Number(item.patient_sex0) + Number(item.patient_sex1) : acc),
               0
             ),
             grid: {
@@ -148,8 +148,8 @@ const ChartPatientsAnalysis = (props: ChartPatientsAnalysisProps) => {
             ticks: {
               beginAtZero: true,
               stepSize:
-                props.data.meses.reduce(
-                  (acc, item) => (Number(item.genero0) + Number(item.genero1) > acc ? Number(item.genero0) + Number(item.genero1) : acc),
+                props.data.months.reduce(
+                  (acc, item) => (Number(item.patient_sex0) + Number(item.patient_sex1) > acc ? Number(item.patient_sex0) + Number(item.patient_sex1) : acc),
                   0
                 ) / 12,
               padding: 8,
@@ -164,7 +164,7 @@ const ChartPatientsAnalysis = (props: ChartPatientsAnalysisProps) => {
       },
       data,
     };
-  }, [CustomLegendBarPlugin, ExternalTooltip, data, props.data.meses, themeValues.alternate, themeValues.separatorLight]);
+  }, [CustomLegendBarPlugin, ExternalTooltip, data, props.data.months, themeValues.alternate, themeValues.separatorLight]);
 
   useEffect(() => {
     let myChart: Chart | null = null;

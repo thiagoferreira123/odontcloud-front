@@ -38,13 +38,13 @@ export default function Filters() {
           </span>
         </div>
       </Col>
-      <Col xs="auto" className="mb-1">
+      {/* <Col xs="auto" className="mb-1">
         <OverlayTrigger placement="top" overlay={<Tooltip>Filtre os pacientes</Tooltip>}>
           <span>
             <StatusSelect />
           </span>
         </OverlayTrigger>
-      </Col>
+      </Col> */}
     </Row>
   );
 }

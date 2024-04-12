@@ -11,7 +11,7 @@ export const useListCalendarStore = create<ListCalendarStore>(() => ({
   getCalendarList: async () => {
     const date = parseDateToIso(new Date());
 
-    const { data } = await api.get<Schedule[]>(`/agenda/dataConsulta/${date}/profissional`);
+    const { data } = await api.get<Schedule[]>(`/calendar/calendar_date/${date}/by-clinic`);
 
     return data;
   },

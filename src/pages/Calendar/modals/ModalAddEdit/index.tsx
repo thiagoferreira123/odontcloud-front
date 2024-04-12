@@ -177,6 +177,8 @@ const ModalAddEdit = () => {
       if (!values.calendar_start_time) throw new Error('Hora de início não selecionada');
       if (!values.calendar_end_time) throw new Error('Hora final não selecionada');
 
+      const patient = patientsResult.data?.find((patient) => patient.patient_id && patient.patient_id.toString() === calendar_name?.value);
+
       const payload: Schedule = {
         calendar_status: (calendar_status as ScheduleStatus) || ScheduleStatus.AGENDADO,
         calendar_name: calendar_name?.label ?? '',
@@ -186,7 +188,7 @@ const ModalAddEdit = () => {
         calendar_recurrence: calendar_recurrence?.value,
         calendar_recurrence_date_end: calendar_recurrence_date_end ? formatDateToApi(new Date(`${calendar_recurrence_date_end}, 00:00:00`)) : undefined,
         calendar_date: formatDateToApi(new Date(`${calendar_date}, 00:00:00`)),
-        calendar_patient_id: calendar_name?.value ? calendar_name?.value : undefined,
+        calendar_patient_id: patient?.patient_id ? patient?.patient_id : undefined,
         ...rest,
         calendar_start_time: values.calendar_start_time,
         calendar_end_time: values.calendar_end_time,
