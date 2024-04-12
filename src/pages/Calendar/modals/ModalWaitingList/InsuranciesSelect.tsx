@@ -1,25 +1,24 @@
 import { Form } from 'react-bootstrap';
-import { FormEventModel } from '../../hooks';
 import { FormikErrors, FormikTouched } from 'formik';
-import { useEffect, useState } from 'react';
-import { Option } from '../../../../types/inputs';
 import { medicalInsuranceOptions } from '../../constatnts';
 import { escapeRegexCharacters } from '../../../../helpers/SearchFoodHelper';
 import Autosuggest from 'react-autosuggest';
+import { ModalWaitingListFormValues } from '.';
+import { useState } from 'react';
 
 type InsuranciesSelectProps = {
   formik: {
     setFieldValue: (field: string, value: string, shouldValidate?: boolean | undefined) => void;
-    values: FormEventModel;
-    errors: FormikErrors<FormEventModel>;
-    touched: FormikTouched<FormEventModel>;
+    values: ModalWaitingListFormValues;
+    errors: FormikErrors<ModalWaitingListFormValues>;
+    touched: FormikTouched<ModalWaitingListFormValues>;
   };
 };
 
 const InsuranciesSelect = ({ formik }: InsuranciesSelectProps) => {
   const { setFieldValue, values, touched, errors } = formik;
 
-  const [valueState, setValueState] = useState(values.calendar_medical_insurance || '');
+  const [valueState, setValueState] = useState(values.calendar_waiting_list_health_insurance || '');
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
   const onSuggestionsFetchRequested = ({ value }: { value: string }) => {
@@ -45,12 +44,8 @@ const InsuranciesSelect = ({ formik }: InsuranciesSelectProps) => {
 
     setValueState(newValue);
 
-    setFieldValue('calendar_medical_insurance', newValue ?? '');
+    setFieldValue('calendar_waiting_list_health_insurance', newValue ?? '');
   };
-
-  useEffect(() => {
-    setValueState(values.calendar_medical_insurance || '');
-  }, [values.calendar_medical_insurance]);
 
   return (
     <div className="mb-3 top-label">
@@ -59,8 +54,8 @@ const InsuranciesSelect = ({ formik }: InsuranciesSelectProps) => {
         value={value}
         onChange={(e) => handleChange(e as Option)}
         isClearable
-        id="calendar_medical_insurance"
-        name="calendar_medical_insurance"
+        id="calendar_waiting_list_health_insurance"
+        name="calendar_waiting_list_health_insurance"
         classNamePrefix="react-select"
         placeholder="Selecione o convênio"
       /> */}
@@ -80,7 +75,7 @@ const InsuranciesSelect = ({ formik }: InsuranciesSelectProps) => {
         }}
       />
       <Form.Label>CONVÊNIO</Form.Label>
-      {errors.calendar_medical_insurance && touched.calendar_medical_insurance && <div className="error">{errors.calendar_medical_insurance}</div>}
+      {errors.calendar_waiting_list_health_insurance && touched.calendar_waiting_list_health_insurance && <div className="error">{errors.calendar_waiting_list_health_insurance}</div>}
     </div>
   );
 };

@@ -3,9 +3,9 @@ import api from "../../../../services/useAxios";
 import { WaitingList, WaitingListActions } from "./types";
 
 const useWaitingListActions = (): WaitingListActions => ({
-  addWaitingList: async (waitinglistDetailData, queryClient) => {
+  addWaitingList: async (payload, queryClient) => {
     try {
-      const { data } = await api.post<WaitingList>('/agenda-lista-espera/', waitinglistDetailData);
+      const { data } = await api.post<WaitingList>('/calendar-waiting-list/', payload);
 
       queryClient.setQueryData<WaitingList[]>(['waiting-list'], (oldData) => [...(oldData || []), data]);
 
@@ -21,7 +21,7 @@ const useWaitingListActions = (): WaitingListActions => ({
 
   removeWaitingList: async (waitinglist, queryClient) => {
     try {
-      await api.delete(`/agenda-lista-espera/${waitinglist.calendar_waiting_list_id}`);
+      await api.delete(`/calendar-waiting-list/${waitinglist.calendar_waiting_list_id}`);
 
       queryClient.setQueryData<WaitingList[]>(['waiting-list'], (oldData) =>
         oldData ? oldData.filter(detail => detail.calendar_waiting_list_id !== waitinglist.calendar_waiting_list_id) : []
