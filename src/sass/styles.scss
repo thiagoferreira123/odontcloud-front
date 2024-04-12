@@ -73,7 +73,7 @@
 @import 'layout/print';
 @import 'layout/settings';
 
-@import '../pages/EquivalentEatingPlan/modals/ModalFoodOptions/scss/index.scss';
+// @import '../pages/EquivalentEatingPlan/modals/ModalFoodOptions/scss/index.scss';
 
 .pointer {
   cursor: pointer !important;
@@ -469,6 +469,49 @@ textarea.custom-scrollbar::-webkit-scrollbar {
   max-height: unset;
 }
 
+/**
+  * Schedule Types
+  */
 .bg-consulta {
   background-color: #0eb0f2 !important;
+}
+
+.bg-retorno {
+  background-color: #ebb71a !important;
+}
+
+.bg-possivel-retorno {
+  background-color: #cf2637 !important;
+}
+
+.bg-outros {
+  background-color: #558df3 !important;
+}
+
+.bg-agendado {
+  background-color: #5de3c8 !important;
+}
+
+/**
+  * Schedule Status
+  */
+
+.bg-confirmed {
+  background-color: #0eb0f2 !important;
+}
+
+.bg-canceled {
+  background-color: #cf2637 !important;
+}
+
+.bg-pending {
+  background-color: #ebb71a !important;
+}
+
+.bg-scheduled {
+  background-color: #ebb71a !important;
+}
+
+.bg-no-show {
+  background-color: #558df3 !important;
 }

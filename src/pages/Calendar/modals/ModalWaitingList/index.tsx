@@ -48,7 +48,7 @@ const validationSchema = yup.object({
       value: yup.string(),
     })
     .nullable()
-    .required('Escolha um paciente'),
+    .required('Selecione um paciente'),
   calendar_waiting_list_health_insurance: yup.string().notRequired(),
   calendar_waiting_list_appointment_type: yup
     .object()
@@ -57,7 +57,7 @@ const validationSchema = yup.object({
       value: yup.string(),
     })
     .nullable()
-    .required('Escolha um tipo de consulta'),
+    .required('Selecione um tipo de consulta'),
   calendar_waiting_list_contact: yup.string().notRequired(),
   calendar_waiting_list_email: yup.string().notRequired(),
   calendar_waiting_list_observation: yup.string().nullable().notRequired(),
@@ -163,12 +163,17 @@ const ModalWaitingList = () => {
   };
 
   const handleAddEvent = (waiting: WaitingList) => {
+    const calendar_type_found = appointmentOptions.find((appointment) => appointment.value === waiting.calendar_waiting_list_appointment_type);
+
     setEvent({
       calendar_name: { label: waiting.calendar_waiting_list_patient_name, value: '0' },
       calendar_email: waiting.calendar_waiting_list_email,
       calendar_phone: waiting.calendar_waiting_list_contact,
       calendar_medical_insurance: waiting.calendar_waiting_list_health_insurance,
       calendar_observation: waiting.calendar_waiting_list_observation,
+      calendar_type: calendar_type_found
+        ? ({ label: calendar_type_found.label, value: calendar_type_found.value } as unknown as SingleValue<{ value: ScheduleType; label: string }>)
+        : null,
     });
     hideModal();
     openModalAddEdit();

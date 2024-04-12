@@ -376,7 +376,7 @@ const ModalAddEdit = () => {
             <Row>
               <Col md={8}>
                 <div className="mb-3 top-label position-relative">
-                  <Form.Control id="calendar_email" name="calendar_email" value={values.calendar_email} onChange={handleChange} type="text" />
+                  <Form.Control id="calendar_email" name="calendar_email" value={values.calendar_email ?? ''} onChange={handleChange} type="text" />
                   <Form.Label>EMAIL</Form.Label>
                   {errors.calendar_email && touched.calendar_email && <div className="error">{errors.calendar_email}</div>}
                 </div>
@@ -584,7 +584,7 @@ const ModalAddEdit = () => {
                   <Form.Control
                     id="calendar_observation"
                     name="calendar_observation"
-                    value={values.calendar_observation}
+                    value={values.calendar_observation ?? ''}
                     onChange={handleChange}
                     as="textarea"
                     rows={3}

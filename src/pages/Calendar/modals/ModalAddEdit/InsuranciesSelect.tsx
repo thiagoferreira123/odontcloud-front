@@ -2,7 +2,6 @@ import { Form } from 'react-bootstrap';
 import { FormEventModel } from '../../hooks';
 import { FormikErrors, FormikTouched } from 'formik';
 import { useEffect, useState } from 'react';
-import { Option } from '../../../../types/inputs';
 import { medicalInsuranceOptions } from '../../constatnts';
 import { escapeRegexCharacters } from '../../../../helpers/SearchFoodHelper';
 import Autosuggest from 'react-autosuggest';
@@ -54,16 +53,6 @@ const InsuranciesSelect = ({ formik }: InsuranciesSelectProps) => {
 
   return (
     <div className="mb-3 top-label">
-      {/* <Select
-        options={options}
-        value={value}
-        onChange={(e) => handleChange(e as Option)}
-        isClearable
-        id="calendar_medical_insurance"
-        name="calendar_medical_insurance"
-        classNamePrefix="react-select"
-        placeholder="Selecione o convênio"
-      /> */}
       <Autosuggest
         suggestions={suggestions}
         onSuggestionsFetchRequested={onSuggestionsFetchRequested}
@@ -73,7 +62,7 @@ const InsuranciesSelect = ({ formik }: InsuranciesSelectProps) => {
         focusInputOnSuggestionClick={false}
         shouldRenderSuggestions={() => true}
         inputProps={{
-          placeholder: 'Digite ou seleciona um convênio',
+          placeholder: 'Digite ou selecione um convênio',
           value: valueState,
           onChange: changeInput,
           className: 'form-control',

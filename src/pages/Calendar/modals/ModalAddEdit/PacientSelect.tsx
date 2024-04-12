@@ -46,7 +46,7 @@ const PacientSelect = ({ onChange, value }: Props) => {
         loadingMessage={() => 'Carregando Pacientes'}
         formatCreateLabel={(inputValue: string) => `Criar paciente ${inputValue}`}
         isClearable
-        placeholder=""
+        placeholder="Selecione um paciente"
         id="paciente"
         name="paciente"
       />

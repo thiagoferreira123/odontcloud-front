@@ -436,19 +436,19 @@ const CalendarApp = () => {
             <Col md={6} className="mt-5">
               <label className="my-custom-link text-end">
                 Categorias de agendamentos:
-                <Badge pill className="bg-consulta">
+                <Badge pill bg="consulta">
                   Consulta
                 </Badge>{' '}
-                <Badge pill bg="warning">
+                <Badge pill bg="retorno">
                   Retorno
                 </Badge>{' '}
-                <Badge pill bg="danger">
+                <Badge pill bg="possivel-retorno">
                   Possível retorno
                 </Badge>{' '}
-                <Badge pill bg="tertiary">
+                <Badge pill bg="agendado">
                   Agendado pelo site
                 </Badge>{' '}
-                <Badge pill bg="quaternary">
+                <Badge pill bg="outros">
                   Outros
                 </Badge>{' '}
               </label>
@@ -456,16 +456,16 @@ const CalendarApp = () => {
             <Col md={6} className="mt-5">
               <label className="my-custom-link text-end">
                 Status dos agendamentos:
-                <Badge pill bg="primary">
+                <Badge pill bg="confirmed">
                   Confirmada
                 </Badge>{' '}
-                <Badge pill bg="warning">
+                <Badge pill bg="pending">
                   Pendente
                 </Badge>{' '}
-                <Badge pill bg="danger">
+                <Badge pill bg="canceled">
                   Desmarcada
                 </Badge>{' '}
-                <Badge pill bg="quaternary">
+                <Badge pill bg="no-show">
                   Não compareceu
                 </Badge>{' '}
               </label>

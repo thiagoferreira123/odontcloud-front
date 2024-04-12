@@ -4,7 +4,7 @@ import { medicalInsuranceOptions } from '../../constatnts';
 import { escapeRegexCharacters } from '../../../../helpers/SearchFoodHelper';
 import Autosuggest from 'react-autosuggest';
 import { ModalWaitingListFormValues } from '.';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type InsuranciesSelectProps = {
   formik: {
@@ -47,18 +47,12 @@ const InsuranciesSelect = ({ formik }: InsuranciesSelectProps) => {
     setFieldValue('calendar_waiting_list_health_insurance', newValue ?? '');
   };
 
+  useEffect(() => {
+    setValueState(values.calendar_waiting_list_health_insurance || '');
+  }, [values.calendar_waiting_list_health_insurance]);
+
   return (
     <div className="mb-3 top-label">
-      {/* <Select
-        options={options}
-        value={value}
-        onChange={(e) => handleChange(e as Option)}
-        isClearable
-        id="calendar_waiting_list_health_insurance"
-        name="calendar_waiting_list_health_insurance"
-        classNamePrefix="react-select"
-        placeholder="Selecione o convênio"
-      /> */}
       <Autosuggest
         suggestions={suggestions}
         onSuggestionsFetchRequested={onSuggestionsFetchRequested}
@@ -68,7 +62,7 @@ const InsuranciesSelect = ({ formik }: InsuranciesSelectProps) => {
         focusInputOnSuggestionClick={false}
         shouldRenderSuggestions={() => true}
         inputProps={{
-          placeholder: 'Digite ou seleciona um convênio',
+          placeholder: 'Digite ou selecione um convênio',
           value: valueState,
           onChange: changeInput,
           className: 'form-control',
