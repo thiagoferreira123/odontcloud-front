@@ -86,6 +86,7 @@ export default function CarePlan() {
         budget_date_creation: new Date().toISOString(),
         budget_name: result.data?.care_plan_identification ?? 'Sem identificação',
         budget_value: parseToBrValue(totalValue).replace('R$', '').trim(),
+        budget_care_plan_id: id,
       };
       const response = await addCarePlanBudget({ ...payload, budget_care_plan_patient_id: result.data?.care_plan_patient_id }, queryClient);
 
