@@ -50,6 +50,12 @@ export interface User {
   clinic_number?: number;
   clinic_logo_link: string;
   clinic_signature_link: string;
+  subscription: {
+    id: number,
+    stripeSubscriptionId: string,
+    userId: number,
+    status: 'active' | 'canceled' | 'trialing' | 'past_due' | 'unpaid',
+  }
 }
 
 export enum Role {

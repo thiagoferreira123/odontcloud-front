@@ -1,7 +1,6 @@
 import { Row, Col, Card } from 'react-bootstrap';
 import ListPatient from './patients/ListPatient.tsx';
 import ListCalendar from './ListCalendar/index.tsx';
-import { CtaIntrodutionVideo } from './CtaIntrodutionVideo.tsx';
 import PatientListFilter from './patients/PatientListFilter.tsx';
 import PatientsAnalysis from './PatientsAnalysis/index.tsx';
 import { useQuery } from '@tanstack/react-query';
@@ -14,6 +13,8 @@ import { AppException } from '../../helpers/ErrorHelpers.ts';
 import { notify } from '../../components/toast/NotificationIcon.tsx';
 import { TransactionTypeOptions } from '../FinancialControl/hooks/TransactionStore/types.ts';
 import { parseBrValueToNumber } from '../../helpers/StringHelpers.ts';
+import { Link } from 'react-router-dom';
+import api from '../../services/useAxios.ts';
 
 const actualDate = new Date();
 const actualYear = actualDate.getFullYear();
@@ -55,6 +56,25 @@ const Dashboard = () => {
         : acc;
     }, 0) ?? 0;
 
+  const getBillingPortal = async () => {
+    try {
+      const response = await api.get('/payments/get-portal-link'); // Add this line
+
+      console.log(response.data); // Add this line
+
+      return response.data.url; // Add this line
+    } catch (error) {
+      console.error(error);
+      error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
+      throw error;
+    }
+  };
+
+  const result = useQuery({
+    queryKey: ['portal-link'],
+    queryFn: getBillingPortal,
+  });
+
   return (
     <>
       <Row>
@@ -78,7 +98,7 @@ const Dashboard = () => {
             <ListCalendar />
 
             <Row className="mt-4">
-              <Col xl="12" className='mb-4'>
+              <Col xl="12" className="mb-4">
                 <Card>
                   <Card.Body className="py-4">
                     <Row className="g-0 align-items-center">
@@ -97,7 +117,7 @@ const Dashboard = () => {
                   </Card.Body>
                 </Card>
               </Col>
-              <Col xl="12" className='mb-4'>
+              <Col xl="12" className="mb-4">
                 <Card>
                   <Card.Body className="py-4">
                     <Row className="g-0 align-items-center">
@@ -118,6 +138,17 @@ const Dashboard = () => {
               </Col>
             </Row>
           </div>
+        </Col>
+      </Row>
+
+      <Row>
+        <Col>
+          {/* <StripeContainer /> */}
+          <Link to={result.data} className="btn btn-primary">
+            Gerenciar assinatura
+          </Link>{' '}
+          {/* Add this line */}
+          {/* <Link to={checkoutUrl} className='btn btn-primary'>Checkout</Link> */}
         </Col>
       </Row>
 
