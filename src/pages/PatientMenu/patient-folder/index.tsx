@@ -75,10 +75,11 @@ export default function HistoryPatientFolder() {
     <>
       <Card>
         <Card.Body className="mb-n3 border-last-none">
-          <Alert className="text-center">
-            Use essa área para salvar arquivos importantes, como resultado de exames, foto de remédios ou suplementos, etc. Os materiais inseridos nessa área
-            não serão compartilhados com o paciente.
-          </Alert>
+            <div className='text-center'>
+              <h5>Use essa área para salvar arquivos importantes, como resultado de exames, foto de remédios ou suplementos, etc. Os materiais inseridos nessa área
+              não serão compartilhados com o paciente.</h5>
+            </div>
+         
           {result.isLoading ? (
             <div className="h-50 d-flex justify-content-center align-items-center">
               <StaticLoading />
