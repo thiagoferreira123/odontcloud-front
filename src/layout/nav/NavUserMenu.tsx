@@ -9,6 +9,10 @@ import CsLineIcons from '../../cs-line-icons/CsLineIcons';
 import SettingsModal from '../right-buttons/SettingsModal';
 import { useAuth } from '../../pages/Auth/Login/hook';
 import { layoutShowingNavMenu } from '../layoutSlice';
+import api from '../../services/useAxios';
+import { AppException } from '../../helpers/ErrorHelpers';
+import { notify } from '../../components/toast/NotificationIcon';
+import { useQuery } from '@tanstack/react-query';
 
 interface NavUserMenuDropdownToggleProps {
   onClick: (e: React.MouseEvent) => void;
@@ -28,10 +32,31 @@ const NavUserMenuContent = (props: NavUserMenuContentProps) => {
   const showSettingsModal = () => {
     setIsShowSettingsModal(true);
   };
+
   const closeSettingsModal = () => {
     setIsShowSettingsModal(false);
     document.documentElement.click();
   };
+
+  const getBillingPortal = async () => {
+    try {
+      const response = await api.get('/payments/get-portal-link'); // Add this line
+
+      console.log(response.data); // Add this line
+
+      return response.data.url; // Add this line
+    } catch (error) {
+      console.error(error);
+      error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
+      throw error;
+    }
+  };
+
+  const result = useQuery({
+    queryKey: ['portal-link'],
+    queryFn: getBillingPortal,
+    enabled: !!user?.clinic_stripe_customer_id,
+  });
 
   return (
     <div>
@@ -45,15 +70,15 @@ const NavUserMenuContent = (props: NavUserMenuContentProps) => {
             </li>
           </ul>
         </Col>
-        {/* <Col xs="12" className="pe-1 ps-1 mb-2">
-        <ul className="list-unstyled">
-          <li>
-          <a href="https://purchase.hotmart.com/" target="_blank" rel="noopener noreferrer">
-            <CsLineIcons icon="money" className="me-2" size={17} /> <span className="align-middle">Pagamentos</span>
-          </a>
-          </li>
-        </ul>
-      </Col> */}
+        {result.data && <Col xs="12" className="pe-1 ps-1 mb-2">
+          <ul className="list-unstyled">
+            <li>
+              <Link to={result.data}>
+                <CsLineIcons icon="money" className="me-2" size={17} /> <span className="align-middle">Gerenciar assinatura</span>
+              </Link>
+            </li>
+          </ul>
+        </Col>}
         <Col xs="12" className="pe-1 ps-1 mb-1">
           <ul className="list-unstyled">
             <li>

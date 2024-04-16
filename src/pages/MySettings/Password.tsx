@@ -55,8 +55,6 @@ const Password: React.FC = () => {
 
       const { data } = await api.post('/clinic/update-password', payload);
 
-      console.log(data);
-
       notify('Senha alterada com sucesso', 'Sucesso', 'check', 'success');
       setIsSaving(false);
     } catch (error) {

@@ -32,6 +32,11 @@ export type CreateAuthStore = {
   getUser: () => User | null;
   setUser: (user: User) => void;
 }
+export enum PriceNames {
+  MONTHLY = 'monthly',
+  YEARLY = 'yearly',
+  SEMI_ANNUALLY = 'semi-annually',
+}
 
 export interface User {
   clinic_id: string;
@@ -50,11 +55,13 @@ export interface User {
   clinic_number?: number;
   clinic_logo_link: string;
   clinic_signature_link: string;
+  clinic_stripe_customer_id: string;
   subscription: {
     id: number,
-    stripeSubscriptionId: string,
-    userId: number,
-    status: 'active' | 'canceled' | 'trialing' | 'past_due' | 'unpaid',
+    stripe_subscription_id: string,
+    clinic_id: number,
+    subscription_level: PriceNames;
+    subscription_status: 'active' | 'canceled' | 'trialing' | 'past_due' | 'unpaid',
   }
 }
 

@@ -14,6 +14,9 @@ import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import ModalPremium from '../ModalPremium.tsx';
 import Empty from '../../../components/Empty.tsx';
+import { useAuth } from '../../Auth/Login/hook/index.ts';
+import api from '../../../services/useAxios.ts';
+import AsyncButton from '../../../components/AsyncButton.tsx';
 
 // Componente Skeleton para simular um item da lista de pacientes
 const PatientItemSkeleton = () => {
@@ -42,14 +45,33 @@ const filterPatient = (patients: (Patient & { patient_id: string })[], query: st
 };
 
 const ListPatient = () => {
+  const user = useAuth((state) => state.user);
+
   const { handleOpenModal } = useModalAddPatientStore();
   const query = usePatientListFilterStore((state) => state.query);
   const [showModalPremium, setShowModalPremium] = useState(false);
+  const [isFetchingSignatureStatus, setIsFetchingSignatureStatus] = useState(false);
 
   const { getPatients } = usePatientStore();
 
   const handleClickOpenModalAddPatient = async () => {
-    handleOpenModal();
+    try {
+      setIsFetchingSignatureStatus(true);
+      if (!user?.subscription?.subscription_status || user.subscription.subscription_status !== 'active') {
+        const { data } = await api.get('/clinic-patient/count-by-clinic/');
+
+        if (data.statusCode === 900) {
+          setIsFetchingSignatureStatus(false);
+          return setShowModalPremium(true);
+        }
+      }
+
+      setIsFetchingSignatureStatus(false);
+      handleOpenModal();
+    } catch (error) {
+      console.error(error);
+      setIsFetchingSignatureStatus(false);
+    }
   };
 
   const result = useQuery({
@@ -57,7 +79,7 @@ const ListPatient = () => {
     queryFn: getPatients,
   });
 
-  const filteredData = (result.data?.length && query.length) ? filterPatient(result.data ?? [], query) : result.data ?? [];
+  const filteredData = result.data?.length && query.length ? filterPatient(result.data ?? [], query) : result.data ?? [];
 
   return (
     <>
@@ -95,9 +117,16 @@ const ListPatient = () => {
               </>
             ) : (
               <>
-                <Button variant="primary" size="lg" className="btn-icon btn-icon-end mb-1 mt-3 me-2" onClick={handleClickOpenModalAddPatient}>
+                <AsyncButton
+                  isSaving={isFetchingSignatureStatus}
+                  variant="primary"
+                  size="lg"
+                  className="btn-icon btn-icon-end mb-1 mt-3 me-2"
+                  onClickHandler={handleClickOpenModalAddPatient}
+                  loadingText=' '
+                >
                   <span>Cadastrar paciente</span> <Icon.Plus size={20} className="ms-2" />
-                </Button>
+                </AsyncButton>
               </>
             )}
           </div>

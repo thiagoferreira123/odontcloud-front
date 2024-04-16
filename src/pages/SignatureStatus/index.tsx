@@ -7,6 +7,8 @@ import { AppException } from '../../helpers/ErrorHelpers';
 import { notify } from '../../components/toast/NotificationIcon';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../Auth/Login/hook';
+import { appRoot } from '../../routes';
 
 interface BlockReason {
   statusCode: number;
@@ -14,6 +16,7 @@ interface BlockReason {
   fullName: string;
   subscriptionStatus: string;
   message: string;
+  subscription_level: string;
 }
 
 const queryClient = new QueryClient();
@@ -25,13 +28,13 @@ const translatedPaymentStatus = ['Cancelada', 'Reembolsada', 'Solicitação de r
 const SignatureStatus = () => {
   useLayout();
 
+  const user = useAuth((state) => state.user);
+
   const blockReason: BlockReason = JSON.parse(localStorage.getItem('block') || '{}');
 
-  const getCheckoutUrl = async () => {
+  const getBillingPortal = async () => {
     try {
-      const response = await api.post('/payments/subscribe'); // Add this line
-
-      console.log(response.data); // Add this line
+      const response = await api.get('/payments/get-portal-link'); // Add this line
 
       return response.data.url; // Add this line
     } catch (error) {
@@ -42,8 +45,8 @@ const SignatureStatus = () => {
   };
 
   const result = useQuery({
-    queryKey: ['checkout-url'],
-    queryFn: getCheckoutUrl,
+    queryKey: ['portal-link'],
+    queryFn: getBillingPortal,
   });
 
   return (

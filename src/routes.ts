@@ -108,6 +108,13 @@ const routesAndMenuItems: RoutesAndMenuItems = {
       roles: [],
     },
     {
+      path: `${appRoot}/planos`,
+      label: 'menu.planos',
+      hideInMenu: true,
+      component: ferramentas.Pricing,
+      roles: [],
+    },
+    {
       path: `${appRoot}/ferramentas`,
       label: 'menu.apps',
       icon: 'screen',
@@ -116,7 +123,6 @@ const routesAndMenuItems: RoutesAndMenuItems = {
         { path: '/calendar', label: 'menu.calendar', component: ferramentas.calendar },
         { path: '/controle-pacientes', label: 'menu.controle-pacientes', component: ferramentas.PatientControl },
         { path: '/controle-financeiro', label: 'menu.controle-financeiro', component: ferramentas.FinancialControl },
-        { path: '/planos', label: 'menu.planos', component: ferramentas.Pricing },
         // { path: '/site', label: 'menu.site', component: ferramentas.ProfessionalWebsite },
       ],
     },

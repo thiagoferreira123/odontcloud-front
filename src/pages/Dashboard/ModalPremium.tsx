@@ -1,8 +1,15 @@
-import CsLineIcons from '/src/cs-line-icons/CsLineIcons';
 import React, { useState } from 'react';
 import { Alert, Button, Form, Modal } from 'react-bootstrap';
+import CsLineIcons from '../../cs-line-icons/CsLineIcons';
+import { Link } from 'react-router-dom';
+import { appRoot } from '../../routes';
 
-const ModalPremium = ({ showModal, setShowModal }) => {
+interface ModalPremiumProps {
+  showModal: boolean;
+  setShowModal: (show: boolean) => void;
+}
+
+const ModalPremium = ({ showModal, setShowModal }: ModalPremiumProps) => {
   const [assinarClicked, setAssinarClicked] = useState(false);
 
   const handleAssinar = () => {
@@ -14,33 +21,7 @@ const ModalPremium = ({ showModal, setShowModal }) => {
     setAssinarClicked(false); // Reset the state when modal is closed
   };
 
-  const [selectedOption, setSelectedOption] = useState(null);
-
-  const handleCheckboxChange = (event) => {
-    setSelectedOption(event.target.id);
-    switch (event.target.id) {
-      case 'stackedRadio1':
-        window.open('https://pay.hotmart.com/J58136392B?off=4y8a8ivl&sck=HOTMART_PRODUCT_PAGE&checkoutMode=10&bid=1671809359107', '_blank');
-        break;
-      case 'stackedRadio2':
-        window.open('https://pay.hotmart.com/J58136392B?off=oq3u2gqb&sck=HOTMART_PRODUCT_PAGE&checkoutMode=10&bid=1671811088948', '_blank');
-        break;
-      case 'stackedRadio3':
-        window.open('https://pay.hotmart.com/J58136392B?off=5gjsos5l&sck=HOTMART_PRODUCT_PAGE&checkoutMode=10&bid=1628877905809', '_blank');
-        break;
-      case 'stackedRadio5':
-        window.open('https://pay.hotmart.com/J58136392B?off=6zmjbi4i&sck=HOTMART_PRODUCT_PAGE&checkoutMode=10&bid=1628877935792', '_blank');
-        break;
-      case 'stackedRadio6':
-        window.open('https://api.whatsapp.com/send?phone=5567998841541&text=Ol%C3%A1,%20quero%20ativer%20minha%20assinatura%20estudante,%20por%20apenas%2027.90%20R$%20por%20m%C3%AAs,%20at%C3%A9%20o%20fim%20da%20minha%20gradua%C3%A7%C3%A3o.%0A%0AAqui%20est%C3%A1%20meu%20comprovante%20de%20matricula:%0ADocumento%20com%20foto:%0AData%20de%20t%C3%A9rmino%20da%20gradua%C3%A7%C3%A3o:', '_blank');
-        break;
-      default:
-        break;
-    }
-  };
-  
-
-  const whatsappNumber = '5567981490781'; 
+  const whatsappNumber = '5567981490781';
   const message = encodeURIComponent("Olá Thiago! gostaria de assinar o OdontCloud, mas antes tenho uma dúvida. Você poderia me ajudar?");
 
   const handleWhatsAppButtonClick = () => {
@@ -142,86 +123,8 @@ const ModalPremium = ({ showModal, setShowModal }) => {
                   <Button className='me-1' variant="light" onClick={handleClose}>
                     <span className='text-medium text-alternate'> Talvez mais tarde</span>
                   </Button>
-                  <Button onClick={handleAssinar}>Assinar</Button>
+                  <Link to={`${appRoot}/planos`} onClick={handleAssinar} className='btn btn-primary'>Assinar</Link>
                 </div>
-              </div>
-            </div>
-          )}
-          {assinarClicked && ( 
-            <div style={{ flex: 1, padding: '20px' }}>
-              <div>
-                <h4>
-                  Escolha o plano ideal para você!
-                </h4>
-              </div>
-              <Alert variant="light">
-                <div className="mb-3">
-                  <div className="d-flex align-items-center">
-                    <Form.Check
-                      type="radio"
-                      id="stackedRadio1"
-                      name="stackedRadio"
-                      className="mr-3 me-2 mb-2"
-                      onChange={handleCheckboxChange}
-                      checked={selectedOption === "stackedRadio1"}
-                    />
-                    <span className="text-bold" style={{ marginBottom: "1px" }}>38.1 R$ /mês - Anual <small>(20% OFF)</small></span>
-                  </div>
-                  <div className="d-flex align-items-center">
-                    <Form.Check
-                      type="radio"
-                      id="stackedRadio2"
-                      name="stackedRadio"
-                      className="mr-3 me-2 mb-2"
-                      onChange={handleCheckboxChange}
-                      checked={selectedOption === "stackedRadio2"}
-                    />
-                    <span className="text-alternate" style={{ marginBottom: "1px" }}>41.3 R$ /mês - Semestral <small>(15% OFF)</small></span>
-                  </div>
-                  <div className="d-flex align-items-center">
-                    <Form.Check
-                      type="radio"
-                      id="stackedRadio3"
-                      name="stackedRadio"
-                      className="mr-3 me-2 mb-2"
-                      onChange={handleCheckboxChange}
-                      checked={selectedOption === "stackedRadio3"}
-                    />
-                    <span className="text-alternate" style={{ marginBottom: "1px" }}>43.3 R$ /mês - Trimestral <small>(10% OFF)</small></span>
-                  </div>
-                  <div className="d-flex align-items-center">
-                    <Form.Check
-                      type="radio"
-                      id="stackedRadio5"
-                      name="stackedRadio"
-                      className="mr-3 me-2 mb-2"
-                      onChange={handleCheckboxChange}
-                      checked={selectedOption === "stackedRadio5"}
-                    />
-                    <span className="text-alternate" style={{ marginBottom: "1px" }}>47.9 R$ /mês - Mensal</span>
-                  </div>
-                </div>
-              </Alert>
-              <div className='text-medium text-center'>
-                <span>* Utilize o mesmo e-mail de cadastro no OdontCloud para realizar o pagamento 🚀</span>
-              </div>
-              <div className='mt-3 mb-3'>
-                Dúvidas frequentes:
-                <p className='text-medium mb-2 mt-3'>
-                  a) Os planos semestral e anual podem ser parcelados no cartão de crédito
-                </p>
-                <p className='text-medium mb-2'>
-                  b) Cancelamento a qualquer momento, sem multas ou fidelidade.
-                </p>
-                <p className='text-medium mb-2'>
-                  c) Garantia de 7 dias de satisfação ou seu dinheiro de volta.
-                </p>
-                <p className='text-medium mb-2'>
-                  d) Quando o pagamento é feito por cartão de crédito ou PIX, o OdontCloud é desbloqueado imediatamente. Em caso de boleto, pode levar até 3 dias úteis.
-                </p>
-              </div>
-              <div className='text-center'>
-                <Button onClick={handleWhatsAppButtonClick}>Restam dúvidas? Entre em contato</Button>
               </div>
             </div>
           )}
