@@ -74,43 +74,6 @@ const SignatureStatus = () => {
                   Regularizar
                 </Link>{' '}
               </p>
-
-              <p>Instruções:</p>
-              <ol>
-                <li>
-                  <p>Digite o e-mail utilizado na compra. </p>
-                </li>
-                <li>
-                  <p>Digite sua senha (se esqueceu, selecione "esqueci minha senha").</p>
-                </li>
-                <li>
-                  <p>Acesse suas compras e selecione o OdontCloud.</p>
-                </li>
-                <li>
-                  <p>Verifique suas faturas pendentes e realize o pagamento.</p>
-                </li>
-              </ol>
-
-              <p>
-                <p>
-                  Tutorial completo:{' '}
-                  <a
-                    href="https://help.hotmart.com/pt-br/article/como-gerir-os-meus-pagamentos-pela-area-do-comprador-da-plataforma-beta-/19424127593741"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Como emitir um novo boleto para uma assinatura atrasada
-                  </a>
-                  .
-                </p>
-              </p>
-              <p>
-                Se tiver dúvidas, consulte nossa{' '}
-                <a href="https://OdontCloud.com.br/politica-de-pagamentos" target="_blank" rel="noreferrer">
-                  política de pagamentos
-                </a>
-                .
-              </p>
             </div>
           </Card.Body>
         </Card>
