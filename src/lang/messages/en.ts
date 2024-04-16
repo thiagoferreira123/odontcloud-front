@@ -186,6 +186,7 @@ const enMessages = {
   'menu.videochamada': 'Videochamada',
   'menu.laminas-nutricionais': 'Lâminas nutricionais',
   'menu.controle-financeiro': 'Controle financeiro ',
+  'menu.planos': 'Planos',
   // 'menu.admin': 'Admin',
   // 'menu.meus-dados': 'Meus dados',
   // 'menu.road-map': 'Acompanhar progresso do OdontCloud',

@@ -95,7 +95,7 @@ export default function ProfessionalWebsite() {
         specialityDescription: '',
       },
     ],
-    websiteColor: '#0eb0f2',
+    websiteColor: '#009ee3',
     professionalPhotoLink: '',
     facebook: '',
     instagram: '',
@@ -187,7 +187,7 @@ export default function ProfessionalWebsite() {
             }))
           : initialValues.specialities,
       });
-    result.data && result.data.id && setColor(result.data.websiteColor || '#0eb0f2');
+    result.data && result.data.id && setColor(result.data.websiteColor || '#009ee3');
   }, [result.data, setValues]);
 
   if (result.isLoading)

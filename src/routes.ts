@@ -16,6 +16,7 @@ const ferramentas = {
   calendar: lazy(() => import('./pages/Calendar')),
   PatientControl: lazy(() => import('./pages/PatientControl')),
   FinancialControl: lazy(() => import('./pages/FinancialControl')),
+  Pricing: lazy(() => import('./pages/Pricing')),
   MySettings: lazy(() => import('./pages/MySettings')),
   ProfessionalWebsite: lazy(() => import('./pages/ProfessionalWebsite')),
 };
@@ -115,6 +116,7 @@ const routesAndMenuItems: RoutesAndMenuItems = {
         { path: '/calendar', label: 'menu.calendar', component: ferramentas.calendar },
         { path: '/controle-pacientes', label: 'menu.controle-pacientes', component: ferramentas.PatientControl },
         { path: '/controle-financeiro', label: 'menu.controle-financeiro', component: ferramentas.FinancialControl },
+        { path: '/planos', label: 'menu.planos', component: ferramentas.Pricing },
         // { path: '/site', label: 'menu.site', component: ferramentas.ProfessionalWebsite },
       ],
     },

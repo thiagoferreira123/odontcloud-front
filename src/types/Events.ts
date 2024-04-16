@@ -1,7 +1,7 @@
 import { ScheduleStatus, ScheduleType } from "../pages/Calendar/hooks/ScheduleStore/types";
 
 export enum EventColor {
-  CONSULTA = '#0eb0f2',
+  CONSULTA = '#009ee3',
   RETORNO = '#ebb71a',
   POSSIVEL_RETORNO = '#cf2637',
   OUTROS = '#558df3',
@@ -21,7 +21,7 @@ export const eventColorMap: EventColorMap = {
 };
 
 export enum EventStatusColor {
-  CONFIRMED = '#0eb0f2',
+  CONFIRMED = '#009ee3',
   PENDING = '#ebb71a',
   SCHEDULED = '#ebb71a',
   CANCELLED = '#cf2637',
