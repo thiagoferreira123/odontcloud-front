@@ -42,8 +42,6 @@ const NavUserMenuContent = (props: NavUserMenuContentProps) => {
     try {
       const response = await api.get('/payments/get-portal-link'); // Add this line
 
-      console.log(response.data); // Add this line
-
       return response.data.url; // Add this line
     } catch (error) {
       console.error(error);

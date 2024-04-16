@@ -156,12 +156,6 @@ export default function CarePlanBudget() {
         </Card.Body>
       </Card>
 
-      <div className="d-flex justify-content-center mt-3">
-        <Button variant="primary" className="mb-1 hover-scale-up"  onClick={handleShowModal}>
-          Criar um novo orçamento
-        </Button>
-      </div>
-
       <DeleteConfirmationModal />
       <ConfigModal />
     </>

@@ -47,6 +47,7 @@ const PersonalData = () => {
     clinic_state: Yup.string().matches(/^[A-Za-z]{2}$/, 'Insira uma sigla de estado válida'),
     clinic_city: Yup.string(),
     clinic_neighborhood: Yup.string(),
+    clinic_street: Yup.string(),
     clinic_logo_link: Yup.string(),
     clinic_number: Yup.number(),
   });
@@ -58,6 +59,7 @@ const PersonalData = () => {
     clinic_phone: '',
     clinic_zipcode: '',
     clinic_state: '',
+    clinic_street: '',
     clinic_city: '',
     clinic_neighborhood: '',
     clinic_number: '',
@@ -118,7 +120,7 @@ const PersonalData = () => {
         formik.setFieldValue('clinic_state', uf);
         formik.setFieldValue('clinic_city', localidade);
         formik.setFieldValue('clinic_neighborhood', clinic_neighborhood);
-        formik.setFieldValue('endereco', logradouro);
+        formik.setFieldValue('clinic_street', logradouro);
       } catch (error) {
         console.error('Erro ao buscar CEP', error);
       }
@@ -154,6 +156,7 @@ const PersonalData = () => {
       clinic_state: user.clinic_state ?? '',
       clinic_city: user.clinic_city?.toString() ?? '',
       clinic_neighborhood: user.clinic_neighborhood ?? '',
+      clinic_street: user.clinic_street ?? '',
       clinic_logo_link: user.clinic_logo_link ?? '',
       clinic_number: user.clinic_number?.toString() ?? '',
     });
@@ -243,6 +246,16 @@ const PersonalData = () => {
                 {errors.clinic_neighborhood && touched.clinic_neighborhood && <div className="error">{errors.clinic_neighborhood}</div>}
               </div>
             </Col>
+            <Col xl={6}>
+              <div className="mb-3 top-label d-flex me-2">
+                <Form.Control type="text" name="clinic_street" value={values.clinic_street} onChange={handleChange} />
+                <Form.Label>RUA</Form.Label>
+                {errors.clinic_street && touched.clinic_street && <div className="error">{errors.clinic_street}</div>}
+              </div>
+            </Col>
+          </div>
+
+          <div className="d-flex">
             <Col xl={6}>
               <div className="mb-3 top-label d-flex me-2">
                 <Form.Control type="text" name="clinic_number" value={values.clinic_number} onChange={handleChange} />

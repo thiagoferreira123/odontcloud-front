@@ -21,6 +21,7 @@ import usePatientMenuStore from '../PatientMenu/hooks/patientMenuStore';
 import { getTotalValueWithDiscount } from './helpers';
 import ResponsiveNav from '../../components/ResponsiveNav';
 import TransactionConfirmationModal from './modals/TransactionConfirmationModal';
+import ProfessionalSelect from './ProfessionalSelect';
 
 export default function Budget() {
   const [showModal, setShowModal] = useState(false);
@@ -145,7 +146,7 @@ export default function Budget() {
                   <Form.Label className="d-block">
                     <strong>Profissional</strong>
                   </Form.Label>
-                  {/* <SelectMultiple /> */}
+                  {result.data && <ProfessionalSelect carePlanBudget={result.data} />}
                 </Col>
               </div>
               <Table striped>
