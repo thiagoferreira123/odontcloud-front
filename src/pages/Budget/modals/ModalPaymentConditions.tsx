@@ -67,9 +67,11 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
       await createMenyCarePlanBudgetHistoryItems(
         {
           paymentBudgetId: carePlanBudget.budget_id,
-          totalAmount: Number(valueWithDiscount),
+          totalAmount: valueWithDiscount,
           installments: installments,
+          budgetEntranceValue: values.budget_pay_day,
           firstPaymentDate: values.budget_due_first_installment,
+          entranceDate: values.budget_entry_payment,
         },
         queryClient
       );
@@ -132,13 +134,13 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
   };
 
   const validationSchema = Yup.object().shape({
-    budget_discount_value: Yup.string(),
-    budget_discount_type: Yup.string(),
-    budget_number_installments: Yup.string(),
-    budget_payment_method: Yup.string(),
-    budget_pay_day: Yup.string(),
+    budget_payment_method: Yup.string().required('Forma de pagamento é obrigatório'),
+    budget_discount_value: Yup.string().notRequired(),
+    budget_discount_type: Yup.string().notRequired(),
+    budget_number_installments: Yup.string().notRequired(),
+    budget_pay_day: Yup.string().notRequired(),
     budget_due_first_installment: Yup.date(),
-    budget_entry_payment: Yup.date(),
+    budget_entry_payment: Yup.date().notRequired(),
   });
 
   const formik = useFormik({ initialValues, validationSchema, onSubmit });
@@ -171,6 +173,7 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
                 <strong>Forma de pagamento</strong>
               </Form.Label>
               <SelectPaymentMethod formik={formik} />
+              {errors.budget_payment_method && touched.budget_payment_method && <div className="error transform-down-4">{errors.budget_payment_method.toString()}</div>}
             </Col>
           </Row>
           <Row>
@@ -195,7 +198,7 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
                 checked={values.budget_discount_type == 'real'}
               />
             </Form.Label>
-            {errors.budget_discount_type && touched.budget_discount_type && <div className="error">{errors.budget_discount_type.toString()}</div>}
+            {errors.budget_discount_type && touched.budget_discount_type && <div className="error transform-down-4">{errors.budget_discount_type.toString()}</div>}
           </Row>
           <Row>
             <Form.Label className="d-block">
@@ -203,7 +206,7 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
             </Form.Label>
             <Col xs="12" className="mb-3 d-flex">
               <Form.Control type="text" name="budget_discount_value" value={values.budget_discount_value ?? ''} onChange={handleChangeMaskMoney} />
-              {errors.budget_discount_value && touched.budget_discount_value && <div className="error">{errors.budget_discount_value}</div>}
+              {errors.budget_discount_value && touched.budget_discount_value && <div className="error transform-down-4">{errors.budget_discount_value}</div>}
             </Col>
           </Row>
           <Alert variant="light">
@@ -211,17 +214,17 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
             Valor com desconto: {parseToBrValue(valueWithDiscount)}
           </Alert>
           <Row>
-            <Col xs="6" className="mb-3">
+            <Col xs="6" className="mb-3 position-relative">
               <Form.Label className="d-block">
                 <strong>Quantidade de parcelas</strong>
               </Form.Label>
               <Col xs="12" className="mb-3 d-flex">
                 <Form.Control type="text" name="budget_number_installments" value={values.budget_number_installments ?? ''} onChange={handleChange} />
-                {errors.budget_number_installments && touched.budget_number_installments && <div className="error">{errors.budget_number_installments}</div>}
+                {errors.budget_number_installments && touched.budget_number_installments && <div className="error transform-down-4">{errors.budget_number_installments}</div>}
               </Col>
             </Col>
 
-            <Col xs="6" className="mb-3">
+            <Col xs="6" className="mb-3 position-relative">
               <Form.Label>
                 <strong>Data do vencimento da primeira parcela</strong>
               </Form.Label>
@@ -233,21 +236,22 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
                 locale="pt-BR"
                 dateFormat="dd/MM/yyyy"
               />
+              {errors.budget_due_first_installment && touched.budget_due_first_installment && <div className="error transform-down-4">{String(errors.budget_due_first_installment)}</div>}
             </Col>
           </Row>
 
           <Row>
-            <Col xs="6" className="mb-3">
+            <Col xs="6" className="mb-3 position-relative">
               <Form.Label className="d-block">
                 <strong>Entrada</strong>
               </Form.Label>
               <Col xs="12" className="mb-3 d-flex">
                 <Form.Control type="text" name="budget_pay_day" value={values.budget_pay_day ?? ''} onChange={handleChange} />
-                {errors.budget_pay_day && touched.budget_pay_day && <div className="error">{errors.budget_pay_day}</div>}
+                {errors.budget_pay_day && touched.budget_pay_day && <div className="error transform-down-4">{errors.budget_pay_day}</div>}
               </Col>
             </Col>
 
-            <Col xs="6" className="mb-3">
+            <Col xs="6" className="mb-3 position-relative">
               <Form.Label>
                 <strong>Data da entrada</strong>
               </Form.Label>
@@ -259,6 +263,7 @@ const ModalPaymentConditions = ({ showModal, onHide, carePlanBudget }: ModalPaym
                 locale="pt-BR"
                 dateFormat="dd/MM/yyyy"
               />
+              {errors.budget_entry_payment && touched.budget_entry_payment && <div className="error transform-down-4">{String(errors.budget_entry_payment)}</div>}
             </Col>
           </Row>
           <div className="text-center">

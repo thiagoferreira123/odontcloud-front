@@ -116,10 +116,13 @@ export default function Budget() {
     result.data?.budget_discount_value ?? '0',
     result.data?.budget_discount_type ?? 'percentage'
   );
-  const discountValue =
-    result.data?.budget_discount_type === 'percentage' ? `${result.data?.budget_discount_value}%` : parseToBrValue(result.data?.budget_discount_value ?? '0');
+  const discountValue = result.data?.budget_discount_value
+    ? result.data?.budget_discount_type === 'percentage'
+      ? `${result.data?.budget_discount_value}%`
+      : parseToBrValue(result.data?.budget_discount_value ?? '0')
+    : null;
   const installments = result.data?.budget_number_installments ? Number(result.data?.budget_number_installments) : 1;
-  const installmentValue = parseToBrValue(valueWithDiscount / installments);
+  const installmentValue = (valueWithDiscount - parseBrValueToNumber(result.data?.budget_pay_day ?? '0')) / installments;
 
   return (
     <>
@@ -194,10 +197,15 @@ export default function Budget() {
               </div>
               <h5 className="mt-4 text-center">
                 {' '}
-                O valor total do orçamento é de <strong>{parseToBrValue(valueWithDiscount)}</strong> com um desconto de <strong>{discountValue}</strong> já
-                aplicado. Será parcelado em{' '}
+                O valor total do orçamento é de <strong>{parseToBrValue(valueWithDiscount)}</strong>
+                {discountValue ? (
+                  <span>
+                    com um desconto de <strong>{discountValue}</strong> já aplicado.
+                  </span>
+                ) : null}{' '}
+                Será parcelado em{' '}
                 <strong>
-                  {installments}x de {installmentValue} R${' '}
+                  {installments}x de {parseToBrValue(installmentValue)}
                 </strong>
               </h5>
             </Card>

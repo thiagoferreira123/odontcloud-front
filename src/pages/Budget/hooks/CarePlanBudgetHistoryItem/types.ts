@@ -20,7 +20,9 @@ interface CreateCarePlanBudgetHistoryItemPayload {
   paymentBudgetId: string,
   totalAmount: number,
   installments: number,
-  firstPaymentDate: string
+  budgetEntranceValue: string,
+  firstPaymentDate: string,
+  entranceDate: string,
 }
 
 export type CarePlanBudgetHistoryItemActions = {
