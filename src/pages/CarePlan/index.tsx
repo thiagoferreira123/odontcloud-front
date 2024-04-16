@@ -22,6 +22,8 @@ import { CarePlanBudget } from '../PatientMenu/budget/hooks/CarePlanBudgetStore/
 import { appRoot } from '../../routes';
 import AsyncButton from '../../components/AsyncButton';
 import { parseToBrValue } from '../../helpers/StringHelpers';
+import usePatientMenuStore from '../PatientMenu/hooks/patientMenuStore';
+import PatientMenuRow from '../../components/PatientMenuRow';
 
 const getProfessionalName = (professionalId: string, professionals: Professional[]) => {
   return professionals.find((professional: any) => professional.professional_id === professionalId)?.professional_full_name;
@@ -42,6 +44,7 @@ export default function CarePlan() {
   const { getProfessionals } = useProfessionalStore();
   const { handleShowModalNewProcedure, handleSelectProcedureToEdit } = useModalNewProcedureStore();
   const { handleSelectToothToRemove } = useDeleteConfirmationModalStore();
+  const { setPatientId } = usePatientMenuStore();
 
   const getProfessionals_ = async () => {
     try {
@@ -68,6 +71,8 @@ export default function CarePlan() {
       const response = await getCarePlan(id);
 
       if (response === false) throw new Error('Erro ao buscar plano de tratamento');
+
+      response.care_plan_patient_id && setPatientId(response.care_plan_patient_id);
 
       return response;
     } catch (error) {
@@ -113,6 +118,8 @@ export default function CarePlan() {
 
   return (
     <>
+      <PatientMenuRow />
+
       <h2 className="medium-title">Plano de tratamento</h2>
       <Card body className="mb-2">
         {result.isLoading || resultProfessionals.isLoading ? (
