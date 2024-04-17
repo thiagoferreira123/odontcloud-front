@@ -82,6 +82,8 @@ const CalendarApp = () => {
     try {
       if (!user?.clinic_id) throw new Error('Clinic id not found');
 
+      if (user && user.subscription?.subscription_status !== 'active') return 'disabled';
+
       const result = await checkSession(user?.clinic_id);
 
       return result;
@@ -404,9 +406,15 @@ const CalendarApp = () => {
         <Col md={4} className="d-flex justify-content-end align-items-center">
           {resultWhatsApp.isLoading ? (
             <StaticLoading />
-          ) : !resultWhatsApp.data ? (
+          ) : resultWhatsApp.data === false ? (
             <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-add">Conecte seu WhatsApp para enviar alertas aos pacientes</Tooltip>}>
               <Button className="blink-effect" onClick={openModalWhatsApp}>
+                <Icon.Whatsapp /> <span>Lembrete por WhatsApp</span>
+              </Button>
+            </OverlayTrigger>
+          ) : resultWhatsApp.data === 'disabled' ? (
+            <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-add">Conecte seu WhatsApp para enviar alertas aos pacientes (Premium)</Tooltip>}>
+              <Button className="blink-effect opacity-25 not-allowed">
                 <Icon.Whatsapp /> <span>Lembrete por WhatsApp</span>
               </Button>
             </OverlayTrigger>
