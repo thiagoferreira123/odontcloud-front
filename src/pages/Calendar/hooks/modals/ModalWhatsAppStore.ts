@@ -3,8 +3,8 @@ import { create } from "zustand";
 interface ModalWhatsAppStore {
   showModal: boolean;
 
-  checkSession: (clinicId: string) => Promise<boolean>;
-  deleteSession: (clinicId: string) => Promise<void>;
+  checkSession: (userId: string) => Promise<boolean>;
+  deleteSession: (userId: string) => Promise<void>;
   openModalWhatsApp: () => void;
   hideModal: () => void;
 }
@@ -12,9 +12,9 @@ interface ModalWhatsAppStore {
 export const useModalWhatsAppStore = create<ModalWhatsAppStore>((set) => ({
   showModal: false,
 
-  checkSession: async (clinicId) => {
+  checkSession: async (userId) => {
     try {
-      const response = await fetch(`http://localhost:3002/check-session/${clinicId}`);
+      const response = await fetch(`http://localhost:3002/check-session/${userId}`);
 
       return response.status === 200 ? true : false;
     } catch (error) {
@@ -25,9 +25,9 @@ export const useModalWhatsAppStore = create<ModalWhatsAppStore>((set) => ({
       throw error;
     }
   },
-  deleteSession: async (clinicId) => {
+  deleteSession: async (userId) => {
     try {
-      await fetch(`http://localhost:3002/delete-session/${clinicId}`, {
+      await fetch(`http://localhost:3002/delete-session/${userId}`, {
         method: 'DELETE',
       });
     } catch (error) {

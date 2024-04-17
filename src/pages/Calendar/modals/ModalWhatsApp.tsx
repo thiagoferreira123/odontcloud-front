@@ -7,6 +7,10 @@ import * as Icon from 'react-bootstrap-icons';
 import { useAuth } from '../../Auth/Login/hook';
 import { useQueryClient } from '@tanstack/react-query';
 
+const webSocketStatus = [
+  'success', 'error', 'qrReadSuccess'
+]
+
 const ModalWhatsApp = () => {
   const queryClient = useQueryClient();
   const user = useAuth((state) => state.user);
@@ -31,7 +35,7 @@ const ModalWhatsApp = () => {
       sendMessage(
         JSON.stringify({
           type: 'createSession',
-          clinicId: user?.clinic_id,
+          userId: user?.clinic_id,
         })
       );
     }
@@ -44,8 +48,8 @@ const ModalWhatsApp = () => {
       if ('base64Qr' in content) {
         setBase64Qr(content.base64Qr);
       } else if ('status' in content) {
-        queryClient.invalidateQueries({queryKey: ['whatsapp-session']});
-        setStatus(content.status);
+        content.status === 'success' &&queryClient.invalidateQueries({queryKey: ['whatsapp-session']});
+        webSocketStatus.includes(content.status) && setStatus(content.status);
       }
     });
   }, [messages]);
@@ -61,6 +65,13 @@ const ModalWhatsApp = () => {
         {!base64Qr && !status && (
           <div className="sh-30 d-flex flex-column align-items-center justify-content-center">
             <h5>Gerando QRCode</h5>
+            <p> Aguarde, essa operação pode levar alguns minutos..</p>
+            <StaticLoading />
+          </div>
+        )}
+        {(status === 'qrReadSuccess') && ( // Loading após a leitura do qrCode
+          <div className="sh-30 d-flex flex-column align-items-center justify-content-center">
+            <h5>Conectando...</h5>
             <p> Aguarde, essa operação pode levar alguns minutos..</p>
             <StaticLoading />
           </div>
