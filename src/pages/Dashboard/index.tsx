@@ -128,28 +128,6 @@ const Dashboard = () => {
           </div>
         </Col>
       </Row>
-
-      <a
-        href="https://api.whatsapp.com/send?phone=5567981490781"
-        style={{
-          position: 'fixed',
-          right: '20px',
-          bottom: '20px',
-          backgroundColor: '#25D366',
-          color: 'white',
-          borderRadius: '50%',
-          padding: '10px',
-          fontSize: '24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '2px 2px 3px rgba(0,0,0,0.3)',
-        }}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Icon.Whatsapp />
-      </a>
     </>
   );
 };

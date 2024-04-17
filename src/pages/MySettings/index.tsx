@@ -23,7 +23,7 @@ const ProfileStandard = () => {
                 <Nav className="flex-column" activeKey="personal-data">
                   <Nav.Link className="px-0 border-bottom border-separator-light cursor-pointer" eventKey="personal-data">
                     <CsLineIcons icon="user" className="me-2" size={17} />
-                    <span className="align-middle">Dados cadastrais</span>
+                    <span className="align-middle">Dados da clínica</span>
                   </Nav.Link>
                   <Nav.Link className="px-0 border-bottom border-separator-light cursor-pointer" eventKey="password">
                     <CsLineIcons icon="lock-off" className="me-2" size={17} />
@@ -31,7 +31,7 @@ const ProfileStandard = () => {
                   </Nav.Link>
                   <Nav.Link className="px-0 border-bottom border-separator-light cursor-pointer" eventKey="signatureimage">
                     <CsLineIcons icon="file-image" className="me-2" size={17} />
-                    <span className="align-middle">Imagem da assinatura</span>
+                    <span className="align-middle">Assinatura eletrônica</span>
                   </Nav.Link>
                   <Nav.Link className="px-0 border-bottom border-separator-light cursor-pointer" eventKey="professionals">
                     <CsLineIcons icon="file-image" className="me-2" size={17} />

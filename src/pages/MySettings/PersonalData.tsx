@@ -177,7 +177,7 @@ const PersonalData = () => {
               inputWithFilesContent={null}
               onChangeStatus={onChangeStatus}
               classNames={{ inputLabelWithFiles: defaultClassNames.inputLabel }}
-              inputContent="Insira uma foto de perfil"
+              inputContent="Insira a logo da clínica"
             />
           </div>
 
