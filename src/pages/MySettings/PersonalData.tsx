@@ -258,7 +258,7 @@ const PersonalData = () => {
           <div className="d-flex">
             <Col xl={6}>
               <div className="mb-3 top-label d-flex me-2">
-                <Form.Control type="text" name="clinic_number" value={values.clinic_number} onChange={handleChange} />
+                <Form.Control type="text" name="clinic_number" value={Number(values.clinic_number) ? values.clinic_number : ''} onChange={handleChange} />
                 <Form.Label>Nº</Form.Label>
                 {errors.clinic_number && touched.clinic_number && <div className="error">{errors.clinic_number}</div>}
               </div>

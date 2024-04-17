@@ -2,13 +2,9 @@ import { useEffect, useState } from 'react';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { Button, Col, Form, Modal, Row, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
-import { NumericFormat, PatternFormat } from 'react-number-format';
-import { isValidHour } from '../../../helpers/Utils';
-import { useCalendarStore } from '../hooks';
 import DatepickerTime from '../../../views/interface/forms/controls/datepicker/DatepickerTime';
 import CsLineIcons from '../../../cs-line-icons/CsLineIcons';
 import { useModalConfigCalendarStore } from '../hooks/modals/ModalConfigCalendarStore';
-import { useServiceLocationStore } from '../../../hooks/professional/ServiceLocationStore';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { notify } from '../../../components/toast/NotificationIcon';
 import useCalendarConfigStore from '../hooks/CalendarConfigStore';
@@ -154,11 +150,11 @@ const ModalConfigCalendar = () => {
   const { values, errors, touched, resetForm, handleChange, setFieldValue, handleSubmit } = useFormik({
     enableReinitialize: true,
     initialValues: {
-      calendar_config_time_start: (result.data?.calendar_config_time_start) || '',
-      calendar_config_time_end: (result.data?.calendar_config_time_end) || '',
-      calendar_config_interval_start: (result.data?.calendar_config_interval_start) || '',
-      calendar_config_interval_end: (result.data?.calendar_config_interval_end) || '',
-      calendar_config_service_days: (result.data?.calendar_config_service_days?.split(',').map((value) => +value)) || [],
+      calendar_config_time_start: (result.data?.calendar_config_time_start) ?? '07:00',
+      calendar_config_time_end: (result.data?.calendar_config_time_end) ?? '18:00',
+      calendar_config_interval_start: (result.data?.calendar_config_interval_start) ?? '',
+      calendar_config_interval_end: (result.data?.calendar_config_interval_end) ?? '',
+      calendar_config_service_days: (result.data?.calendar_config_service_days?.split(',').map((value) => +value)) || [0, 1, 2, 3, 4, 5, 6, 7],
       // duracao_consulta: selectedLocal?.duracao_consulta || '',
       // duracao_retorno: selectedLocal?.duracao_retorno || '',
       // valor_consulta: String(selectedLocal?.valor_consulta) || '',
@@ -170,10 +166,10 @@ const ModalConfigCalendar = () => {
 
   useEffect(() => {
     if (result.data && showModal) {
-      setFieldValue('calendar_config_time_start', result.data.calendar_config_time_start);
-      setFieldValue('calendar_config_time_end', result.data.calendar_config_time_end);
-      setFieldValue('calendar_config_interval_start', result.data.calendar_config_interval_start);
-      setFieldValue('calendar_config_interval_end', result.data.calendar_config_interval_end);
+      setFieldValue('calendar_config_time_start', result.data.calendar_config_time_start ?? '07:00');
+      setFieldValue('calendar_config_time_end', result.data.calendar_config_time_end ?? '18:00');
+      setFieldValue('calendar_config_interval_start', result.data.calendar_config_interval_start ?? '');
+      setFieldValue('calendar_config_interval_end', result.data.calendar_config_interval_end ?? '');
       result.data.calendar_config_service_days &&
         setFieldValue(
           'calendar_config_service_days',

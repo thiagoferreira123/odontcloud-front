@@ -408,15 +408,15 @@ const CalendarApp = () => {
               minute: '2-digit',
               meridiem: false,
             }}
-            slotMinTime={calendarConfigResult.data?.calendar_config_time_start || '08:00:00'}
-            slotMaxTime={calendarConfigResult.data?.calendar_config_time_end || '18:00:00'}
+            slotMinTime={calendarConfigResult.data?.calendar_config_time_start ?? '07:00:00'}
+            slotMaxTime={calendarConfigResult.data?.calendar_config_time_end ?? '18:00:00'}
             allDaySlot={false}
             businessHours={
               calendarConfigResult.data?.calendar_config_time_start
                 ? [
                     {
                       daysOfWeek: calendarConfigResult.data?.calendar_config_service_days?.split(',').map((day) => +day - 1) ?? [],
-                      startTime: calendarConfigResult.data?.calendar_config_time_start ?? '08:00:00',
+                      startTime: calendarConfigResult.data?.calendar_config_time_start ?? '07:00:00',
                       endTime: calendarConfigResult.data?.calendar_config_interval_start ?? '12:00:00',
                     },
                     {
@@ -426,8 +426,8 @@ const CalendarApp = () => {
                     },
                   ]
                 : {
-                    daysOfWeek: calendarConfigResult.data?.calendar_config_service_days?.split(',').map((day) => +day - 1) ?? [],
-                    startTime: calendarConfigResult.data?.calendar_config_time_start ?? '08:00:00',
+                    daysOfWeek: calendarConfigResult.data?.calendar_config_service_days?.split(',').map((day) => +day - 1) ?? [0, 1, 2, 3, 4, 5, 6],
+                    startTime: calendarConfigResult.data?.calendar_config_time_start ?? '07:00:00',
                     endTime: calendarConfigResult.data?.calendar_config_time_end ?? '18:00:00',
                   }
             }
