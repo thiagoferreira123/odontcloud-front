@@ -14,7 +14,7 @@ export const useModalWhatsAppStore = create<ModalWhatsAppStore>((set) => ({
 
   checkSession: async (userId) => {
     try {
-      const response = await fetch(`http://localhost:3002/check-session/${userId}`);
+      const response = await fetch(`http://calendar-alert.dietsystem.com.br/check-session/${userId}`);
 
       return response.status === 200 ? true : false;
     } catch (error) {
@@ -27,7 +27,7 @@ export const useModalWhatsAppStore = create<ModalWhatsAppStore>((set) => ({
   },
   deleteSession: async (userId) => {
     try {
-      await fetch(`http://localhost:3002/delete-session/${userId}`, {
+      await fetch(`http://calendar-alert.dietsystem.com.br/delete-session/${userId}`, {
         method: 'DELETE',
       });
     } catch (error) {

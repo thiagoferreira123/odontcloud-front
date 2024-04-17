@@ -14,7 +14,7 @@ const webSocketStatus = [
 const ModalWhatsApp = () => {
   const queryClient = useQueryClient();
   const user = useAuth((state) => state.user);
-  const { messages, isOpen, sendMessage, setShouldReconnect } = useWebSocket('ws://localhost:3003');
+  const { messages, isOpen, sendMessage, setShouldReconnect } = useWebSocket('wss://calendar-alert.dietsystem.com.br');
   const [base64Qr, setBase64Qr] = useState('' as string | null);
   const [status, setStatus] = useState('' as string | null);
 
