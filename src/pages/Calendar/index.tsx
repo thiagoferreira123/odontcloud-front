@@ -36,6 +36,8 @@ import DeleteScheduleConfirmationModal from './modals/DeleteScheduleConfirmation
 import StaticLoading from '../../components/loading/StaticLoading';
 import { useAuth } from '../Auth/Login/hook';
 import useCalendarConfigStore from './hooks/CalendarConfigStore';
+import ModalWhatsApp from './modals/ModalWhatsApp';
+import { useModalWhatsAppStore } from './hooks/modals/ModalWhatsAppStore';
 
 const CustomToggle = React.forwardRef<HTMLButtonElement | null, { onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void }>(
   ({ onClick }, ref) => (
@@ -65,14 +67,50 @@ const CalendarApp = () => {
   const calendarRef = useRef<FullCalendar>(null);
   const [dateTitle, setDateTitle] = useState('');
   const [selectedView, setSelectedView] = useState('dayGridMonth');
+  const [isDeletingSession, setIsDeletingSession] = useState(false);
 
   const { openModalWaitingList } = useModalWaitingListStore();
   const { openModalAddEdit } = useModalAddEditStore();
   const { openModalAppointmentList } = useModalAppointmentListStore();
   const { openModalConfigCalendar } = useModalConfigCalendarStore();
   const { openModalAppointmentDetails } = useModalAppointmentDetailsStore();
+  const { openModalWhatsApp, checkSession, deleteSession } = useModalWhatsAppStore();
   const { getSchedules, updateSchedule } = useScheduleStore();
   const { getCalendarConfigs } = useCalendarConfigStore();
+
+  const checkSession_ = async () => {
+    try {
+      if (!user?.clinic_id) throw new Error('Clinic id not found');
+
+      const result = await checkSession(user?.clinic_id);
+
+      return result;
+    } catch (error) {
+      console.error(error);
+
+      error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
+
+      throw error;
+    }
+  };
+
+  const handleDeleteSession = async () => {
+    try {
+      if (!user?.clinic_id) throw new Error('Clinic id not found');
+      setIsDeletingSession(true);
+
+      await deleteSession(user?.clinic_id);
+      setIsDeletingSession(false);
+      queryClient.invalidateQueries({ queryKey: ['whatsapp-session'] });
+    } catch (error) {
+      setIsDeletingSession(false);
+      console.error(error);
+
+      error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
+    }
+  };
+
+  const resultWhatsApp = useQuery({ queryKey: ['whatsapp-session'], queryFn: checkSession_, enabled: !!user?.clinic_id });
 
   const getSchedules_ = async () => {
     try {
@@ -352,24 +390,37 @@ const CalendarApp = () => {
           </OverlayTrigger>
 
           <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-add">Lista de agendamentos realizados</Tooltip>}>
-            <Button
-              variant="primary"
-              className="btn-icon btn-icon-start ms-1 w-100 w-md-auto"
-              onClick={openModalAppointmentList}
-            >
+            <Button variant="primary" className="btn-icon btn-icon-start ms-1 w-100 w-md-auto" onClick={openModalAppointmentList}>
               <Icon.List />
             </Button>
           </OverlayTrigger>
 
           <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-add">Configuração da agenda</Tooltip>}>
-            <Button
-              variant="primary"
-              className="btn-icon btn-icon-start ms-1 w-100 w-md-auto"
-              onClick={openModalConfigCalendar}
-            >
+            <Button variant="primary" className="btn-icon btn-icon-start ms-1 w-100 w-md-auto" onClick={openModalConfigCalendar}>
               <Icon.Gear />
             </Button>
           </OverlayTrigger>
+        </Col>
+        <Col md={4} className="d-flex justify-content-end align-items-center">
+          {resultWhatsApp.isLoading ? (
+            <StaticLoading />
+          ) : !resultWhatsApp.data ? (
+            <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-add">Conecte seu WhatsApp para enviar alertas aos pacientes</Tooltip>}>
+              <Button className="blink-effect" onClick={openModalWhatsApp}>
+                <Icon.Whatsapp /> <span>Lembrete por WhatsApp</span>
+              </Button>
+            </OverlayTrigger>
+          ) : (
+            <>
+              <div className="text-primary">
+                <Icon.Check2Circle size={28} /> WhatsApp conectado
+              </div>
+
+              <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-add">Desconectar Whatsapp</Tooltip>}>
+                <span>{isDeletingSession ? <StaticLoading /> : <Icon.Trash size={28} className="text-danger pointer" onClick={handleDeleteSession} />}</span>
+              </OverlayTrigger>
+            </>
+          )}
         </Col>
       </Row>
       {result.isLoading || result.isPending ? (
@@ -480,6 +531,8 @@ const CalendarApp = () => {
       <ModalAppointmentList />
       <ModalConfigCalendar />
       <ModalAppointmentDetails />
+
+      <ModalWhatsApp />
 
       <DeleteScheduleConfirmationModal />
     </>
