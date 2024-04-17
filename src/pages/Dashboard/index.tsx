@@ -1,5 +1,5 @@
 import { Row, Col, Card, Button } from 'react-bootstrap';
-import ListPatient from './patients/ListPatient.tsx';
+import ListPatient from './patients/index.tsx';
 import ListCalendar from './ListCalendar/index.tsx';
 import PatientListFilter from './patients/PatientListFilter.tsx';
 import PatientsAnalysis from './PatientsAnalysis/index.tsx';

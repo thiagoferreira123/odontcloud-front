@@ -10,6 +10,8 @@ import { Patient } from '../../../../../../types/Patient.ts';
 import { useQueryClient } from '@tanstack/react-query';
 import { useModalAddPatientStore } from '../../../hooks/ModalAddPatientStore.ts';
 import { parseBrDateToIso, parseDateToIso } from '../../../../../../helpers/DateHelper.ts';
+import ContactValues from './ContactValues.tsx';
+import AddressValues from './AddressValues.tsx';
 
 export interface FormikValues {
   patient_last_interaction: string;
@@ -162,28 +164,42 @@ const FormAddPatiente = (props: FormAddPatienteProps, ref: React.Ref<unknown> | 
 
   return (
     <Form onSubmit={handleSubmit} className="tooltip-end-top">
-      <Tab.Container defaultActiveKey="First">
-        <Nav variant="tabs" className="nav-tabs-title nav-tabs-line-title mb-3" activeKey="First">
+      <Tab.Container defaultActiveKey="RequiredData">
+        <Nav variant="tabs" className="nav-tabs-title nav-tabs-line-title mb-3" activeKey="RequiredData">
           <Nav.Item>
-            <Nav.Link eventKey="First">Dados obrigatórios</Nav.Link>
+            <Nav.Link eventKey="RequiredData">Obrigatórios</Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link eventKey="Second">Dados opcionais</Nav.Link>
+            <Nav.Link eventKey="OptionalData">Opcionais</Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link eventKey="Three">Foto do paciente</Nav.Link>
+            <Nav.Link eventKey="ContactData">Contato</Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link eventKey="AddressData">Endereço</Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link eventKey="PatientAvatar">Foto do paciente</Nav.Link>
           </Nav.Item>
         </Nav>
         <Tab.Content>
-          <Tab.Pane eventKey="First">
+          <Tab.Pane eventKey="RequiredData">
             <RequiredData formik={formik} />
           </Tab.Pane>
 
-          <Tab.Pane eventKey="Second">
+          <Tab.Pane eventKey="OptionalData">
             <OptionalValues formik={formik} />
           </Tab.Pane>
 
-          <Tab.Pane eventKey="Three">
+          <Tab.Pane eventKey="ContactData">
+            <ContactValues formik={formik} />
+          </Tab.Pane>
+
+          <Tab.Pane eventKey="AddressData">
+            <AddressValues formik={formik} />
+          </Tab.Pane>
+
+          <Tab.Pane eventKey="PatientAvatar">
             <Avatar formik={formik} />
           </Tab.Pane>
         </Tab.Content>
