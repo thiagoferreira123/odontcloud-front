@@ -38,6 +38,7 @@ import { useAuth } from '../Auth/Login/hook';
 import useCalendarConfigStore from './hooks/CalendarConfigStore';
 import ModalWhatsApp from './modals/ModalWhatsApp';
 import { useModalWhatsAppStore } from './hooks/modals/ModalWhatsAppStore';
+import ModalPremium from '../Dashboard/ModalPremium';
 
 const CustomToggle = React.forwardRef<HTMLButtonElement | null, { onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void }>(
   ({ onClick }, ref) => (
@@ -68,6 +69,7 @@ const CalendarApp = () => {
   const [dateTitle, setDateTitle] = useState('');
   const [selectedView, setSelectedView] = useState('dayGridMonth');
   const [isDeletingSession, setIsDeletingSession] = useState(false);
+  const [showModalPremium, setShowModalPremium] = useState(false);
 
   const { openModalWaitingList } = useModalWaitingListStore();
   const { openModalAddEdit } = useModalAddEditStore();
@@ -82,11 +84,12 @@ const CalendarApp = () => {
     try {
       if (!user?.clinic_id) throw new Error('Clinic id not found');
 
-      if (user && user.subscription?.subscription_status !== 'active') return 'disabled';
+      if (user && 'subscriptionStatus' in user && user.subscription?.subscription_status !== 'active') return 'disabled';
 
       const result = await checkSession(user?.clinic_id);
 
-      return result;
+      console.log('result', (result && result.instance_data?.phone_connected) || false);
+      return (result && result.instance_data?.phone_connected) || false;
     } catch (error) {
       console.error(error);
 
@@ -380,7 +383,7 @@ const CalendarApp = () => {
       {/* Calendar Title End */}
 
       <Row className="justify-content-between mb-3">
-        <Col md={8} className="text-md-end gap-2 d-flex flex-wrap align-items-center">
+        <Col md={8} className="text-md-end gap-2 d-flex flex-wrap align-items-center w-100">
           <Button variant="primary" className="btn-icon btn-icon-start ms-1 w-100 w-md-auto" onClick={openModalAddEdit}>
             <CsLineIcons icon="plus" /> <span>Cadastrar agendamento</span>
           </Button>
@@ -402,33 +405,50 @@ const CalendarApp = () => {
               <Icon.Gear />
             </Button>
           </OverlayTrigger>
-        </Col>
-        <Col md={4} className="d-flex justify-content-end align-items-center">
-          {resultWhatsApp.isLoading ? (
-            <StaticLoading />
-          ) : resultWhatsApp.data === false ? (
-            <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-add">Conecte seu WhatsApp para enviar alertas aos pacientes</Tooltip>}>
-              <Button className="blink-effect" onClick={openModalWhatsApp}>
-                <Icon.Whatsapp /> <span>Lembrete por WhatsApp</span>
-              </Button>
-            </OverlayTrigger>
-          ) : resultWhatsApp.data === 'disabled' ? (
-            <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-add">Conecte seu WhatsApp para enviar alertas aos pacientes (Premium)</Tooltip>}>
-              <Button className="blink-effect opacity-25 not-allowed">
-                <Icon.Whatsapp /> <span>Lembrete por WhatsApp</span>
-              </Button>
-            </OverlayTrigger>
-          ) : (
-            <>
-              <div className="text-primary">
-                <Icon.Check2Circle size={28} /> WhatsApp conectado
-              </div>
 
-              <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-add">Desconectar Whatsapp</Tooltip>}>
-                <span>{isDeletingSession ? <StaticLoading /> : <Icon.Trash size={28} className="text-danger pointer" onClick={handleDeleteSession} />}</span>
-              </OverlayTrigger>
-            </>
-          )}
+          {
+            <span className="flex-fill">
+              {resultWhatsApp.isLoading || result.data === undefined ? (
+                <StaticLoading />
+              ) : resultWhatsApp.data === false ? (
+                <OverlayTrigger
+                  placement="top"
+                  overlay={
+                    <Tooltip id="tooltip-add">
+                      Conecte seu WhatsApp para enviar lembretes aos pacientes, Os lembretes serão enviados automaticamente todos os dias, um dia antes das
+                      consultas. O envio dos lembretes começará às 7:00 da manhã, horário de Brasília.
+                    </Tooltip>
+                  }
+                >
+                  <Button className="blink-effect" onClick={openModalWhatsApp}>
+                    <Icon.Whatsapp /> <span>Lembrete por WhatsApp</span>
+                  </Button>
+                </OverlayTrigger>
+              ) : resultWhatsApp.data === 'disabled' ? (
+                <OverlayTrigger
+                  placement="top"
+                  overlay={<Tooltip id="tooltip-add">Conecte seu WhatsApp para enviar lembretes aos pacientes (Premium)</Tooltip>}
+                >
+                  <Button className="blink-effect" onClick={() => setShowModalPremium(true)}>
+                    <Icon.Whatsapp /> <span>Lembrete por WhatsApp</span>
+                  </Button>
+                </OverlayTrigger>
+              ) : (
+                resultWhatsApp.data && (
+                  <>
+                    <div className="text-primary ms-2 font-weight-bold">
+                      <Icon.Check2Circle size={20} /> WhatsApp conectado
+                      <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-add">Desconectar Whatsapp</Tooltip>}>
+                        <span>
+                          {isDeletingSession ? <StaticLoading /> : <Icon.Trash size={15} className="text-danger pointer ms-2" onClick={handleDeleteSession} />}
+                        </span>
+                      </OverlayTrigger>
+                    </div>
+                  </>
+                )
+              )}
+            </span>
+          }
         </Col>
       </Row>
       {result.isLoading || result.isPending ? (
@@ -543,6 +563,8 @@ const CalendarApp = () => {
       <ModalWhatsApp />
 
       <DeleteScheduleConfirmationModal />
+
+      <ModalPremium showModal={showModalPremium} setShowModal={setShowModalPremium} />
     </>
   );
 };

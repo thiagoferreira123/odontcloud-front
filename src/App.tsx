@@ -5,7 +5,14 @@ import Layout from './layout/Layout';
 import { useEffect } from 'react';
 import { useAuth } from './pages/Auth/Login/hook';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+    },
+  },
+});
 
 const App = () => {
   const { checkAuth } = useAuth();

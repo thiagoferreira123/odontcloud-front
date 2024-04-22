@@ -1,99 +1,156 @@
 import { useEffect, useState } from 'react';
-import { Alert, Modal } from 'react-bootstrap';
+import { Alert, Button, Modal } from 'react-bootstrap';
 import { useModalWhatsAppStore } from '../hooks/modals/ModalWhatsAppStore';
-import useWebSocket from '../../../services/useWebSocket';
 import StaticLoading from '../../../components/loading/StaticLoading';
 import * as Icon from 'react-bootstrap-icons';
 import { useAuth } from '../../Auth/Login/hook';
-import { useQueryClient } from '@tanstack/react-query';
-
-const webSocketStatus = [
-  'success', 'error', 'qrReadSuccess'
-]
+import { useQuery } from '@tanstack/react-query';
+import { AppException } from '../../../helpers/ErrorHelpers';
+import { notify } from '../../../components/toast/NotificationIcon';
 
 const ModalWhatsApp = () => {
-  const queryClient = useQueryClient();
   const user = useAuth((state) => state.user);
-  const { messages, isOpen, sendMessage, setShouldReconnect } = useWebSocket('wss://calendar-alert.dietsystem.com.br');
-  const [base64Qr, setBase64Qr] = useState('' as string | null);
-  const [status, setStatus] = useState('' as string | null);
+  const [termsAreAccepted, setTermsAreAccepted] = useState(false);
 
   const showModal = useModalWhatsAppStore((state) => state.showModal);
 
-  const { hideModal } = useModalWhatsAppStore();
+  const { hideModal, getQrCode, checkSession, createSession } = useModalWhatsAppStore();
 
-  useEffect(() => {
-    if (showModal) {
-      setShouldReconnect(true);
-      setBase64Qr('');
-      setStatus('');
+  const getQrCode_ = async () => {
+    try {
+      if (!user?.clinic_id) throw new Error('Clinic id not found');
+
+      if (user && 'subscriptionStatus' in user && user.subscription?.subscription_status !== 'active') return false;
+
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const result = await getQrCode(user?.clinic_id);
+
+      return result;
+    } catch (error) {
+      console.error(error);
+
+      error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
+
+      throw error;
     }
-  }, [showModal]);
+  };
 
-  useEffect(() => {
-    if (isOpen && user?.clinic_id) {
-      sendMessage(
-        JSON.stringify({
-          type: 'createSession',
-          userId: user?.clinic_id,
-        })
-      );
+  const checkSession_ = async () => {
+    try {
+      if (!user?.clinic_id) throw new Error('Clinic id not found');
+
+      if (user && 'subscriptionStatus' in user && user.subscription?.subscription_status !== 'active') return 'disabled';
+
+      const result = await checkSession(user?.clinic_id);
+
+      console.log('result', (result && result.instance_data?.phone_connected) || false);
+      return (result && result.instance_data?.phone_connected) || false;
+    } catch (error) {
+      console.error(error);
+
+      error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
+
+      throw error;
     }
-  }, [isOpen, user?.clinic_id]);
+  };
+
+  const createSession_ = async () => {
+    try {
+      if (!user?.clinic_id) throw new Error('Clinic id not found');
+
+      if (user && 'subscriptionStatus' in user && user.subscription?.subscription_status !== 'active') return false;
+
+      const result = await createSession(user?.clinic_id);
+
+      return result;
+    } catch (error) {
+      console.error(error);
+
+      error instanceof AppException && notify(error.message, 'Erro', 'close', 'danger');
+
+      throw error;
+    }
+  };
+
+  const resultQrCode = useQuery({ queryKey: ['whatsapp-qrcode'], queryFn: getQrCode_, enabled: !!user?.clinic_id && !!showModal && !!termsAreAccepted });
+  const resultWhatsApp = useQuery({ queryKey: ['whatsapp-session'], queryFn: checkSession_, enabled: !!user?.clinic_id });
+  const createSessionQuery = useQuery({
+    queryKey: ['whatsapp-create-session'],
+    queryFn: createSession_,
+    enabled: !!user?.clinic_id && !!showModal && !resultWhatsApp.data && !resultQrCode.data,
+  });
 
   useEffect(() => {
-    messages.forEach((message) => {
-      const content = JSON.parse(message);
+    if (!showModal) return;
+    if (!resultQrCode.data) return;
 
-      if ('base64Qr' in content) {
-        setBase64Qr(content.base64Qr);
-      } else if ('status' in content) {
-        content.status === 'success' &&queryClient.invalidateQueries({queryKey: ['whatsapp-session']});
-        webSocketStatus.includes(content.status) && setStatus(content.status);
-      }
-    });
-  }, [messages]);
+    const interval = setInterval(() => {
+      resultWhatsApp.refetch();
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [resultQrCode, resultWhatsApp, createSessionQuery]);
 
   if (!showModal) return null;
 
   return (
     <Modal className="modal-close-out" size="lg" show={showModal} onHide={hideModal} backdrop="static" keyboard={false}>
       <Modal.Header closeButton>
-        <Modal.Title>Aponte a câmera</Modal.Title>
+        <Modal.Title>Área para conectar o seu WhatsApp</Modal.Title>
       </Modal.Header>
-      <Modal.Body className='text-center'>
-        {!base64Qr && !status && (
+      <Modal.Body className="text-center">
+        {!termsAreAccepted ? (
+          <Alert variant="light" className="text-start">
+            <h5 className="text-center mb-3">
+              <strong>Para prosseguir, aceite os termo de Uso para Conexão com WhatsApp</strong>
+            </h5>
+            <p>Ao optar pela conexão do seu WhatsApp ao nosso serviço, você, usuário, concorda e reconhece os seguintes termos:</p>
+            <ul>
+              <li>
+                <strong>Independência:</strong> Este serviço é independente e não possui vínculos oficiais com o WhatsApp Inc. ou suas empresas afiliadas. Não
+                somos representantes nem parceiros do WhatsApp e não temos autorizações especiais para operar com o aplicativo.
+              </li>
+              <li>
+                <strong>Não responsabilidade:</strong> Não nos responsabilizamos por quaisquer inconvenientes, problemas ou danos que possam surgir a partir da
+                utilização do seu WhatsApp conectado ao nosso serviço. A responsabilidade pelo uso da plataforma WhatsApp continua sendo inteiramente sua.
+              </li>
+              <li>
+                <strong>Falhas técnicas:</strong> Estamos atualmente em fase de testes (beta) e, por isso, podem ocorrer falhas técnicas que impactem o
+                desempenho e a funcionalidade do serviço, incluindo a possibilidade de não envio de lembretes. Embora trabalhemos para minimizar tais falhas,
+                não podemos garantir a entrega constante e ininterrupta do serviço durante esta fase.
+              </li>
+            </ul>
+            <p>
+              Ao conectar seu WhatsApp ao nosso serviço, você declara que leu e concordou com todos os termos apresentados acima. Certifique-se de entender
+              completamente os riscos envolvidos e considere sua decisão cuidadosamente.
+            </p>
+            <div className="text-center">
+              <Button onClick={() => setTermsAreAccepted(true)}>Aceito os termos</Button>
+            </div>
+          </Alert>
+        ) : resultWhatsApp.data ? (
+          <div className="sh-30 d-flex flex-column align-items-center justify-content-center text-primary">
+            <Icon.Check2Circle size={28} /> WhatsApp conectado com sucesso
+          </div>
+        ) : resultQrCode.isLoading ? (
           <div className="sh-30 d-flex flex-column align-items-center justify-content-center">
             <h5>Gerando QRCode</h5>
             <p> Aguarde, essa operação pode levar alguns minutos..</p>
             <StaticLoading />
           </div>
-        )}
-        {(status === 'qrReadSuccess') && ( // Loading após a leitura do qrCode
-          <div className="sh-30 d-flex flex-column align-items-center justify-content-center">
-            <h5>Conectando...</h5>
-            <p> Aguarde, essa operação pode levar alguns minutos..</p>
-            <StaticLoading />
-          </div>
-        )}
-        {base64Qr && !status &&(
+        ) : resultQrCode.data ? (
           <>
             <Alert variant="light">
               Você deve efetuar a leitura do QRCode com o seu aplicativo do WhatsApp, da mesma forma que você se conecta no WhatsAppWeb.
             </Alert>
-            <img src={base64Qr} alt="QR Code" />
+            <img className="sh-50" src={resultQrCode.data} alt="QR Code" />
           </>
-        )}
-        {status === 'success' && (
-          <div className="sh-30 d-flex flex-column align-items-center justify-content-center text-primary">
-            <Icon.Check2Circle size={28} /> WhatsApp conectado com sucesso
-          </div>
-        )}
-        {status === 'error' && (
-          <div className="sh-30 d-flex flex-column align-items-center justify-content-center text-danger">
-            <Icon.ExclamationCircle size={28} /> Erro ao conectar WhatsApp
-          </div>
-        )}
+        ) : resultQrCode.isError ? (
+          <Alert variant="danger">Ocorreu um erro ao tentar gerar o QRCode. Tente novamente mais tarde.</Alert>
+        ) : null}
       </Modal.Body>
     </Modal>
   );
