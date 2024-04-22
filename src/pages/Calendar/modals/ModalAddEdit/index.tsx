@@ -171,6 +171,7 @@ const ModalAddEdit = () => {
         calendar_date,
         calendar_recurrence_date_end,
         calendar_status,
+        calendar_phone,
         ...rest
       } = values;
 
@@ -189,6 +190,7 @@ const ModalAddEdit = () => {
         calendar_recurrence_date_end: calendar_recurrence_date_end ? formatDateToApi(new Date(`${calendar_recurrence_date_end}, 00:00:00`)) : undefined,
         calendar_date: formatDateToApi(new Date(`${calendar_date}, 00:00:00`)),
         calendar_patient_id: patient?.patient_id ? patient?.patient_id : undefined,
+        calendar_phone: values.calendar_phone?.replace(/\s/g, ''),
         ...rest,
         calendar_start_time: values.calendar_start_time,
         calendar_end_time: values.calendar_end_time,
