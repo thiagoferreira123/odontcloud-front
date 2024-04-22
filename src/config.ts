@@ -28,6 +28,8 @@ export const DEFAULT_PATHS = {
   BLOCK: '/block-access',
   PROFESSIONAL_WEBSITE: '/p/:websiteUrl',
   SERVICE_LOCATION_SCHEDULE: '/local-atendimento/:base64LocationId',
+  CONFIRMED_SCHEDULE: '/agendamento-confirmado',
+  CANCELED_SCHEDULE: '/agendamento-cancelado',
 };
 
 export const DEFAULT_SETTINGS = {

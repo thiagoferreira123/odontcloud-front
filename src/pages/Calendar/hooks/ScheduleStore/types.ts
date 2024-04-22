@@ -10,10 +10,10 @@ export enum ScheduleType {
 }
 
 export enum ScheduleStatus {
-  CONFIRMADO = 'CONFIRMED',
-  PENDENTE = 'PENDING',
   AGENDADO = 'SCHEDULED',
+  CONFIRMADO = 'CONFIRMED',
   CANCELADO = 'CANCELLED',
+  PENDENTE = 'PENDING',
   NAO_COMPARECEU = 'NO_SHOW',
 }
 

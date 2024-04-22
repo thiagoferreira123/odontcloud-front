@@ -13,6 +13,8 @@ import { RouteItemProps } from './protocols/RouteIdentifier';
 import { DEFAULT_PATHS } from '../config';
 import ProfessionalWebsitePreview from '../pages/ProfessionalWebsitePreview';
 import ProfessionalWebSiteSchedule from '../pages/ProfessionalWebSiteSchedule';
+import ConfirmedSchedule from '../pages/Calendar/Status/ConfirmedSchedule';
+import CanceledSchedule from '../pages/Calendar/Status/CanceledSchedule';
 
 /*
 { path: "/path", exact: true, component: ViewHome },
@@ -34,6 +36,8 @@ const defaultRoutes: RouteItemProps[] = [
   { path: DEFAULT_PATHS.APP, component: App, protected: true },
   { path: DEFAULT_PATHS.PROFESSIONAL_WEBSITE, component: ProfessionalWebsitePreview },
   { path: DEFAULT_PATHS.SERVICE_LOCATION_SCHEDULE, component: ProfessionalWebSiteSchedule },
+  { path: DEFAULT_PATHS.CONFIRMED_SCHEDULE, component: ConfirmedSchedule },
+  { path: DEFAULT_PATHS.CANCELED_SCHEDULE, component: CanceledSchedule },
   { path: '/', exact: true, component: Home, redirect: true, to: DEFAULT_PATHS.APP },
   {
     path: '/',

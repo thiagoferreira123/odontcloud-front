@@ -1,5 +1,4 @@
 import axios from "axios";
-import { createElement } from "react";
 import { create } from "zustand";
 
 interface ModalWhatsAppStore {
@@ -33,8 +32,8 @@ interface WppBase64QrResponse {
   qrcode: string,
 }
 
-const wppBotUrl = 'https://whats-alert.dietsystem.com.br/';
-// const wppBotUrl = 'http://localhost:5173/';
+// const wppBotUrl = 'https://whats-alert.dietsystem.com.br/';
+const wppBotUrl = 'http://localhost:8080/';
 const token = 'dietsystemwppapi';
 
 export const useModalWhatsAppStore = create<ModalWhatsAppStore>((set) => ({
