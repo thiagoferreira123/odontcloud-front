@@ -4,14 +4,9 @@ export const apiUrl = 'https://api.odontcloud.com.br';
 // export const apiUrl = 'http://localhost:3001';
 const api = axios.create({
   baseURL: apiUrl,
-  timeout: 100_000,
-  withCredentials: true,
-  headers: {
-    'X-Custom-Header': 'foobar',
-    'Access-Control-Allow-Origin': '*', // Add the Access-Control-Allow-Origin header
-  },
+  timeout: 100000, // Sem underline para melhor legibilidade
+  withCredentials: true // Permite cookies e autenticação de sessões cross-origin
 });
-
 
 api.interceptors.response.use(
   response => response, // Se a resposta for bem-sucedida, apenas a retorne sem modificações
