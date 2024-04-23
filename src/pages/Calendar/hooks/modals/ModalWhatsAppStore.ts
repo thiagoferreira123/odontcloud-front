@@ -32,8 +32,8 @@ interface WppBase64QrResponse {
   qrcode: string,
 }
 
-// const wppBotUrl = 'https://whats-alert.dietsystem.com.br/';
-const wppBotUrl = 'http://localhost:8080/';
+const wppBotUrl = 'https://whats-alert.dietsystem.com.br/';
+// const wppBotUrl = 'http://localhost:8080/';
 const token = 'dietsystemwppapi';
 
 export const useModalWhatsAppStore = create<ModalWhatsAppStore>((set) => ({
