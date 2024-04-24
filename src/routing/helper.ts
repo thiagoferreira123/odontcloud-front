@@ -262,7 +262,7 @@ export const convertToSearchItems = ({ data = [], authGuardActive = IS_AUTH_GUAR
     const itemMapper = (item: RouteItemProps): RouteItemProps | undefined => {
       const tempItem = { ...item };
 
-      if (tempItem.hideInMenu || tempItem.isExternal || tempItem.hideInRoute) {
+      if (tempItem.hideInMenu || /*tempItem.isExternal ||*/ tempItem.hideInRoute) {
         return undefined;
       }
 

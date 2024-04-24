@@ -141,6 +141,9 @@ const PersonalData = () => {
 
       api.delete('/clinic/upload-logo', { data: { url: file.xhr.response } });
       setUser({ ...user, clinic_logo_link: '' });
+    } else if (status === 'error_upload') {
+      console.log('status', status, file);
+      notify('Erro ao enviar imagem', 'Error', 'close', 'danger');
     }
   };
 

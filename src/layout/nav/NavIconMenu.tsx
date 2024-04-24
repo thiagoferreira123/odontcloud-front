@@ -30,13 +30,11 @@ const NavIconMenu = () => {
   return (
     <>
       <ul className="list-unstyled list-inline text-center menu-icons">
-        {user?.role === Role.PROFESSIONAL ? (
-          <li className="list-inline-item">
-            <a href="#/" onClick={onSearchIconClick}>
-              <CsLineIcons icon="search" size={18} />
-            </a>
-          </li>
-        ) : null}
+        <li className="list-inline-item">
+          <a href="#/" onClick={onSearchIconClick}>
+            <CsLineIcons icon="search" size={18} />
+          </a>
+        </li>
         <li className="list-inline-item">
           <a href="#/" id="colorButton" onClick={onLightDarkModeClick}>
             <CsLineIcons icon="light-on" size={18} className="light" />

@@ -7,6 +7,9 @@ const SearchModal = ({ show, setShow }: {
   show: boolean;
   setShow: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+
+  if(!show) return null;
+
   return (
     <Modal id="searchPagesModal" className="modal-under-nav modal-search modal-close-out" size="lg" show={show} onHide={() => setShow(false)}>
       <Modal.Header className="border-0 p-0" />

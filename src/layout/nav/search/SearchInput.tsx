@@ -9,13 +9,14 @@ import routesAndMenuItems from '../../../routes';
 import { USE_MULTI_LANGUAGE } from '../../../config';
 import { useAuth } from '../../../pages/Auth/Login/hook';
 import { Role } from '../../../pages/Auth/Login/hook/types';
+import { RouteItemProps } from '../../../routing/protocols/RouteIdentifier';
 
 const RESULT_LIMIT = 10;
 
 const SearchInput = ({ show, setShow }: {show: boolean, setShow: (show: boolean) => void}) => {
   const history = useNavigate();
   const searchInput = useRef(null);
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<(RouteItemProps | undefined)[]>([]);
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(null);
   const resultCount = React.useRef(0);
@@ -79,7 +80,7 @@ const SearchInput = ({ show, setShow }: {show: boolean, setShow: (show: boolean)
     if (USE_MULTI_LANGUAGE) {
       const formatedRoutes = routes.map((d) => ({
         ...d,
-        label: f({ id: d.label || 'menu.home' }),
+        label: f({ id: d?.label || 'menu.home' }),
       }));
       setData(formatedRoutes);
     } else {
@@ -128,7 +129,7 @@ const SearchInput = ({ show, setShow }: {show: boolean, setShow: (show: boolean)
         {query.length > 0 && (
           <FuzzyHighlighter
             query={query}
-            data={data}
+            data={data.filter(route => !route.isExternal)}
             options={{
               shouldSort: true,
               includeMatches: true,

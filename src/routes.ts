@@ -119,6 +119,7 @@ const routesAndMenuItems: RoutesAndMenuItems = {
       label: 'menu.apps',
       icon: 'screen',
       roles: [],
+      isExternal: true,
       subs: [
         { path: '/calendar', label: 'menu.calendar', component: ferramentas.calendar },
         { path: '/controle-pacientes', label: 'menu.controle-pacientes', component: ferramentas.PatientControl },
