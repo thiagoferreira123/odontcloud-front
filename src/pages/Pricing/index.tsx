@@ -59,7 +59,7 @@ const Pricing = () => {
                   <div className="cta-4 text-primary mb-1">Mensal</div>
                   <div className="d-flex">
                     {' '}
-                    <small>R$</small> <div className="display-4">47</div>
+                    <small>R$</small> <div className="display-4">27</div>
                   </div>
 
                   <div className="text-small text-muted mb-1">todos os meses.</div>
@@ -184,11 +184,11 @@ const Pricing = () => {
                     <Icon.Gem className="text-white" size={18} />
                   </div>
                   <div className="cta-4 text-primary mb-1">Anual (10% OFF)</div>
-                  <div className="text-muted sh-3 line-through">R$ 574.8</div>
+                  <div className="text-muted sh-3 line-through">R$ 297</div>
                   <div className="text-muted sh-3" />
                   <div className="d-flex">
                     {' '}
-                    <small>R$</small> <div className="display-4">517</div>
+                    <small>R$</small> <div className="display-4">257</div>
                   </div>
                   <div className="text-small text-muted mb-1">a cada doze meses</div>
                 </div>
@@ -312,11 +312,11 @@ const Pricing = () => {
                     <Icon.Gem className="text-white" size={18} />
                   </div>
                   <div className="cta-4 text-primary mb-1">Semestral (5% OFF)</div>
-                  <div className="text-muted sh-3 line-through">R$ 287.40</div>
+                  <div className="text-muted sh-3 line-through">R$ 162</div>
                   <div className="text-muted sh-3" />
                   <div className="d-flex">
                     {' '}
-                    <small>R$</small> <div className="display-4">270</div>
+                    <small>R$</small> <div className="display-4">147</div>
                   </div>
                   <div className="text-small text-muted mb-1">a cada seis meses.</div>
                 </div>
