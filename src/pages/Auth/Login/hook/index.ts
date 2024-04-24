@@ -19,7 +19,7 @@ export const useAuth = create<CreateAuthStore>((set) => ({
   },
 
   register: async (payload) => {
-    const response = await api.post('/clinic', payload);
+    const response = await api.post('/clinic', { ...payload, clinic_phone: payload.clinic_phone.replace(/\s/g, '').replace(/[^\w\s]/gi, ''), });
 
     localStorage.setItem('user', JSON.stringify(response.data));
 
@@ -42,7 +42,7 @@ export const useAuth = create<CreateAuthStore>((set) => ({
       token: values.token,
       newPassword: values.password,
       confirmPassword: values.passwordConfirm
-  }
+    }
     // const payload = {
     //   email: values.email,
     //   token: values.token,
