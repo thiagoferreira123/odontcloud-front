@@ -44,7 +44,6 @@ const ModalWhatsApp = () => {
 
       const result = await checkSession(user?.clinic_id);
 
-      console.log('result', (result && result.instance_data?.phone_connected) || false);
       return (result && result.instance_data?.phone_connected) || false;
     } catch (error) {
       console.error(error);

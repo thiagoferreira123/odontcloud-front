@@ -120,7 +120,6 @@ export default function ProfessionalWebsite() {
         if (response === false) throw new AppException('Erro ao adicionar site profissional');
       }
 
-      console.log(values);
       setIsSaving(false);
     } catch (error) {
       console.error(error);
@@ -139,7 +138,6 @@ export default function ProfessionalWebsite() {
   const handleNavigateToPreview = async () => {
     try {
       const url = `/p/${values.websiteUrl}`;
-      console.log(url);
 
       await onSubmit(values);
 

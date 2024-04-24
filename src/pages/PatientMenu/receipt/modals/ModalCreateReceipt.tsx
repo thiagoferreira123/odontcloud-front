@@ -192,7 +192,6 @@ const ModalCreateReceipt = () => {
     toastId.current = notify('Gerando pdf do recibo, por favor aguarde...', 'Sucesso', 'check', 'success', true);
 
     try {
-      console.log('certificateId', certificateId);
       if (!certificateId) throw new Error('certificateId is not defined');
 
       const { data } = await api.get('/receipt-pdf/' + certificateId, {

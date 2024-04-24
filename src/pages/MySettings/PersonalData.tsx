@@ -136,14 +136,17 @@ const PersonalData = () => {
 
       setFieldValue('clinic_logo_link', file.xhr.response);
     } else if (status === 'removed') {
+      if (file?.xhr?.status === 400) return;
       if (!file?.xhr?.response) return console.error('Erro ao enviar imagem');
       if (!user) return console.error('Usuário não encontrado');
 
       api.delete('/clinic/upload-logo', { data: { url: file.xhr.response } });
       setUser({ ...user, clinic_logo_link: '' });
     } else if (status === 'error_upload') {
-      console.log('status', status, file);
-      notify('Erro ao enviar imagem', 'Error', 'close', 'danger');
+      file?.xhr?.status === 400 ?
+        notify('Formato de imagem inválido, insira uma imagem no formato PNG, JPG ou JPEG',
+        'Error', 'close', 'danger') :
+        notify('Erro ao enviar imagem', 'Error', 'close', 'danger');
     }
   };
 
@@ -192,7 +195,7 @@ const PersonalData = () => {
 
           <div className="mb-3 top-label">
             <Form.Control type="text" name="clinic_email" value={values.clinic_email} readOnly />
-            <Form.Label className='bg-transparent'>EMAIL</Form.Label>
+            <Form.Label className="bg-transparent">EMAIL</Form.Label>
             {errors.clinic_email && touched.clinic_email && <div className="error">{errors.clinic_email}</div>}
           </div>
 

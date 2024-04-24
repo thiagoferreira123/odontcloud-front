@@ -43,8 +43,6 @@ export const useModalWhatsAppStore = create<ModalWhatsAppStore>((set) => ({
     try {
       const response = await axios.get(`${wppBotUrl}instance/init?key=odont_clinic_${clinicId}&token=${token}`);
 
-      console.log(response);
-
       if (response.status !== 200) {
         throw new Error('Erro ao criar sessão no WhatsApp');
       }
