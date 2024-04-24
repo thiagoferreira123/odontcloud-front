@@ -178,9 +178,9 @@ const Register = () => {
                   <NavLink to="https://www.odontcloud.com.br/page-privacy.html" target="_blank" className="text-alternate">
                     Políticas de privacidade,
                   </NavLink>{' '}
-                  {/* <NavLink to="https://www.odontcloud.com.br/page-politic-payments.html" target="_blank" className="text-alternate">
+                  <NavLink to="https://www.odontcloud.com.br/page-politic-payments.html" target="_blank" className="text-alternate">
                     Políticas de pagamentos e
-                  </NavLink>{' '} */}
+                  </NavLink>{' '}
                   <NavLink to="https://www.odontcloud.com.br/page-politic-cookies.html" target="_blank" className="text-alternate">
                     Políticas de cookies
                   </NavLink>
