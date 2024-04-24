@@ -59,7 +59,7 @@ const Dashboard = () => {
 
   return (
     <>
-      {!user?.subscription ? (
+      {/* {!user?.subscription ? (
         <Row>
           <div className="d-flex ">
             <Link to={`${appRoot}/planos`} className="blink-effect mb-3">
@@ -67,7 +67,7 @@ const Dashboard = () => {
             </Link>
           </div>
         </Row>
-      ) : null}
+      ) : null} */}
       <Row>
         <Col lg="7">
           <PatientListFilter />
