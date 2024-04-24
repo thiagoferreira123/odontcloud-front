@@ -63,7 +63,7 @@ const Dashboard = () => {
         <Row>
           <div className="d-flex ">
             <Link to={`${appRoot}/planos`} className="blink-effect mb-3">
-              <Icon.Gem /> <span>Seja Premium!</span>
+              <Icon.Gem /> <span>Cadastre pacientes ilimitados!</span>
             </Link>
           </div>
         </Row>

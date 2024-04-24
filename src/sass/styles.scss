@@ -477,7 +477,7 @@ textarea.custom-scrollbar::-webkit-scrollbar {
   * Schedule Types
   */
 .bg-consulta {
-  background-color: #2f55d4 !important;
+  background-color: #009ee3 !important;
 }
 
 .bg-retorno {
@@ -501,7 +501,7 @@ textarea.custom-scrollbar::-webkit-scrollbar {
   */
 
 .bg-confirmed {
-  background-color: #2f55d4 !important;
+  background-color: #009ee3 !important;
 }
 
 .bg-canceled {
@@ -542,7 +542,7 @@ body {
 }
 
 .blink-effect {
-  background-image: linear-gradient(45deg, #3959c4, #2f55d4, #4e73ee, #2f55d4);
+  background-image: linear-gradient(45deg, #3959c4, #009ee3, #4e73ee, #009ee3);
   background-size: 300% 300%;
   animation: pulseAnimation 2s infinite ease-in-out, colorShift 4s ease infinite;
   color: white;

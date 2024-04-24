@@ -24,6 +24,4 @@ yarn-debug.log*
 yarn-error.log*
 .idea
 
-# Ignorar a pasta services 
-/services/useAxios/
-src/services/useAxios.ts
+

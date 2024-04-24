@@ -82,7 +82,7 @@ const Register = () => {
     <div className="sw-lg-70 min-h-100 bg-foreground d-flex justify-content-center align-items-center shadow-deep py-5 full-page-content-right-border">
       <div className="sw-lg-50 px-5">
         <Col xs="12" sm={25} className="text-center">
-          <img src="/img/logo/logo.webp" className="img-fluid sh-30" alt="Fluid image" />
+          <img src="/img/logo/logo.webp" className="img-fluid sh-20" alt="Fluid image" />
         </Col>
         <div className="mb-2 mt-3">
           <h4 className="cta-1 mb-3 text-alternate">Boas-vindas ao OdontCloud!</h4>
@@ -172,16 +172,16 @@ const Register = () => {
                 />
                 <label className="form-check-label">
                   Eu li e aceito os{' '}
-                  <NavLink to="https://OdontCloud.com.br/termos-de-uso" target="_blank" className="text-alternate">
+                  <NavLink to="https://www.odontcloud.com.br/page-terms-of-use.html" target="_blank" className="text-alternate">
                     Termos de uso,
                   </NavLink>{' '}
-                  <NavLink to="https://OdontCloud.com.br/politica-de-privacidade" target="_blank" className="text-alternate">
+                  <NavLink to="https://www.odontcloud.com.br/page-privacy.html" target="_blank" className="text-alternate">
                     Políticas de privacidade,
                   </NavLink>{' '}
-                  <NavLink to="https://OdontCloud.com.br/politica-de-pagamentos" target="_blank" className="text-alternate">
+                  <NavLink to="https://www.odontcloud.com.br/page-politic-payments.html" target="_blank" className="text-alternate">
                     Políticas de pagamentos e
                   </NavLink>{' '}
-                  <NavLink to="https://OdontCloud.com.br/politica-de-cookies" target="_blank" className="text-alternate">
+                  <NavLink to="https://www.odontcloud.com.br/page-politic-cookies.html" target="_blank" className="text-alternate">
                     Políticas de cookies
                   </NavLink>
                 </label>
