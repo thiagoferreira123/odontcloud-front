@@ -520,6 +520,14 @@ textarea.custom-scrollbar::-webkit-scrollbar {
   background-color: #558df3 !important;
 }
 
+body {
+  margin: 0 !important;
+}
+
+.tox .tox-edit-area::before {
+  border: 2px solid var(--light-darker) !important;
+}
+
 
 @keyframes pulseAnimation {
   0% {
